@@ -1,0 +1,54 @@
+﻿<ui:FluentWindow x:Class="GW2MidiConverter.App.Views.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
+                 mc:Ignorable="d"
+                 d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
+                 Title="{Binding ApplicationTitle}"
+                 Width="800"
+                 Height="450"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Mica"
+                 WindowCornerPreference="Default"
+                 WindowStartupLocation="CenterScreen"
+                 SizeChanged="OnSizeChanged">
+    <Grid>
+        <ui:NavigationView x:Name="NavigationView"
+                           MinHeight="300"
+                           Padding="42,0,42,0"
+                           FrameMargin="0"
+                           PaneDisplayMode="Left"
+                           IsBackButtonVisible="Visible"
+                           IsPaneToggleVisible="True"
+                           Transition="FadeInWithSlide"
+                           OpenPaneLength="150"
+                           MenuItemsSource="{Binding MenuItems, Mode=OneWay}"
+                           FooterMenuItemsSource="{Binding FooterMenuItems, Mode=OneWay}"
+                           BreadcrumbBar="{Binding ElementName=BreadcrumbBar}"
+                           TitleBar="{Binding ElementName=TitleBar}"
+                           PaneClosed="NavigationView_OnPaneClosed"
+                           PaneOpened="NavigationView_OnPaneOpened"
+                           SelectionChanged="NavigationView_OnSelectionChanged">
+            <ui:NavigationView.Header>
+                <StackPanel Margin="42,32,42,20">
+                    <ui:BreadcrumbBar x:Name="BreadcrumbBar" />
+                </StackPanel>
+            </ui:NavigationView.Header>
+            <ui:NavigationView.ContentOverlay>
+                <Grid>
+                    <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
+                </Grid>
+            </ui:NavigationView.ContentOverlay>
+        </ui:NavigationView>
+
+        <ContentPresenter x:Name="RootContentDialog" />
+
+        <ui:TitleBar x:Name="TitleBar"
+                     Title="{Binding ApplicationTitle}"
+                     CloseWindowByDoubleClickOnIcon="True"
+                     Icon="{ui:SymbolIcon AnimalCat16}" />
+    </Grid>
+</ui:FluentWindow>
