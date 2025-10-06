@@ -5,6 +5,9 @@ using NAudio.Midi;
 
 namespace GW2MidiConverter.Midi;
 
+/// <summary>
+/// Represents a MIDI document that provides information about a given MIDI file.
+/// </summary>
 public class MidiDocument
 {
     private readonly MidiFile _midiFile;
@@ -32,6 +35,12 @@ public class MidiDocument
     /// </remarks>
     public int[] InstrumentTrackIndexes => _instrumentTrackIndexes.ToArray();
 
+    /// <summary>
+    /// Returns the <see cref="MidiTrackInfo"/> for the given track index.
+    /// </summary>
+    /// <param name="trackIndex">The zero-based index of the MIDI track.</param>
+    /// <returns>A <see cref="MidiTrackInfo"/> object for the given track index.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the index does not relate to a track in the document.</exception>
     public MidiTrackInfo GetTrackInfo(int trackIndex)
     {
         if (trackIndex < 0 || trackIndex >= _midiFile.Tracks) throw new ArgumentOutOfRangeException(nameof(trackIndex));
