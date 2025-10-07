@@ -46,6 +46,13 @@ public class MidiDocumentTests
     }
     
     [Test]
+    public void GetInstrumentCount_EmptyMidiFile_ReturnsZero()
+    {
+        MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.EmptyMidiFile);
+        Assert.That(midiDocument.InstrumentCount, Is.EqualTo(0));
+    }
+    
+    [Test]
     public void InstrumentTrackIndices_TwoInstrumentMidiFile_ReturnsCorrectIndexes()
     {
         // The track at index 0 of this file is used purely for meta-events.

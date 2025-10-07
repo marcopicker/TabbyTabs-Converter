@@ -9,5 +9,10 @@
     <ItemGroup>
       <PackageReference Include="NAudio.Midi" Version="2.2.1" />
     </ItemGroup>
-
+    
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>GW2MidiConverter.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 </Project>
