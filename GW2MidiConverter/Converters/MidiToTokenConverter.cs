@@ -7,40 +7,38 @@ using NAudio.Midi;
 
 namespace GW2MidiConverter;
 
-public class MidiToTokenConverter
+public class MidiToTokenConverter(MidiConverterSettings? settings = null)
 {
-    private readonly MidiConverterSettings _settings;
+    private readonly MidiConverterSettings _settings = settings ?? new MidiConverterSettings();
 
-    public MidiToTokenConverter(MidiConverterSettings? settings = null)
-    {
-        _settings = settings ?? new MidiConverterSettings();
-    }
-
-    public Dictionary<int, List<IToken>> ConvertTracks(MidiDocument midiDocument, params int[] trackIndexes)
+    public Dictionary<int, List<Token>> ConvertTracks(MidiDocument midiDocument, params int[] trackIndexes)
     {
         ArgumentNullException.ThrowIfNull(midiDocument);
         if (trackIndexes.Length == 0) throw new ArgumentException("At least one track index must be specified.", nameof(trackIndexes));
         if (midiDocument.InstrumentCount == 0) throw new InvalidMidiDocumentException("The MIDI document must contain at least one instrument.");
 
-        Dictionary<int, List<IToken>> output = new Dictionary<int, List<IToken>>();
+        MidiTimingMap timingMap = MidiTimingMap.FromMidiFile(midiDocument.GetRawMidiFile());
+        
+        Dictionary<int, List<Token>> output = new Dictionary<int, List<Token>>();
         foreach (int index in trackIndexes)
         {
-            List<IToken> tokens = ConvertTrack(midiDocument, index);
-            if (tokens.Count > 0) output.Add(index, tokens);
+            if (!midiDocument.InstrumentTrackIndexes.Contains(index)) continue;
+            List<Token> tokens = ConvertTrack(midiDocument, index, timingMap);
+            output.Add(index, tokens);
         }
 
         return output;
     }
 
-    private List<IToken> ConvertTrack(MidiDocument midiDocument, int trackIndex)
+    private List<Token> ConvertTrack(MidiDocument midiDocument, int trackIndex, MidiTimingMap timingMap)
     {
         if (trackIndex < 0 || trackIndex >= midiDocument.GetRawMidiFile().Tracks) throw new IndexOutOfRangeException(nameof(trackIndex));
-        if (!midiDocument.InstrumentTrackIndexes.Contains(trackIndex)) return [];
-
         List<MidiEvent>? events = midiDocument.GetRawMidiFile().Events?.GetTrackEvents(trackIndex).ToList();
         if (events == null) throw new Exception("Could not get events for track.");
 
-        List<long> eventTimes = events.Select(e => e.AbsoluteTime).Distinct().ToList();
+        List<long> eventTimes = events.Select(e => e.AbsoluteTime).Distinct().Order().ToList();
+
+        
         return [];
     }
 }

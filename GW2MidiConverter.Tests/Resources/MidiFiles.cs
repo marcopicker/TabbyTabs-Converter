@@ -45,4 +45,31 @@ public static class MidiFiles
     /// </list>
     /// </summary>
     public static string TimingTestFile => Path.Combine(RESOURCE_FOLDER, "time_tests.mid");
+    
+    /// <summary>
+    /// The path to a MIDI file that contains various time signature and tempo changes alongside different note lengths, including dotted ones.
+    /// <list type="table">
+    ///     <listheader>
+    ///         <term>Bar</term>
+    ///         <description>Description</description>
+    ///     </listheader>
+    ///     <item>
+    ///         <term>1</term>
+    ///         <description>4/4, four quarter notes: 'C', 'D', 'E', 'G'.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>2</term>
+    ///         <description>3/4, dotted quarter note 'C', eighth note 'D' at the end of the bar.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>3</term>
+    ///         <description>3/4, half note 'C' at the start of bar.</description>
+    ///     </item>
+    ///     <item>
+    ///         <term>4</term>
+    ///         <description>4/4, one whole note 'C'.</description>
+    ///     </item>
+    /// </list>
+    /// </summary>
+    public static string LengthTestFile => Path.Combine(RESOURCE_FOLDER, "note_lengths.mid");
 }

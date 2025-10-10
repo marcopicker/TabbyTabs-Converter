@@ -35,14 +35,14 @@ public class MidiTimingMapTests
         MidiFile midiFile = new MidiFile(MidiFiles.TimingTestFile);
         MidiTimingMap map = MidiTimingMap.FromMidiFile(midiFile);
 
-        int beatDelta = midiFile.DeltaTicksPerQuarterNote * 4;
+        int resolution = midiFile.DeltaTicksPerQuarterNote;
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(map.GetTimeSignatureAtTick(0 * beatDelta), Is.EqualTo(new TimeSignature(4, 4)));
-            Assert.That(map.GetTimeSignatureAtTick(1 * beatDelta), Is.EqualTo(new TimeSignature(3, 4)));
-            Assert.That(map.GetTimeSignatureAtTick(2 * beatDelta), Is.EqualTo(new TimeSignature(4, 4)));
-            Assert.That(map.GetTimeSignatureAtTick(3 * beatDelta), Is.EqualTo(new TimeSignature(4, 4)));
+            Assert.That(map.GetTimeSignatureAtTick(0 * resolution), Is.EqualTo(new TimeSignature(4, 4)));
+            Assert.That(map.GetTimeSignatureAtTick(4 * resolution), Is.EqualTo(new TimeSignature(3, 4)));
+            Assert.That(map.GetTimeSignatureAtTick(7 * resolution), Is.EqualTo(new TimeSignature(4, 4)));
+            Assert.That(map.GetTimeSignatureAtTick(11 * resolution), Is.EqualTo(new TimeSignature(4, 4)));
         }
     }
 
@@ -55,7 +55,7 @@ public class MidiTimingMapTests
     }
 
     #endregion
-    
+
     #region Tempo
 
     [Test]
@@ -85,6 +85,8 @@ public class MidiTimingMapTests
 
     #endregion
 
+    #region GetBarAtTick
+
     [Test]
     public void GetBarAtTick_InvalidTick_Throws()
     {
@@ -92,7 +94,7 @@ public class MidiTimingMapTests
         MidiTimingMap map = MidiTimingMap.FromMidiFile(midiFile);
         Assert.Throws<ArgumentOutOfRangeException>(() => map.GetTimeAtTick(-1));
     }
-    
+
     [Test]
     public void GetBarAtTick_ValidTests()
     {
@@ -112,8 +114,44 @@ public class MidiTimingMapTests
             Assert.That(map.GetTimeAtTick(4 * quarterNote), Is.EqualTo(new SongTime(2, 1)));
             Assert.That(map.GetTimeAtTick(5 * quarterNote), Is.EqualTo(new SongTime(2, 2)));
             Assert.That(map.GetTimeAtTick(6 * quarterNote), Is.EqualTo(new SongTime(2, 3)));
-            
+
             Assert.That(map.GetTimeAtTick(7 * quarterNote), Is.EqualTo(new SongTime(3, 1)));
+        }
+    }
+
+    #endregion
+
+    [Test]
+    public void Measures_MidiIsEmpty_MeasuresIsEmpty()
+    {
+        MidiFile midiFile = new MidiFile(MidiFiles.EmptyMidiFile);
+        MidiTimingMap map = MidiTimingMap.FromMidiFile(midiFile);
+        Assert.That(map.Measures, Is.Empty);
+    }
+
+    [Test]
+    public void Measures_MidiIsNotEmpty_HasCorrectAmountOfElements()
+    {
+        MidiFile midiFile = new MidiFile(MidiFiles.LengthTestFile);
+        MidiTimingMap map = MidiTimingMap.FromMidiFile(midiFile);
+        Assert.That(map.Measures, Has.Length.EqualTo(4));
+    }
+
+    [Test]
+    public void Measures_CorrectMeasures()
+    {
+        MidiFile midiFile = new MidiFile(MidiFiles.TimingTestFile);
+        MidiTimingMap map = MidiTimingMap.FromMidiFile(midiFile);
+
+        long resolution = midiFile.DeltaTicksPerQuarterNote;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(map.Measures, Has.Length.EqualTo(4));
+            Assert.That(map.Measures[0], Is.EqualTo(new MidiMeasureSpan(resolution * 00, resolution * 04, new TimeSignature(4, 4))));
+            Assert.That(map.Measures[1], Is.EqualTo(new MidiMeasureSpan(resolution * 04, resolution * 07, new TimeSignature(3, 4))));
+            Assert.That(map.Measures[2], Is.EqualTo(new MidiMeasureSpan(resolution * 07, resolution * 11, new TimeSignature(4, 4))));
+            Assert.That(map.Measures[3], Is.EqualTo(new MidiMeasureSpan(resolution * 11, resolution * 15, new TimeSignature(4, 4))));
         }
     }
 }
