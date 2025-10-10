@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO.MemoryMappedFiles;
 using System.Linq;
 using NAudio.Midi;
 
@@ -87,45 +86,23 @@ internal class MidiTimingMap
 
     private void CalculateMeasures()
     {
-        List<MidiMeasureSpan> measures = [];
+        MeasureSpanListBuilder builder = new MeasureSpanListBuilder(_resolution, _timeSignatureEvents.First().AbsoluteTime);
 
-        TimeSignatureEvent lastTimeSignatureEvent = _timeSignatureEvents.First();
-        TimeSignature lastTimeSignature = TimeSignature.FromTimeSignatureEvent(lastTimeSignatureEvent);
-        foreach (TimeSignatureEvent timeSignatureEvent in _timeSignatureEvents)
+        TimeSignatureEvent previousTimeSignatureEvent = _timeSignatureEvents.First();
+        TimeSignature previousTimeSignature = TimeSignature.FromTimeSignatureEvent(previousTimeSignatureEvent);
+        foreach (TimeSignatureEvent timeSignatureEvent in _timeSignatureEvents.Skip(1))
         {
-            long timeSinceLastEvent = timeSignatureEvent.AbsoluteTime - lastTimeSignatureEvent.AbsoluteTime;
-            long currentTicksPerMeasure = GetTicksPerMeasureForTimeSignature(lastTimeSignature);
-            int elapsedMeasures = (int)(timeSinceLastEvent / currentTicksPerMeasure);
+            long timeSinceLastEvent = timeSignatureEvent.AbsoluteTime - previousTimeSignatureEvent.AbsoluteTime;
+            builder.AppendMeasuresFromTicks(previousTimeSignature, timeSinceLastEvent);
 
-            for (int i = 0; i < elapsedMeasures; i++)
-            {
-                long measureStart = lastTimeSignatureEvent.AbsoluteTime + (i * currentTicksPerMeasure);
-                long measureEnd = measureStart + currentTicksPerMeasure;
-                measures.Add(new MidiMeasureSpan(measureStart, measureEnd, lastTimeSignature));
-            }
-
-            lastTimeSignatureEvent = timeSignatureEvent;
-            lastTimeSignature = TimeSignature.FromTimeSignatureEvent(lastTimeSignatureEvent);
+            previousTimeSignatureEvent = timeSignatureEvent;
+            previousTimeSignature = TimeSignature.FromTimeSignatureEvent(timeSignatureEvent);
         }
 
-        // Calculate the remaining measures after the final time signature event.
-        long remainingTime = GetLastEventTime() - lastTimeSignatureEvent.AbsoluteTime;
-        long ticksPerMeasure = GetTicksPerMeasureForTimeSignature(lastTimeSignature);
-        int remainingMeasures = (int)(remainingTime / ticksPerMeasure);
+        long remainingTime = GetLastEventTime() - previousTimeSignatureEvent.AbsoluteTime;
+        builder.AppendMeasuresFromTicks(previousTimeSignature, remainingTime);
 
-        for (int i = 0; i < remainingMeasures; i++)
-        {
-            long measureStart = lastTimeSignatureEvent.AbsoluteTime + (i * ticksPerMeasure);
-            long measureEnd = measureStart + ticksPerMeasure;
-            measures.Add(new MidiMeasureSpan(measureStart, measureEnd, lastTimeSignature));
-        }
-
-        Measures = measures.ToArray();
-    }
-
-    private long GetTicksPerMeasureForTimeSignature(TimeSignature timeSignature)
-    {
-        return (timeSignature.Numerator * _resolution) / (4 / timeSignature.Denominator);
+        Measures = builder.Build();
     }
 
     private List<MidiEvent> GetTimingChangeEvents()

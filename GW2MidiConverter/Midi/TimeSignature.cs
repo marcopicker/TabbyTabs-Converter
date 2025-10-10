@@ -21,4 +21,9 @@ public class TimeSignature(int numerator, int denominator)
                Numerator == other.Numerator &&
                Denominator == other.Denominator;
     }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Numerator, Denominator);
+    }
 }
