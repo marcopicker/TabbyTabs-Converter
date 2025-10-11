@@ -1,4 +1,4 @@
-namespace GW2MidiConverter.Tokens;
+namespace GW2MidiConverter.Converters.Tokens;
 
 public abstract class Token(long startTime, long endTime)
 {

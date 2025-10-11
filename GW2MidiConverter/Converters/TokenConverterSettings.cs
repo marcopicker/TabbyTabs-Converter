@@ -1,4 +1,4 @@
-namespace GW2MidiConverter;
+namespace GW2MidiConverter.Converters;
 
 public class TokenConverterSettings
 {

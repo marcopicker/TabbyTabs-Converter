@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GW2MidiConverter.Converters.Tokens;
 using GW2MidiConverter.Midi;
-using GW2MidiConverter.Tokens;
 using NAudio.Midi;
 
-namespace GW2MidiConverter;
+namespace GW2MidiConverter.Converters;
 
 public class MidiToTokenConverter
 {
@@ -21,9 +21,9 @@ public class MidiToTokenConverter
         _settings = settings ?? new TokenConverterSettings();
     }
 
-    public Dictionary<int, List<Token>> ConvertTracks(params int[] trackIndexes)
+    public Dictionary<int, List<Token>> ConvertTracks(List<int> trackIndexes)
     {
-        if(trackIndexes.Length == 0) throw new ArgumentException("At least one track index must be specified.", nameof(trackIndexes));
+        if(trackIndexes.Count == 0) throw new ArgumentException("At least one track index must be specified.", nameof(trackIndexes));
         List<int> tracks = trackIndexes.Where(i => _midiDocument.InstrumentTrackIndexes.Contains(i)).ToList();
         return tracks.ToDictionary(track => track, ConvertTrack);
     }
@@ -40,10 +40,13 @@ public class MidiToTokenConverter
         List<Token> tokens = [];
         foreach (MidiMeasureSpan measure in _timingMap.Measures)
         {
+            bool isFirstMeasure = _timingMap.Measures.First() == measure;
+            MeasureTokenType measureType = isFirstMeasure ? MeasureTokenType.Beginning : MeasureTokenType.Middle;
+            tokens.Add(new MeasureToken(measure.StartTick, measure.StartTick, measure.IsTimeSignatureChange ? measure.TimeSignature : null, measureType));
             tokens.AddRange(ConvertMeasure(measure, relevantEvents));
         }
 
-        tokens.Add(CreateClosingMeasureToken());
+        tokens.Add(new MeasureToken(_timingMap.Measures.Last().EndTick, _timingMap.Measures.Last().EndTick, null, MeasureTokenType.End));
         tokens = AddRests(tokens);
         return tokens;
     }
@@ -53,19 +56,13 @@ public class MidiToTokenConverter
         List<long> eventTimes = events.Where(e => e.AbsoluteTime >= midiMeasureSpan.StartTick && e.AbsoluteTime < midiMeasureSpan.EndTick)
                                       .Select(e => e.AbsoluteTime)
                                       .Distinct().Order().ToList();
-        List<Token> tokens =
-        [
-            // Always start with a measure token.
-            new MeasureToken(midiMeasureSpan.StartTick, midiMeasureSpan.StartTick, midiMeasureSpan.TimeSignature)
-        ];
-        
+        List<Token> tokens = [];
         foreach (long time in eventTimes)
         {
             Token? token = CreateTokenForTick(time, events.Where(e => e.AbsoluteTime == time).ToList());
             if (token == null) continue;
             tokens.Add(token);
         }
-
         return tokens;
     }
 
@@ -86,11 +83,6 @@ public class MidiToTokenConverter
         int[] pitches = noteOnEvents.Select(e => e.NoteNumber).Distinct().Order().ToArray();
         NoteToken token = new NoteToken(noteOnEvent.AbsoluteTime, noteOnEvent.AbsoluteTime + noteOnEvent.NoteLength, pitches, NoteLength.FromQuarterNotes(1));
         return token;
-    }
-
-    private MeasureToken CreateClosingMeasureToken()
-    {
-        return new MeasureToken(_timingMap.Measures.Last().EndTick, _timingMap.Measures.Last().EndTick, null);
     }
 
     private List<Token> AddRests(List<Token> tokens)

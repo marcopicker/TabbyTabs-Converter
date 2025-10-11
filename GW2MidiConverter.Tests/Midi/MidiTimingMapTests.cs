@@ -148,10 +148,10 @@ public class MidiTimingMapTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(map.Measures, Has.Length.EqualTo(4));
-            Assert.That(map.Measures[0], Is.EqualTo(new MidiMeasureSpan(resolution * 00, resolution * 04, new TimeSignature(4, 4))));
-            Assert.That(map.Measures[1], Is.EqualTo(new MidiMeasureSpan(resolution * 04, resolution * 07, new TimeSignature(3, 4))));
-            Assert.That(map.Measures[2], Is.EqualTo(new MidiMeasureSpan(resolution * 07, resolution * 11, new TimeSignature(4, 4))));
-            Assert.That(map.Measures[3], Is.EqualTo(new MidiMeasureSpan(resolution * 11, resolution * 15, new TimeSignature(4, 4))));
+            Assert.That(map.Measures[0], Is.EqualTo(new MidiMeasureSpan(resolution * 00, resolution * 04, new TimeSignature(4, 4), true)));
+            Assert.That(map.Measures[1], Is.EqualTo(new MidiMeasureSpan(resolution * 04, resolution * 07, new TimeSignature(3, 4), true)));
+            Assert.That(map.Measures[2], Is.EqualTo(new MidiMeasureSpan(resolution * 07, resolution * 11, new TimeSignature(4, 4), true)));
+            Assert.That(map.Measures[3], Is.EqualTo(new MidiMeasureSpan(resolution * 11, resolution * 15, new TimeSignature(4, 4), false)));
         }
     }
 }

@@ -1,6 +1,6 @@
 using GW2MidiConverter.Midi;
 
-namespace GW2MidiConverter.Tokens;
+namespace GW2MidiConverter.Converters.Tokens;
 
 public class NoteToken(long startTime, long endTime, int[] midiNotes, NoteLength length) : Token(startTime, endTime)
 {
