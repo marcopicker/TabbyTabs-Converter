@@ -4,6 +4,7 @@ using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tests.Resources;
 using GW2MidiConverter.Tokens;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace GW2MidiConverter.Tests.Converters;
 
@@ -13,42 +14,42 @@ public class MidiToTokenConverterTests
     [Test]
     public void ConvertTracks_DocumentIsNull_Throws()
     {
-        MidiToTokenConverter converter = new MidiToTokenConverter();
-        Assert.Throws<ArgumentNullException>(() => converter.ConvertTracks(null!, 1, 2, 3));
+        Assert.Throws<ArgumentNullException>(() => _ = new MidiToTokenConverter(null!));
     }
     
     [Test]
     public void ConvertTracks_NoIndexesSpecified_Throws()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
-        MidiToTokenConverter converter = new MidiToTokenConverter();
-        Assert.Throws<ArgumentException>(() => converter.ConvertTracks(midiDocument));
+        MidiToTokenConverter converter = new MidiToTokenConverter(midiDocument);
+        Assert.Throws<ArgumentException>(() => converter.ConvertTracks());
     }
     
     [Test]
-    public void ConvertTracks_DocumentHasNoInstruments_Throws()
+    public void ConvertTracks_DocumentHasNoInstruments_ReturnsEmpty()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.EmptyMidiFile);
-        MidiToTokenConverter converter = new MidiToTokenConverter();
-        Assert.Throws<InvalidMidiDocumentException>(() => converter.ConvertTracks(midiDocument, 1));
+        MidiToTokenConverter converter = new MidiToTokenConverter(midiDocument);
+        
+        Dictionary<int, List<Token>> output = converter.ConvertTracks(1);
+        Assert.That(output, Is.Empty);
     }
     
     [Test]
-    public void ConvertTracks_TwoTracks_IndexesOutOfRange_Throws()
+    public void ConvertTracks_TwoTracks_IndexesOutOfRange_Ignores()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
-        MidiToTokenConverter converter = new MidiToTokenConverter();
-        
-        Assert.Throws<IndexOutOfRangeException>(() => converter.ConvertTracks(midiDocument, -1));
+        MidiToTokenConverter converter = new MidiToTokenConverter(midiDocument);
+        Assert.DoesNotThrow(() => converter.ConvertTracks(-1));
     }
     
     [Test]
     public void ConvertTracks_IndexIsNotMusicTrack_SkipsIndex()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
-        MidiToTokenConverter converter = new MidiToTokenConverter();
+        MidiToTokenConverter converter = new MidiToTokenConverter(midiDocument);
         
-        Dictionary<int, List<Token>> result = converter.ConvertTracks(midiDocument, 0, 1, 2);
+        Dictionary<int, List<Token>> result = converter.ConvertTracks(0, 1, 2);
         
         Assert.That(result, Has.Count.EqualTo(2));
         Assert.That(result.Keys, Has.No.Member(0));
@@ -59,9 +60,9 @@ public class MidiToTokenConverterTests
     public void ConvertTracks_TwoTracks_ReturnsTwoTracks()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
-        MidiToTokenConverter converter = new MidiToTokenConverter();
+        MidiToTokenConverter converter = new MidiToTokenConverter(midiDocument);
         
-        Dictionary<int, List<Token>> result = converter.ConvertTracks(midiDocument, 1, 2);
+        Dictionary<int, List<Token>> result = converter.ConvertTracks(1, 2);
         
         Assert.That(result, Has.Count.EqualTo(2));
     }
@@ -70,9 +71,9 @@ public class MidiToTokenConverterTests
     public void ConvertTrack_TokenTypeTest()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.LengthTestFile);
-        MidiToTokenConverter converter = new MidiToTokenConverter();
+        MidiToTokenConverter converter = new MidiToTokenConverter(midiDocument);
         
-        Dictionary<int, List<Token>> result = converter.ConvertTracks(midiDocument, 1);
+        Dictionary<int, List<Token>> result = converter.ConvertTracks(1);
         List<Token> tokens = result[1];
         Assert.That(tokens, Is.Not.Null);
         
@@ -101,6 +102,23 @@ public class MidiToTokenConverterTests
             Assert.That(tokens[13], Is.TypeOf<NoteToken>());
             
             Assert.That(tokens[14], Is.TypeOf<MeasureToken>());
+        }
+    }
+    
+    [Test]
+    public void ConvertTrack_NoGapsBetweenTokens()
+    {
+        MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.LengthTestFile);
+        MidiToTokenConverter converter = new MidiToTokenConverter(midiDocument);
+        
+        Dictionary<int, List<Token>> result = converter.ConvertTracks(1);
+        List<Token> tokens = result[1];
+        
+        for (int i = 0; i < tokens.Count - 1; i++)
+        {
+            Token token = tokens[i];
+            Token nextToken = tokens[i + 1];
+            Assert.That(token.EndTime, Is.EqualTo(nextToken.StartTime));
         }
     }
 }
