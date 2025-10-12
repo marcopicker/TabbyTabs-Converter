@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GW2MidiConverter.Converters;
 using GW2MidiConverter.Converters.Tokens;
+using GW2MidiConverter.Converters.Tokens.Midi;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
@@ -17,8 +18,8 @@ public class TokenToTabConverterTests
         MidiToTokenConverter tokenConverter = new MidiToTokenConverter(midiDocument);
         TokenToTabConverter tabConverter = new TokenToTabConverter();
         
-        Dictionary<int, List<Token>> tracks = tokenConverter.ConvertTracks([1]);
-        List<Token> track = tracks[1];
+        Dictionary<int, List<MidiToken>> tracks = tokenConverter.ConvertTracks([1]);
+        List<MidiToken> track = tracks[1];
         string tab = tabConverter.Convert(track);
     }
 }

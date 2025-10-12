@@ -1,8 +1,8 @@
 using GW2MidiConverter.Midi;
 
-namespace GW2MidiConverter.Converters.Tokens;
+namespace GW2MidiConverter.Converters.Tokens.Midi;
 
-public class MeasureToken(long startTime, long endTime, TimeSignature? newTimeSignature, MeasureTokenType type) : Token(startTime, endTime)
+public class MeasureMidiToken(long startTime, long endTime, TimeSignature? newTimeSignature, MeasureTokenType type) : MidiToken(startTime, endTime)
 {
     public TimeSignature? NewTimeSignature { get; } = newTimeSignature;
     

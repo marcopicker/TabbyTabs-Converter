@@ -1,4 +1,4 @@
-namespace GW2MidiConverter.Converters.Tokens;
+namespace GW2MidiConverter.Converters.Tokens.Midi;
 
 public enum MeasureTokenType
 {

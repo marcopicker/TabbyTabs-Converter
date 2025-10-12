@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Converters.Tokens;
+using GW2MidiConverter.Converters.Tokens.Midi;
 using GW2MidiConverter.Midi;
 using NAudio.Midi;
 
@@ -21,14 +22,14 @@ public class MidiToTokenConverter
         _settings = settings ?? new TokenConverterSettings();
     }
 
-    public Dictionary<int, List<Token>> ConvertTracks(List<int> trackIndexes)
+    public Dictionary<int, List<MidiToken>> ConvertTracks(List<int> trackIndexes)
     {
         if(trackIndexes.Count == 0) throw new ArgumentException("At least one track index must be specified.", nameof(trackIndexes));
         List<int> tracks = trackIndexes.Where(i => _midiDocument.InstrumentTrackIndexes.Contains(i)).ToList();
         return tracks.ToDictionary(track => track, ConvertTrack);
     }
 
-    private List<Token> ConvertTrack(int trackIndex)
+    private List<MidiToken> ConvertTrack(int trackIndex)
     {
         if (trackIndex < 0 || trackIndex >= _midiDocument.GetRawMidiFile().Tracks) throw new IndexOutOfRangeException(nameof(trackIndex));
         List<MidiEvent>? events = _midiDocument.GetRawMidiFile().Events?.GetTrackEvents(trackIndex).ToList();
@@ -37,36 +38,36 @@ public class MidiToTokenConverter
         // We really only care about NoteOn events.
         List<MidiEvent> relevantEvents = events.Where(e => e is NoteOnEvent).ToList();
         
-        List<Token> tokens = [];
+        List<MidiToken> tokens = [];
         foreach (MidiMeasureSpan measure in _timingMap.Measures)
         {
             bool isFirstMeasure = _timingMap.Measures.First() == measure;
             MeasureTokenType measureType = isFirstMeasure ? MeasureTokenType.Beginning : MeasureTokenType.Middle;
-            tokens.Add(new MeasureToken(measure.StartTick, measure.StartTick, measure.IsTimeSignatureChange ? measure.TimeSignature : null, measureType));
+            tokens.Add(new MeasureMidiToken(measure.StartTick, measure.StartTick, measure.IsTimeSignatureChange ? measure.TimeSignature : null, measureType));
             tokens.AddRange(ConvertMeasure(measure, relevantEvents));
         }
 
-        tokens.Add(new MeasureToken(_timingMap.Measures.Last().EndTick, _timingMap.Measures.Last().EndTick, null, MeasureTokenType.End));
+        tokens.Add(new MeasureMidiToken(_timingMap.Measures.Last().EndTick, _timingMap.Measures.Last().EndTick, null, MeasureTokenType.End));
         tokens = AddRests(tokens);
         return tokens;
     }
 
-    private List<Token> ConvertMeasure(MidiMeasureSpan midiMeasureSpan, List<MidiEvent> events)
+    private List<MidiToken> ConvertMeasure(MidiMeasureSpan midiMeasureSpan, List<MidiEvent> events)
     {
         List<long> eventTimes = events.Where(e => e.AbsoluteTime >= midiMeasureSpan.StartTick && e.AbsoluteTime < midiMeasureSpan.EndTick)
                                       .Select(e => e.AbsoluteTime)
                                       .Distinct().Order().ToList();
-        List<Token> tokens = [];
+        List<MidiToken> tokens = [];
         foreach (long time in eventTimes)
         {
-            Token? token = CreateTokenForTick(time, events.Where(e => e.AbsoluteTime == time).ToList());
+            MidiToken? token = CreateTokenForTick(time, events.Where(e => e.AbsoluteTime == time).ToList());
             if (token == null) continue;
             tokens.Add(token);
         }
         return tokens;
     }
 
-    private Token? CreateTokenForTick(long tick, List<MidiEvent> events)
+    private MidiToken? CreateTokenForTick(long tick, List<MidiEvent> events)
     {
         List<NoteOnEvent> noteOnEvents = events.OfType<NoteOnEvent>().ToList();
         // Shouldn't happen for now, but I'm paranoid.
@@ -80,27 +81,26 @@ public class MidiToTokenConverter
         
         // For chords, we can use any of the played notes for time information.
         NoteOnEvent noteOnEvent = noteOnEvents.First();
-        int[] pitches = noteOnEvents.Select(e => e.NoteNumber).Distinct().Order().ToArray();
-        NoteToken token = new NoteToken(noteOnEvent.AbsoluteTime, noteOnEvent.AbsoluteTime + noteOnEvent.NoteLength, pitches, NoteLength.FromQuarterNotes(1));
+        MidiNoteNumber[] pitches = noteOnEvents.Select(e => (MidiNoteNumber) e.NoteNumber).Distinct().Order().ToArray();
+        NoteMidiToken token = new NoteMidiToken(noteOnEvent.AbsoluteTime, noteOnEvent.AbsoluteTime + noteOnEvent.NoteLength, pitches);
         return token;
     }
 
-    private List<Token> AddRests(List<Token> tokens)
+    private List<MidiToken> AddRests(List<MidiToken> tokens)
     {
-        List<Token> output = [];
+        List<MidiToken> output = [];
 
         // The idea is to check if any token's end aligns with the start of the next one.
         // For the last token, we don't need to check.
         for (int i = 0; i < tokens.Count - 1; i++)
         {
-            Token token = tokens[i];
+            MidiToken token = tokens[i];
+            MidiToken nextToken = tokens[i + 1]; // Safe, since we ignore the last element.
+
             output.Add(token);
-            
-            Token nextToken = tokens[i + 1]; // Safe, since we ignore the last element.
 
             if (token.EndTime == nextToken.StartTime) continue;
-            // TODO MP: Use actual time.
-            RestToken restToken = new RestToken(token.EndTime, nextToken.StartTime);
+            RestMidiToken restToken = new RestMidiToken(token.EndTime, nextToken.StartTime);
             output.Add(restToken);
         }
 

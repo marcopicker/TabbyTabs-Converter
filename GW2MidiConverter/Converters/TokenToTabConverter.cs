@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using GW2MidiConverter.Converters.Tokens;
+using GW2MidiConverter.Converters.Tokens.Midi;
 
 namespace GW2MidiConverter.Converters;
 
@@ -8,18 +9,18 @@ public class TokenToTabConverter(MidiConverterSettings? settings = null)
 {
     private readonly MidiConverterSettings _settings = settings ?? new MidiConverterSettings();
 
-    public string Convert(List<Token> tokens)
+    public string Convert(List<MidiToken> tokens)
     {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < tokens.Count - 1; i++)
         {
-            Token token = tokens[i];
-            Token nextToken = tokens[i + 1];
+            MidiToken token = tokens[i];
+            MidiToken nextToken = tokens[i + 1];
             
             switch (token)
             {
-                case MeasureToken measureToken:
+                case MeasureMidiToken measureToken:
                 {
                     if (measureToken.HasTimeSignatureChange)
                     {
@@ -34,7 +35,7 @@ public class TokenToTabConverter(MidiConverterSettings? settings = null)
                     builder.Append('|');
                     break;
                 }
-                case NoteToken noteToken:
+                case NoteMidiToken noteToken:
                 {
                     bool isChord = noteToken.MidiNotes.Length > 1;
                     if (isChord)
@@ -46,13 +47,13 @@ public class TokenToTabConverter(MidiConverterSettings? settings = null)
                         builder.Append(noteToken.MidiNotes[0]);
                     }
 
-                    if (nextToken is NoteToken)
+                    if (nextToken is NoteMidiToken)
                     {
                         builder.Append(' ');
                     }
                     break;
                 }
-                case RestToken restToken:
+                case RestMidiToken restToken:
                 {
                     builder.Append('-');
                     break;
