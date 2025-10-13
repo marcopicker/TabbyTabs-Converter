@@ -5,9 +5,10 @@ namespace GW2MidiConverter.Midi;
 
 internal class MeasureSpanListBuilder(long resolution, long startTime)
 {
-    private readonly List<MidiMeasureSpan> _spans = [];
+    private readonly List<MidiMeasureInfo> _spans = [];
 
     private long _lastTick = startTime;
+    private int _currentMeasureNumber = 0;
 
     public void AppendMeasures(TimeSignature timeSignature, int count)
     {
@@ -17,10 +18,10 @@ internal class MeasureSpanListBuilder(long resolution, long startTime)
         {
             long measureStart = _lastTick;
             long measureEnd = measureStart + ticksPerMeasure;
-            bool isNewTimeSignature = IsTimeSignatureNew(timeSignature);
-            _spans.Add(new MidiMeasureSpan(measureStart, measureEnd, timeSignature, isNewTimeSignature));
+            _spans.Add(new MidiMeasureInfo(measureStart, measureEnd, _currentMeasureNumber, timeSignature));
 
             _lastTick = measureEnd;
+            _currentMeasureNumber++;
         }
     }
 
@@ -31,7 +32,7 @@ internal class MeasureSpanListBuilder(long resolution, long startTime)
         AppendMeasures(timeSignature, elapsedMeasures);
     }
 
-    public MidiMeasureSpan[] Build() => _spans.ToArray();
+    public MidiMeasureInfo[] Build() => _spans.ToArray();
 
     private long CalculateTicksPerMeasure(TimeSignature timeSignature)
     {

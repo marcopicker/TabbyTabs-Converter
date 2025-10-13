@@ -3,17 +3,16 @@ namespace GW2MidiConverter.GuildWars;
 public enum GuildWarsNoteKey
 {
     Note1 = 0,
-    Note2 = 1,
-    Note3 = 2,
-    Note4 = 3,
-    Note5 = 4,
-    Note6 = 5,
-    Note7 = 6,
-    Note8 = 7,
-    
-    Note1Sharp = 10,
-    Note2Sharp = 11,
-    Note4Sharp = 13,
-    Note5Sharp = 14,
-    Note6Sharp = 15,
+    Note1Sharp = 1,
+    Note2 = 2,
+    Note2Sharp = 3,
+    Note3 = 4,
+    Note4 = 5,
+    Note4Sharp = 6,
+    Note5 = 7,
+    Note5Sharp = 8,
+    Note6 = 9,
+    Note6Sharp = 10,
+    Note7 = 11,
+    Note8 = 12
 }

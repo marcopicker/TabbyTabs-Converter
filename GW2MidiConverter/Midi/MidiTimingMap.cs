@@ -12,7 +12,7 @@ internal class MidiTimingMap
     private List<TimeSignatureEvent> _timeSignatureEvents = [];
     private List<TempoEvent> _tempoEvents = [];
 
-    public MidiMeasureSpan[] Measures { get; private set; }
+    public MidiMeasureInfo[] Measures { get; private set; }
 
     private MidiTimingMap(MidiFile midiFile)
     {
@@ -37,7 +37,7 @@ internal class MidiTimingMap
         return tempoEvent?.Tempo ?? 120;
     }
 
-    public SongTime GetTimeAtTick(long absoluteTime)
+    public SongPosition GetPositionAtTick(long absoluteTime)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(absoluteTime);
         List<TimeSignatureEvent> leadingTimeSignatureEvents = _timeSignatureEvents.Where(t => t.AbsoluteTime <= absoluteTime).ToList();
@@ -60,8 +60,9 @@ internal class MidiTimingMap
         // We have arrived at the current measure! Time to calculate the beat.
         long ticksInCurrentMeasure = absoluteTime - lastTimeSignatureEvent.AbsoluteTime;
         int beat = (int)(ticksInCurrentMeasure / _resolution) + 1;
-
-        return new SongTime(measure, beat);
+        long ticksInCurrentBeat = ticksInCurrentMeasure - (beat - 1) * _resolution;
+        
+        return new SongPosition(measure, beat, ticksInCurrentBeat);
     }
 
     private void BuildMaps()

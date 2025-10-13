@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GW2MidiConverter.Converters.Tokens;
-using GW2MidiConverter.Converters.Tokens.Midi;
 using GW2MidiConverter.Midi;
 using NAudio.Midi;
 
@@ -17,94 +15,82 @@ public class MidiToTokenConverter
     public MidiToTokenConverter(MidiDocument midiDocument, TokenConverterSettings? settings = null)
     {
         ArgumentNullException.ThrowIfNull(midiDocument);
+        ArgumentNullException.ThrowIfNull(midiDocument.GetRawMidiFile().Events);
+        
         _midiDocument = midiDocument;
         _timingMap = MidiTimingMap.FromMidiFile(_midiDocument.GetRawMidiFile());
         _settings = settings ?? new TokenConverterSettings();
     }
 
-    public Dictionary<int, List<MidiToken>> ConvertTracks(List<int> trackIndexes)
+    public Dictionary<int, MidiTrack> ConvertTracks(List<int> trackIndexes)
     {
-        if(trackIndexes.Count == 0) throw new ArgumentException("At least one track index must be specified.", nameof(trackIndexes));
+        if (trackIndexes.Count == 0) throw new ArgumentException("At least one track index must be specified.", nameof(trackIndexes));
+        if (trackIndexes.Any(t => t < 0 || t >= _midiDocument.GetRawMidiFile().Tracks)) throw new ArgumentOutOfRangeException(nameof(trackIndexes), "One or more track indexes are out of range.");
+
         List<int> tracks = trackIndexes.Where(i => _midiDocument.InstrumentTrackIndexes.Contains(i)).ToList();
         return tracks.ToDictionary(track => track, ConvertTrack);
     }
 
-    private List<MidiToken> ConvertTrack(int trackIndex)
+    private MidiTrack ConvertTrack(int trackIndex)
     {
-        if (trackIndex < 0 || trackIndex >= _midiDocument.GetRawMidiFile().Tracks) throw new IndexOutOfRangeException(nameof(trackIndex));
-        List<MidiEvent>? events = _midiDocument.GetRawMidiFile().Events?.GetTrackEvents(trackIndex).ToList();
-        if (events == null) throw new Exception("Could not get events for track.");
-
-        // We really only care about NoteOn events.
-        List<MidiEvent> relevantEvents = events.Where(e => e is NoteOnEvent).ToList();
-        
-        List<MidiToken> tokens = [];
-        foreach (MidiMeasureSpan measure in _timingMap.Measures)
+        // We really only care about note events.
+        List<NoteOnEvent> eventsOfTrack = _midiDocument.GetRawMidiFile()
+                                                       .Events
+                                                       .GetTrackEvents(trackIndex)
+                                                       .OfType<NoteOnEvent>()
+                                                       .Where(e => e.NoteLength >= _settings.MinimumNoteDuration)
+                                                       .ToList();
+        List<MidiMeasure> measures = [];
+        foreach (MidiMeasureInfo measureInfo in _timingMap.Measures)
         {
-            bool isFirstMeasure = _timingMap.Measures.First() == measure;
-            MeasureTokenType measureType = isFirstMeasure ? MeasureTokenType.Beginning : MeasureTokenType.Middle;
-            tokens.Add(new MeasureMidiToken(measure.StartTick, measure.StartTick, measure.IsTimeSignatureChange ? measure.TimeSignature : null, measureType));
-            tokens.AddRange(ConvertMeasure(measure, relevantEvents));
+            MidiMeasure measure = ConvertMeasure(measureInfo, eventsOfTrack);
+            measures.Add(measure);
         }
 
-        tokens.Add(new MeasureMidiToken(_timingMap.Measures.Last().EndTick, _timingMap.Measures.Last().EndTick, null, MeasureTokenType.End));
-        tokens = AddRests(tokens);
-        return tokens;
+        MidiTrackInfo info = GetMidiTrackInfoForTrack(trackIndex);
+        return new MidiTrack(info, measures.ToArray());
     }
 
-    private List<MidiToken> ConvertMeasure(MidiMeasureSpan midiMeasureSpan, List<MidiEvent> events)
+    private MidiTrackInfo GetMidiTrackInfoForTrack(int trackIndex)
     {
-        List<long> eventTimes = events.Where(e => e.AbsoluteTime >= midiMeasureSpan.StartTick && e.AbsoluteTime < midiMeasureSpan.EndTick)
-                                      .Select(e => e.AbsoluteTime)
-                                      .Distinct().Order().ToList();
-        List<MidiToken> tokens = [];
-        foreach (long time in eventTimes)
+        TextEvent? trackNameEvent = _midiDocument.GetRawMidiFile()
+                                                 .Events
+                                                 .GetTrackEvents(trackIndex)
+                                                 .OfType<TextEvent>()
+                                                 .FirstOrDefault(t => t.MetaEventType == MetaEventType.SequenceTrackName);
+        string trackName = trackNameEvent == null ? string.Empty : trackNameEvent.Text;
+        return new MidiTrackInfo(trackIndex, trackName);
+    }
+
+    private MidiMeasure ConvertMeasure(MidiMeasureInfo midiMeasureInfo, List<NoteOnEvent> noteEventsInTrack)
+    {
+        List<long> eventTimesInMeasure = noteEventsInTrack.Where(e => e.AbsoluteTime >= midiMeasureInfo.StartTick && e.AbsoluteTime < midiMeasureInfo.EndTick)
+                                                      .Select(e => e.AbsoluteTime)
+                                                      .Distinct().Order().ToList();
+        List<MidiNoteGroup> noteGroups = [];
+        foreach (long time in eventTimesInMeasure)
         {
-            MidiToken? token = CreateTokenForTick(time, events.Where(e => e.AbsoluteTime == time).ToList());
-            if (token == null) continue;
-            tokens.Add(token);
+            List<NoteOnEvent> eventsAtTime = noteEventsInTrack.Where(e => e.AbsoluteTime == time).ToList();
+            MidiNoteGroup group = ConvertNoteEvents(eventsAtTime);
+            noteGroups.Add(group);
         }
-        return tokens;
+
+        return new MidiMeasure(midiMeasureInfo, noteGroups.ToArray());
     }
 
-    private MidiToken? CreateTokenForTick(long tick, List<MidiEvent> events)
+    private MidiNoteGroup ConvertNoteEvents(List<NoteOnEvent> events)
     {
-        List<NoteOnEvent> noteOnEvents = events.OfType<NoteOnEvent>().ToList();
-        // Shouldn't happen for now, but I'm paranoid.
-        if(noteOnEvents.Count == 0) return null;
-        
-        bool areNotesOfSameLength = noteOnEvents.All(e => e.NoteLength == noteOnEvents.First().NoteLength);
+        bool areNotesOfSameLength = events.All(e => e.NoteLength == events.First().NoteLength);
         if (!areNotesOfSameLength)
         {
             // TODO MP: Add warning.
         }
-        
+
         // For chords, we can use any of the played notes for time information.
-        NoteOnEvent noteOnEvent = noteOnEvents.First();
-        MidiNoteNumber[] pitches = noteOnEvents.Select(e => (MidiNoteNumber) e.NoteNumber).Distinct().Order().ToArray();
-        NoteMidiToken token = new NoteMidiToken(noteOnEvent.AbsoluteTime, noteOnEvent.AbsoluteTime + noteOnEvent.NoteLength, pitches);
-        return token;
-    }
-
-    private List<MidiToken> AddRests(List<MidiToken> tokens)
-    {
-        List<MidiToken> output = [];
-
-        // The idea is to check if any token's end aligns with the start of the next one.
-        // For the last token, we don't need to check.
-        for (int i = 0; i < tokens.Count - 1; i++)
-        {
-            MidiToken token = tokens[i];
-            MidiToken nextToken = tokens[i + 1]; // Safe, since we ignore the last element.
-
-            output.Add(token);
-
-            if (token.EndTime == nextToken.StartTime) continue;
-            RestMidiToken restToken = new RestMidiToken(token.EndTime, nextToken.StartTime);
-            output.Add(restToken);
-        }
-
-        if (tokens.Count > 1) output.Add(tokens.Last());
-        return output;
+        NoteOnEvent firstEvent = events.First();
+        MidiNoteNumber[] pitches = events.Select(e => (MidiNoteNumber)e.NoteNumber).Distinct().Order().ToArray();
+        SongPosition position = _timingMap.GetPositionAtTick(firstEvent.AbsoluteTime);
+        
+        return new MidiNoteGroup(pitches, position, firstEvent.NoteLength);
     }
 }
