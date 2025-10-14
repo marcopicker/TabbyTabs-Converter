@@ -95,26 +95,49 @@ public class MidiToTokenConverterTests
 
         using (Assert.EnterMultipleScope())
         {
+            // Measure 1
             Assert.That(track.Measures[0].MeasureInfo.TimeSignature, Is.EqualTo(new TimeSignature(4, 4)));
+            
             Assert.That(track.Measures[0].NoteGroups[0].Notes, Has.Length.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[0].Notes, Has.Member(new MidiNoteNumber(60)));
             Assert.That(track.Measures[0].NoteGroups[0].Position, Is.EqualTo(new SongPosition(1, 1, 0)));
+            Assert.That(track.Measures[0].NoteGroups[0].Length.QuarterNotes, Is.EqualTo(1m));
+            Assert.That(track.Measures[0].NoteGroups[0].IsChord, Is.False);
+            Assert.That(track.Measures[0].IsEmpty, Is.False);
+            
             Assert.That(track.Measures[0].NoteGroups[1].Notes, Has.Length.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[1].Notes, Has.Member(new MidiNoteNumber(62)));
+            Assert.That(track.Measures[0].NoteGroups[1].Position, Is.EqualTo(new SongPosition(1, 2, 0)));
+            Assert.That(track.Measures[0].NoteGroups[1].Length.QuarterNotes, Is.EqualTo(1m));
+            
             Assert.That(track.Measures[0].NoteGroups[2].Notes, Has.Length.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[2].Notes, Has.Member(new MidiNoteNumber(64)));
+            Assert.That(track.Measures[0].NoteGroups[2].Position, Is.EqualTo(new SongPosition(1, 3, 0)));
+            Assert.That(track.Measures[0].NoteGroups[2].Length.QuarterNotes, Is.EqualTo(1m));
+            
             Assert.That(track.Measures[0].NoteGroups[3].Notes, Has.Length.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[3].Notes, Has.Member(new MidiNoteNumber(67)));
+            Assert.That(track.Measures[0].NoteGroups[3].Position, Is.EqualTo(new SongPosition(1, 4, 0)));
+            Assert.That(track.Measures[0].NoteGroups[3].Length.QuarterNotes, Is.EqualTo(1m));
 
+            // Measure 2
             Assert.That(track.Measures[1].MeasureInfo.TimeSignature, Is.EqualTo(new TimeSignature(3, 4)));
             Assert.That(track.Measures[1].NoteGroups[0].Notes, Has.Member(new MidiNoteNumber(60)));
+            Assert.That(track.Measures[1].NoteGroups[0].Position, Is.EqualTo(new SongPosition(2, 1, 0)));
+            Assert.That(track.Measures[1].NoteGroups[0].Length.QuarterNotes, Is.EqualTo(1.5m));
+            
             Assert.That(track.Measures[1].NoteGroups[1].Notes, Has.Member(new MidiNoteNumber(62)));
+            Assert.That(track.Measures[1].NoteGroups[1].Length.QuarterNotes, Is.EqualTo(0.5m));
 
+            // Measure 3
             Assert.That(track.Measures[2].MeasureInfo.TimeSignature, Is.EqualTo(new TimeSignature(3, 4)));
             Assert.That(track.Measures[2].NoteGroups[0].Notes, Has.Member(new MidiNoteNumber(60)));
+            Assert.That(track.Measures[2].NoteGroups[0].Length.QuarterNotes, Is.EqualTo(2m));
 
+            // Measure 4
             Assert.That(track.Measures[3].MeasureInfo.TimeSignature, Is.EqualTo(new TimeSignature(4, 4)));
             Assert.That(track.Measures[3].NoteGroups[0].Notes, Has.Member(new MidiNoteNumber(60)));
+            Assert.That(track.Measures[3].NoteGroups[0].Length.QuarterNotes, Is.EqualTo(4m));
         }
     }
 }

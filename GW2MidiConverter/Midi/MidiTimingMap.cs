@@ -61,7 +61,7 @@ internal class MidiTimingMap
         long ticksInCurrentMeasure = absoluteTime - lastTimeSignatureEvent.AbsoluteTime;
         int beat = (int)(ticksInCurrentMeasure / _resolution) + 1;
         long ticksInCurrentBeat = ticksInCurrentMeasure - (beat - 1) * _resolution;
-        
+
         return new SongPosition(measure, beat, ticksInCurrentBeat);
     }
 

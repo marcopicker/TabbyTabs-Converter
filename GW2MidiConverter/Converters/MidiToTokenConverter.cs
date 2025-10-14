@@ -90,7 +90,8 @@ public class MidiToTokenConverter
         NoteOnEvent firstEvent = events.First();
         MidiNoteNumber[] pitches = events.Select(e => (MidiNoteNumber)e.NoteNumber).Distinct().Order().ToArray();
         SongPosition position = _timingMap.GetPositionAtTick(firstEvent.AbsoluteTime);
+        MidiNoteLength length = MidiNoteLength.FromTicks(firstEvent.NoteLength, _midiDocument.GetRawMidiFile().DeltaTicksPerQuarterNote);
         
-        return new MidiNoteGroup(pitches, position, firstEvent.NoteLength);
+        return new MidiNoteGroup(pitches, position, length);
     }
 }
