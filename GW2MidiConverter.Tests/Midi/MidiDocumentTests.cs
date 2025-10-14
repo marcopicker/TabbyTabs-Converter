@@ -44,14 +44,14 @@ public class MidiDocumentTests
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
         Assert.That(midiDocument.InstrumentCount, Is.EqualTo(2));
     }
-    
+
     [Test]
     public void GetInstrumentCount_EmptyMidiFile_ReturnsZero()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.EmptyMidiFile);
         Assert.That(midiDocument.InstrumentCount, Is.EqualTo(0));
     }
-    
+
     [Test]
     public void InstrumentTrackIndices_TwoInstrumentMidiFile_ReturnsCorrectIndexes()
     {
@@ -64,19 +64,19 @@ public class MidiDocumentTests
     public void GetTrackInfo_TwoInstrumentMidiFile_ValidIndex_DoesNotThrow()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
-        Assert.DoesNotThrow(() => midiDocument.GetTrackInfo(0)); // Meta-event track.
         Assert.DoesNotThrow(() => midiDocument.GetTrackInfo(1));
         Assert.DoesNotThrow(() => midiDocument.GetTrackInfo(2));
     }
-    
+
     [Test]
     public void GetTrackInfo_TwoInstrumentMidiFile_InvalidIndex_Throws()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
+        Assert.Throws<ArgumentOutOfRangeException>(() => midiDocument.GetTrackInfo(0)); // Meta-event track.
         Assert.Throws<ArgumentOutOfRangeException>(() => midiDocument.GetTrackInfo(-1));
         Assert.Throws<ArgumentOutOfRangeException>(() => midiDocument.GetTrackInfo(3));
     }
-    
+
     [Test]
     public void GetTrackInfo_TwoInstrumentMidiFile_HasCorrectInfo()
     {
@@ -86,17 +86,8 @@ public class MidiDocumentTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(trackInfo.TrackIndex, Is.EqualTo(1));
-            Assert.That(trackInfo.InstrumentName, Is.EqualTo("Piano"));   
+            Assert.That(trackInfo.InstrumentName, Is.EqualTo("Piano"));
         }
-    }
-    
-    [Test]
-    public void GetTrackInfo_TwoInstrumentMidiFile_MetaEventTrack_InstrumentNameIsEmpty()
-    {
-        MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
-        MidiTrackInfo trackInfo = midiDocument.GetTrackInfo(0);
-
-        Assert.That(trackInfo.InstrumentName, Is.EqualTo(string.Empty));   
     }
 
     #endregion

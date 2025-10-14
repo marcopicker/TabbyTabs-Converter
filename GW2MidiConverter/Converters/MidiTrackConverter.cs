@@ -6,20 +6,20 @@ using NAudio.Midi;
 
 namespace GW2MidiConverter.Converters;
 
-public class MidiToTokenConverter
+internal class MidiTrackConverter
 {
-    private readonly TokenConverterSettings _settings;
+    private readonly MidiConverterSettings _settings;
     private readonly MidiDocument _midiDocument;
     private readonly MidiTimingMap _timingMap;
 
-    public MidiToTokenConverter(MidiDocument midiDocument, TokenConverterSettings? settings = null)
+    public MidiTrackConverter(MidiDocument midiDocument, MidiConverterSettings? settings = null)
     {
         ArgumentNullException.ThrowIfNull(midiDocument);
         ArgumentNullException.ThrowIfNull(midiDocument.GetRawMidiFile().Events);
         
         _midiDocument = midiDocument;
         _timingMap = MidiTimingMap.FromMidiFile(_midiDocument.GetRawMidiFile());
-        _settings = settings ?? new TokenConverterSettings();
+        _settings = settings ?? new MidiConverterSettings();
     }
 
     public Dictionary<int, MidiTrack> ConvertTracks(List<int> trackIndexes)

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using GW2MidiConverter.Converters;
-using GW2MidiConverter.Converters.Tokens;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tests.GuildWars.Instruments;
@@ -16,7 +15,8 @@ public class TokenToTabConverterTests
     public void Test1()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.LengthTestFile);
-        MidiToTokenConverter tokenConverter = new MidiToTokenConverter(midiDocument);
+        
+        MidiTrackConverter tokenConverter = new MidiTrackConverter(midiDocument);
         TokenToTabConverter tabConverter = new TokenToTabConverter();
         InstrumentNoteMap map = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
         

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GW2MidiConverter.Converters;
 using NAudio.Midi;
 
 namespace GW2MidiConverter.Midi;
@@ -12,11 +13,16 @@ public class MidiDocument
 {
     private readonly MidiFile _midiFile;
     private readonly List<int> _instrumentTrackIndexes = [];
+    private readonly MidiTrack[] _tracks = [];
 
-    private MidiDocument(MidiFile midiFile)
+    private MidiDocument(MidiFile midiFile, MidiConverterSettings? settings = null)
     {
         _midiFile = midiFile;
         FindInstrumentTracks();
+
+        if (_instrumentTrackIndexes.Count == 0) return;
+        MidiTrackConverter converter = new MidiTrackConverter(this, settings);
+        _tracks = converter.ConvertTracks(_instrumentTrackIndexes).Values.ToArray();
     }
 
     /// <summary>
@@ -26,7 +32,7 @@ public class MidiDocument
     /// <i>Instrument-tracks</i> are tracks with at least one MIDI note event.
     /// </remarks>
     public int InstrumentCount => _instrumentTrackIndexes.Count;
-    
+
     /// <summary>
     /// Returns the track indexes for tracks that contain instruments.
     /// </summary>
@@ -43,22 +49,20 @@ public class MidiDocument
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the index does not relate to a track in the document.</exception>
     public MidiTrackInfo GetTrackInfo(int trackIndex)
     {
-        if (trackIndex < 0 || trackIndex >= _midiFile.Tracks) throw new ArgumentOutOfRangeException(nameof(trackIndex));
-        string instrumentName = GetInstrumentNameForTrack(trackIndex);
-        return new MidiTrackInfo(trackIndex, instrumentName);
+        return GetTrack(trackIndex).Info;
     }
 
-    private string GetInstrumentNameForTrack(int trackIndex)
+    /// <summary>
+    /// Returns the <see cref="MidiTrack"/> for the given track index.
+    /// </summary>
+    /// <param name="trackIndex">The zero-based index of the MIDI track.</param>
+    /// <returns>A <see cref="MidiTrack"/> object for the given track index.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the index does not relate to a track in the document.</exception>
+    public MidiTrack GetTrack(int trackIndex)
     {
-        if(!_instrumentTrackIndexes.Contains(trackIndex)) return string.Empty;
-        
-        IList<MidiEvent>? events = _midiFile.Events.GetTrackEvents(trackIndex);
-        if (events == null) return string.Empty;
-        
-        TextEvent? trackNameEvent = events.FirstOrDefault(e => e is TextEvent { MetaEventType: MetaEventType.SequenceTrackName }) as TextEvent;
-        if (trackNameEvent == null) return string.Empty;
-        
-        return trackNameEvent.Text;
+        if (trackIndex < 0 || trackIndex >= _midiFile.Tracks) throw new ArgumentOutOfRangeException(nameof(trackIndex));
+        if (!_instrumentTrackIndexes.Contains(trackIndex)) throw new ArgumentOutOfRangeException(nameof(trackIndex), "The given track index does not relate to an instrument track.");
+        return _tracks.First(t => t.Info.TrackIndex == trackIndex);
     }
 
     private void FindInstrumentTracks()
@@ -72,7 +76,7 @@ public class MidiDocument
             if (isInstrumentTrack) _instrumentTrackIndexes.Add(i);
         }
     }
-    
+
     #region Loading Data
 
     public static MidiDocument LoadFromMidiFile(string path)

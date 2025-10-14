@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using GW2MidiConverter.Converters.Tokens;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 
