@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 
@@ -7,25 +6,46 @@ namespace GW2MidiConverter.Tab;
 
 public class TabDocument
 {
-    private List<TabTrack> _tracks = [];
+    private readonly MidiDocumentConverter _midiDocumentConverter;
+    
+    private readonly Dictionary<int, Instrument> _instrumentsByTrackIds = new Dictionary<int, Instrument>();
+    private readonly List<TabTrack> _tracks = [];
 
     public TabTrack[] Tracks => _tracks.ToArray();
 
-    private TabDocument()
+    private TabDocument(MidiDocument midiDocument)
     {
+        _midiDocumentConverter = new MidiDocumentConverter(midiDocument);
     }
 
-    public static TabDocument FromMidi(MidiDocument midi)
+    public void DisableTrack(int trackIndex)
     {
-        MidiDocumentConverter converter = new MidiDocumentConverter(midi);
-        int[] indexes = midi.InstrumentTrackIndexes;
-        List<TabTrack> tracks = indexes.Select(i => converter.ConvertTrack(i, new InstrumentNoteMap(InstrumentNoteMaps.Piano)))
-                                       .ToList();
+        _instrumentsByTrackIds.Remove(trackIndex);
+        RebuildTracks();
+    }
+
+    public void EnableTrack(int trackIndex, Instrument instrument)
+    {
+        // No need to rebuild when nothing changes.
+        if(_instrumentsByTrackIds.TryGetValue(trackIndex, out Instrument? value) && value == instrument) return;
         
-        TabDocument tabDocument = new TabDocument
+        _instrumentsByTrackIds[trackIndex] = instrument;
+        RebuildTracks();
+    }
+
+    private void RebuildTracks()
+    {
+        _tracks.Clear();
+        foreach (int trackIndex in _instrumentsByTrackIds.Keys)
         {
-            _tracks = tracks
-        };
-        return tabDocument;
+            Instrument instrument = _instrumentsByTrackIds[trackIndex];
+            TabTrack track = _midiDocumentConverter.ConvertTrack(trackIndex, instrument.NoteMap, instrument.Name);
+            _tracks.Add(track);
+        }
+    }
+
+    public static TabDocument FromMidiDocument(MidiDocument midiDocument)
+    {
+        return new TabDocument(midiDocument);
     }
 }

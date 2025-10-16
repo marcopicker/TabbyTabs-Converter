@@ -4,6 +4,7 @@ using System.Linq;
 using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
+using GW2MidiConverter.Shared;
 using GW2MidiConverter.Tab.Tokens;
 
 namespace GW2MidiConverter.Tab;
@@ -19,7 +20,7 @@ public class MidiDocumentConverter
         _midiDocument = midiDocument;
     }
 
-    public TabTrack ConvertTrack(int trackIndex, InstrumentNoteMap noteMap)
+    public TabTrack ConvertTrack(int trackIndex, InstrumentNoteMap noteMap, string? trackName = null)
     {
         if (!_midiDocument.InstrumentTrackIndexes.Contains(trackIndex)) throw new ArgumentOutOfRangeException(nameof(trackIndex), "The given track index is not an instrument track.");
 
@@ -27,7 +28,8 @@ public class MidiDocumentConverter
         if (midiTrack.Length == 0) return new TabTrack(midiTrack.Info, []);
 
         List<TabMeasure> measures = midiTrack.Measures.Select(m => ConvertMeasure(m, noteMap)).ToList();
-        return new TabTrack(midiTrack.Info, measures);
+        TrackInfo trackInfo = string.IsNullOrWhiteSpace(trackName) ? midiTrack.Info : midiTrack.Info with { InstrumentName = trackName };
+        return new TabTrack(trackInfo, measures);
     }
 
     private TabMeasure ConvertMeasure(MidiMeasure midiMeasure, InstrumentNoteMap noteMap)
@@ -37,7 +39,7 @@ public class MidiDocumentConverter
         if (midiMeasure.IsEmpty)
         {
             RestToken fullRest = new RestToken(timeSignature.Denominator);
-            return new TabMeasure([fullRest]);
+            return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, [fullRest]);
         }
 
         List<TabToken> tokens = [];
@@ -65,7 +67,7 @@ public class MidiDocumentConverter
             tokens.Add(lastRest!);
         }
         
-        return new TabMeasure(tokens);
+        return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, tokens);
     }
 
     private NoteGroupToken ConvertNoteGroup(MidiNoteGroup group, InstrumentNoteMap noteMap, TimeSignature timeSignature)

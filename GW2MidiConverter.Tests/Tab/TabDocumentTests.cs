@@ -12,7 +12,7 @@ public class TabDocumentTests
     public void FromMidi_ValidMidiFile_DoesNotThrow()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
-        Assert.DoesNotThrow(() => TabDocument.FromMidi(midiDocument));
+        Assert.DoesNotThrow(() => TabDocument.FromMidiDocument(midiDocument));
     }
     
     [Ignore("Currently not implemented. Very likely to get refactored.")]
@@ -20,7 +20,7 @@ public class TabDocumentTests
     public void FromMidi_ValidMidiFile_CorrectTrackCount()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
-        TabDocument tabDocument = TabDocument.FromMidi(midiDocument);
+        TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument);
 
         Assert.That(tabDocument.Tracks, Has.Length.EqualTo(1));
     }
