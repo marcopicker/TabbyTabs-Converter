@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Midi;
+using GW2MidiConverter.Shared;
 using NAudio.Midi;
 
 namespace GW2MidiConverter.Converters;
@@ -47,11 +48,11 @@ internal class MidiTrackConverter
             measures.Add(measure);
         }
 
-        MidiTrackInfo info = GetMidiTrackInfoForTrack(trackIndex);
+        TrackInfo info = GetMidiTrackInfoForTrack(trackIndex);
         return new MidiTrack(info, measures.ToArray());
     }
 
-    private MidiTrackInfo GetMidiTrackInfoForTrack(int trackIndex)
+    private TrackInfo GetMidiTrackInfoForTrack(int trackIndex)
     {
         TextEvent? trackNameEvent = _midiDocument.GetRawMidiFile()
                                                  .Events
@@ -59,7 +60,7 @@ internal class MidiTrackConverter
                                                  .OfType<TextEvent>()
                                                  .FirstOrDefault(t => t.MetaEventType == MetaEventType.SequenceTrackName);
         string trackName = trackNameEvent == null ? string.Empty : trackNameEvent.Text;
-        return new MidiTrackInfo(trackIndex, trackName);
+        return new TrackInfo(trackIndex, trackName);
     }
 
     private MidiMeasure ConvertMeasure(MidiMeasureInfo midiMeasureInfo, List<NoteOnEvent> noteEventsInTrack)
@@ -90,8 +91,8 @@ internal class MidiTrackConverter
         NoteOnEvent firstEvent = events.First();
         MidiNoteNumber[] pitches = events.Select(e => (MidiNoteNumber)e.NoteNumber).Distinct().Order().ToArray();
         SongPosition position = _timingMap.GetPositionAtTick(firstEvent.AbsoluteTime);
-        MidiNoteLength length = MidiNoteLength.FromTicks(firstEvent.NoteLength, _midiDocument.GetRawMidiFile().DeltaTicksPerQuarterNote);
+        MidiTimeSpan timeSpan = new MidiTimeSpan(firstEvent.AbsoluteTime, firstEvent.AbsoluteTime + firstEvent.NoteLength);
         
-        return new MidiNoteGroup(pitches, position, length);
+        return new MidiNoteGroup(pitches, position, timeSpan);
     }
 }

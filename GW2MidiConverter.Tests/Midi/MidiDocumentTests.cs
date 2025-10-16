@@ -1,5 +1,6 @@
 using System;
 using GW2MidiConverter.Midi;
+using GW2MidiConverter.Shared;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
 
@@ -81,7 +82,7 @@ public class MidiDocumentTests
     public void GetTrackInfo_TwoInstrumentMidiFile_HasCorrectInfo()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.SimpleTwoTrackPiecePianoBass);
-        MidiTrackInfo trackInfo = midiDocument.GetTrackInfo(1);
+        TrackInfo trackInfo = midiDocument.GetTrackInfo(1);
 
         using (Assert.EnterMultipleScope())
         {

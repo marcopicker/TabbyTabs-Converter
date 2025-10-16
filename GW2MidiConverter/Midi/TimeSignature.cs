@@ -5,7 +5,14 @@ namespace GW2MidiConverter.Midi;
 
 public class TimeSignature(int numerator, int denominator)
 {
+    /// <summary>
+    /// The top number of the fraction. 
+    /// </summary>
     public readonly int Numerator = numerator;
+    
+    /// <summary>
+    /// The bottom number of the fraction.
+    /// </summary>
     public readonly int Denominator = denominator;
 
     public static TimeSignature FromTimeSignatureEvent(TimeSignatureEvent timeSignatureEvent)

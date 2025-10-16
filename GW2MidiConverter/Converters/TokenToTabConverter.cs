@@ -15,6 +15,13 @@ public class TokenToTabConverter(MidiConverterSettings? settings = null)
         ArgumentNullException.ThrowIfNull(map);
         
         StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < track.Length; i++)
+        {
+            TimeSignature timeSignature = track.Measures[i].MeasureInfo.TimeSignature;
+            decimal quarterNotesPerBeat = (decimal) 4 / timeSignature.Denominator;
+        }
+        
         return builder.ToString();
     }
 }

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.Midi;
 
-namespace GW2MidiConverter.Tests.GuildWars.Instruments;
+namespace GW2MidiConverter.GuildWars.Instruments;
 
 public static class InstrumentNoteMaps
 {

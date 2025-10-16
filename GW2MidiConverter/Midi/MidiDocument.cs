@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Converters;
+using GW2MidiConverter.Shared;
 using NAudio.Midi;
 
 namespace GW2MidiConverter.Midi;
@@ -41,13 +42,15 @@ public class MidiDocument
     /// </remarks>
     public int[] InstrumentTrackIndexes => _instrumentTrackIndexes.ToArray();
 
+    public int TicksPerQuarterNote => _midiFile.DeltaTicksPerQuarterNote;
+
     /// <summary>
-    /// Returns the <see cref="MidiTrackInfo"/> for the given track index.
+    /// Returns the <see cref="TrackInfo"/> for the given track index.
     /// </summary>
     /// <param name="trackIndex">The zero-based index of the MIDI track.</param>
-    /// <returns>A <see cref="MidiTrackInfo"/> object for the given track index.</returns>
+    /// <returns>A <see cref="TrackInfo"/> object for the given track index.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the index does not relate to a track in the document.</exception>
-    public MidiTrackInfo GetTrackInfo(int trackIndex)
+    public TrackInfo GetTrackInfo(int trackIndex)
     {
         return GetTrack(trackIndex).Info;
     }
@@ -63,6 +66,11 @@ public class MidiDocument
         if (trackIndex < 0 || trackIndex >= _midiFile.Tracks) throw new ArgumentOutOfRangeException(nameof(trackIndex));
         if (!_instrumentTrackIndexes.Contains(trackIndex)) throw new ArgumentOutOfRangeException(nameof(trackIndex), "The given track index does not relate to an instrument track.");
         return _tracks.First(t => t.Info.TrackIndex == trackIndex);
+    }
+
+    public MidiTrack[] GetTracks()
+    {
+        return _tracks;
     }
 
     private void FindInstrumentTracks()
