@@ -43,7 +43,9 @@ internal class TrackConverter
         ArgumentNullException.ThrowIfNull(octaveCalculator);
         
         GetAllPotentialNotes(instrument);
-        _octaves = octaveCalculator.CalculateOctaves(_potentialNotes);
+        List<Octave[]> potentialOctaves = _potentialNotes.Select(n => n.Select(note => note.Octave).Distinct().ToArray())
+                                                         .ToList();
+        _octaves = octaveCalculator.CalculateOctaves(potentialOctaves);
 
         _currentNoteGroupIndex = 0;
         List<TabMeasure> measures = _track.Measures.Select(m => ConvertMeasure(m, instrument.NoteMap)).ToList();

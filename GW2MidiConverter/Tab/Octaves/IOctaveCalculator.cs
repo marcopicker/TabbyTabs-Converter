@@ -5,5 +5,5 @@ namespace GW2MidiConverter.Tab.Octaves;
 
 public interface IOctaveCalculator
 {
-    Octave[] CalculateOctaves(List<GuildWarsNote[]> potentialNotes);
+    Octave[] CalculateOctaves(List<Octave[]> potentialOctaves);
 }
