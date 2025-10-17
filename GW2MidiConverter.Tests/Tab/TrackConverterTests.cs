@@ -1,6 +1,7 @@
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tab;
+using GW2MidiConverter.Tab.Octaves;
 using GW2MidiConverter.Tab.Tokens;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
@@ -20,7 +21,7 @@ public class TrackConverterTests
         Instrument piano = new Instrument("Piano", pianoMap);
         
         TrackConverter trackConverter = new TrackConverter(midiTrack, midiDocument.TicksPerQuarterNote);
-        TabTrack track = trackConverter.Convert(piano);
+        TabTrack track = trackConverter.Convert(piano, new LookAheadOctaveCalculator());
         
         using (Assert.EnterMultipleScope())
         {

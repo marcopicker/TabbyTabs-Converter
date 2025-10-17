@@ -1,5 +1,6 @@
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tab;
+using GW2MidiConverter.Tab.Octaves;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
 
@@ -12,7 +13,7 @@ public class TabDocumentTests
     public void FromMidi_ValidMidiFile_DoesNotThrow()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
-        Assert.DoesNotThrow(() => TabDocument.FromMidiDocument(midiDocument));
+        Assert.DoesNotThrow(() => TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator()));
     }
     
     [Ignore("Currently not implemented. Very likely to get refactored.")]
@@ -20,7 +21,7 @@ public class TabDocumentTests
     public void FromMidi_ValidMidiFile_CorrectTrackCount()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
-        TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument);
+        TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
 
         Assert.That(tabDocument.Tracks, Has.Length.EqualTo(1));
     }

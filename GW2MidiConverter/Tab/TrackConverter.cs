@@ -5,17 +5,18 @@ using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Shared;
+using GW2MidiConverter.Tab.Octaves;
 using GW2MidiConverter.Tab.Tokens;
 
 namespace GW2MidiConverter.Tab;
 
-public class TrackConverter
+internal class TrackConverter
 {
     private readonly MidiTrack _track;
     private readonly int _ticksPerQuarterNote;
 
     private List<GuildWarsNote[]> _potentialNotes = [];
-    private readonly List<Octave> _octaves = [];
+    private Octave[] _octaves = [];
     
     private int _currentNoteGroupIndex;
 
@@ -30,16 +31,21 @@ public class TrackConverter
 
     public bool CanConvert(Instrument instrument)
     {
+        ArgumentNullException.ThrowIfNull(instrument);
+        
         List<MidiNoteNumber> allNoteNumbers = GetNoteNumbersInTrack();
         return allNoteNumbers.All(n => instrument.NoteMap.IsNoteMapped(n));
     }
     
-    public TabTrack Convert(Instrument instrument)
+    public TabTrack Convert(Instrument instrument, IOctaveCalculator octaveCalculator)
     {
+        ArgumentNullException.ThrowIfNull(instrument);
+        ArgumentNullException.ThrowIfNull(octaveCalculator);
+        
         GetAllPotentialNotes(instrument);
-        DetermineOctaves();
-        _currentNoteGroupIndex = 0;
+        _octaves = octaveCalculator.CalculateOctaves(_potentialNotes);
 
+        _currentNoteGroupIndex = 0;
         List<TabMeasure> measures = _track.Measures.Select(m => ConvertMeasure(m, instrument.NoteMap)).ToList();
         TrackInfo trackInfo = _track.Info with { InstrumentName = instrument.Name };
         return new TabTrack(trackInfo, measures);
@@ -61,46 +67,6 @@ public class TrackConverter
         List<GuildWarsNote[]> potentialNotes = allNoteNumbers.Select(n => instrument.NoteMap.MapMidiToNotes(n))
                                                              .ToList();
         _potentialNotes = potentialNotes;
-    }
-
-    private void DetermineOctaves()
-    {
-        _octaves.Clear();
-        for (int i = 0; i < _potentialNotes.Count; i++)
-        {
-            _octaves.Add(DetermineOctaveForIndex(i));
-        }
-    }
-
-    private Octave DetermineOctaveForIndex(int index)
-    {
-        while (index < _potentialNotes.Count)
-        {
-            ArgumentOutOfRangeException.ThrowIfLessThan(index, 0, nameof(index));
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(index, _potentialNotes.Count, nameof(index));
-
-            Octave[] potentialOctaves = _potentialNotes[index].Select(n => n.Octave).Distinct().ToArray();
-            Octave[] nextPotentialOctaves = index + 1 < _potentialNotes.Count ? _potentialNotes[index + 1].Select(n => n.Octave).Distinct().ToArray() : [];
-
-            if (potentialOctaves.Length == 1) return potentialOctaves[0];
-            if (nextPotentialOctaves.Length == 0) return potentialOctaves[0];
-
-            if (nextPotentialOctaves.Length == 1)
-            {
-                Octave nextOctave = nextPotentialOctaves[0];
-                if (potentialOctaves.Contains(nextOctave)) return nextOctave;
-                int octaveSwapDirection = nextOctave - potentialOctaves[0];
-                // We're going up: Prefer the upper one.
-                if (octaveSwapDirection > 0) return potentialOctaves.MaxBy(n => n);
-                // We're going down. Prefer the lower one.
-                return potentialOctaves.MinBy(n => n);
-            }
-
-            // The next octave is ambiguous.
-            index++;
-        }
-
-        throw new InvalidOperationException("This should never happen.");
     }
 
     private TabMeasure ConvertMeasure(MidiMeasure midiMeasure, InstrumentNoteMap noteMap)

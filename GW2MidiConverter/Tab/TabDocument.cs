@@ -1,21 +1,24 @@
 using System.Collections.Generic;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
+using GW2MidiConverter.Tab.Octaves;
 
 namespace GW2MidiConverter.Tab;
 
 public class TabDocument
 {
     private readonly MidiDocument _midiDocument;
+    private readonly IOctaveCalculator _octaveCalculator;
     private readonly Dictionary<int, TrackConverter> _trackConvertersByTrackIds = new Dictionary<int, TrackConverter>();
     private readonly Dictionary<int, Instrument> _instrumentsByTrackIds = new Dictionary<int, Instrument>();
     private readonly List<TabTrack> _tracks = [];
 
     public TabTrack[] Tracks => _tracks.ToArray();
 
-    private TabDocument(MidiDocument midiDocument)
+    private TabDocument(MidiDocument midiDocument, IOctaveCalculator octaveCalculator)
     {
         _midiDocument = midiDocument;
+        _octaveCalculator = octaveCalculator;
         InitialiseTrackConverters();
     }
 
@@ -50,13 +53,13 @@ public class TabDocument
             Instrument instrument = _instrumentsByTrackIds[trackIndex];
             TrackConverter trackConverter = _trackConvertersByTrackIds[trackIndex];
             
-            TabTrack track = trackConverter.Convert(instrument);
+            TabTrack track = trackConverter.Convert(instrument, _octaveCalculator);
             _tracks.Add(track);
         }
     }
 
-    public static TabDocument FromMidiDocument(MidiDocument midiDocument)
+    public static TabDocument FromMidiDocument(MidiDocument midiDocument, IOctaveCalculator octaveCalculator)
     {
-        return new TabDocument(midiDocument);
+        return new TabDocument(midiDocument, octaveCalculator);
     }
 }
