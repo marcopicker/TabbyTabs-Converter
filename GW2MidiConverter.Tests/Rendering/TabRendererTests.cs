@@ -1,11 +1,12 @@
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
+using GW2MidiConverter.Rendering;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Octaves;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
 
-namespace GW2MidiConverter.Tests.Tab;
+namespace GW2MidiConverter.Tests.Rendering;
 
 [TestFixture]
 public class TabRendererTests

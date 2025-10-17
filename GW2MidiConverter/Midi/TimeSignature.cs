@@ -3,7 +3,7 @@ using NAudio.Midi;
 
 namespace GW2MidiConverter.Midi;
 
-public class TimeSignature(int numerator, int denominator)
+public readonly struct TimeSignature(int numerator, int denominator) : IEquatable<TimeSignature>
 {
     /// <summary>
     /// The top number of the fraction. 
@@ -32,5 +32,20 @@ public class TimeSignature(int numerator, int denominator)
     public override int GetHashCode()
     {
         return HashCode.Combine(Numerator, Denominator);
+    }
+
+    public static bool operator ==(TimeSignature left, TimeSignature right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(TimeSignature left, TimeSignature right)
+    {
+        return !(left == right);
+    }
+
+    public bool Equals(TimeSignature other)
+    {
+        return Numerator == other.Numerator && Denominator == other.Denominator;
     }
 }

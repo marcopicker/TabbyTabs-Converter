@@ -84,7 +84,7 @@ public class LookAheadOctaveCalculatorTests
             new[] { new Octave(0), new Octave(1) },
             new[] { new Octave(0), new Octave(1) },
             new[] { new Octave(1) },
-            new[] { new Octave(1) },
+            new[] { new Octave(1), new Octave(0) },
             new[] { new Octave(0) },
             new[] { new Octave(-1) },
         ];
@@ -96,7 +96,7 @@ public class LookAheadOctaveCalculatorTests
             new Octave(1),
             new Octave(1),
             new Octave(1),
-            new Octave(1),
+            new Octave(0),
             new Octave(0),
             new Octave(-1),
         ];

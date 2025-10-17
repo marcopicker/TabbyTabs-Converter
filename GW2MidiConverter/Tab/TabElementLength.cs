@@ -7,6 +7,8 @@ public readonly struct TabElementLength(decimal beats) : IComparable<TabElementL
 {
     public decimal Beats { get; } = beats;
 
+    public bool IsDotted => (Beats * 1000) % 1.5m == 0;
+
     public static implicit operator decimal(TabElementLength length) => length.Beats;
     public static implicit operator TabElementLength(decimal value) => new TabElementLength(value);
 
