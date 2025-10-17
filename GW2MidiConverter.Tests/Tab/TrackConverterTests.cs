@@ -2,30 +2,26 @@ using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Tokens;
-using GW2MidiConverter.Tests.GuildWars.Instruments;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
 
 namespace GW2MidiConverter.Tests.Tab;
 
 [TestFixture]
-public class MidiDocumentConverterTests
+public class TrackConverterTests
 {
     [Test]
-    public void FromMidi_NullMidiDocument_Throws()
-    {
-        Assert.That(() => _ = new MidiDocumentConverter(null!), Throws.ArgumentNullException);
-    }
-    
-    [Test]
-    public void FromMidi_ValidMidiFile()
+    public void Convert_ValidResults()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
-        MidiDocumentConverter converter = new MidiDocumentConverter(midiDocument);
-
+        MidiTrack midiTrack = midiDocument.GetTrack(1);
+        
         InstrumentNoteMap pianoMap = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
-        TabTrack track = converter.ConvertTrack(1, pianoMap);
-
+        Instrument piano = new Instrument("Piano", pianoMap);
+        
+        TrackConverter trackConverter = new TrackConverter(midiTrack, midiDocument.TicksPerQuarterNote);
+        TabTrack track = trackConverter.Convert(piano);
+        
         using (Assert.EnterMultipleScope())
         {
             Assert.That(track, Is.Not.Null);

@@ -84,7 +84,9 @@ public class TabRenderer
     private string RenderNoteGroup(NoteGroupToken noteGroup)
     {
         List<string> notes = noteGroup.Notes.Select(n => _settings.KeyNames[n.Key]).ToList();
-        return string.Join("/", notes) + " ";
+        bool isDotted = noteGroup.Length.Beats is 0.75m or 1.5m or 3m;
+        string dotString = isDotted ? "." : string.Empty;
+        return string.Join("/", notes) + dotString + " ";
     }
 
     private string RenderRest(RestToken restToken)
@@ -96,7 +98,7 @@ public class TabRenderer
             decimal decrement = remainingBeats >= 1 ? 1 : remainingBeats;
 
             string rest = decrement == 1 ? "—" : "-";
-            rests += rest;
+            rests += rest + " ";
             
             remainingBeats -= decrement;
         }

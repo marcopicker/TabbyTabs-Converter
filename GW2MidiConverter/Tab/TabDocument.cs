@@ -6,8 +6,8 @@ namespace GW2MidiConverter.Tab;
 
 public class TabDocument
 {
-    private readonly MidiDocumentConverter _midiDocumentConverter;
-    
+    private readonly MidiDocument _midiDocument;
+    private readonly Dictionary<int, TrackConverter> _trackConvertersByTrackIds = new Dictionary<int, TrackConverter>();
     private readonly Dictionary<int, Instrument> _instrumentsByTrackIds = new Dictionary<int, Instrument>();
     private readonly List<TabTrack> _tracks = [];
 
@@ -15,7 +15,16 @@ public class TabDocument
 
     private TabDocument(MidiDocument midiDocument)
     {
-        _midiDocumentConverter = new MidiDocumentConverter(midiDocument);
+        _midiDocument = midiDocument;
+        InitialiseTrackConverters();
+    }
+
+    private void InitialiseTrackConverters()
+    {
+        foreach (MidiTrack track in _midiDocument.GetTracks())
+        {
+            _trackConvertersByTrackIds[track.Info.TrackIndex] = new TrackConverter(track, _midiDocument.TicksPerQuarterNote);
+        }
     }
 
     public void DisableTrack(int trackIndex)
@@ -39,7 +48,9 @@ public class TabDocument
         foreach (int trackIndex in _instrumentsByTrackIds.Keys)
         {
             Instrument instrument = _instrumentsByTrackIds[trackIndex];
-            TabTrack track = _midiDocumentConverter.ConvertTrack(trackIndex, instrument.NoteMap, instrument.Name);
+            TrackConverter trackConverter = _trackConvertersByTrackIds[trackIndex];
+            
+            TabTrack track = trackConverter.Convert(instrument);
             _tracks.Add(track);
         }
     }
