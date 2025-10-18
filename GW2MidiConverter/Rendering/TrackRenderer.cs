@@ -101,30 +101,8 @@ internal class TrackRenderer(TabRendererSettings settings)
 
     private string RemoveUnnecessaryOctaveSymbols(string input)
     {
-        if (string.IsNullOrWhiteSpace(input)) return input;
-        StringBuilder stringBuilder = new StringBuilder();
-
-        while (true)
-        {
-            int nextClosingBracket = input.IndexOf(']');
-            if (nextClosingBracket == -1) return input;
-
-            stringBuilder.Append(input[..nextClosingBracket]);
-            int nextOpeningBracket = input.IndexOf('[', nextClosingBracket);
-            if (nextOpeningBracket == -1) return stringBuilder.ToString();
-            string substring = input.Substring(nextClosingBracket, nextOpeningBracket - 1);
-            if (substring.IndexOfAny(['1', '2', '3', '4', '5', '6', '7', '8']) == -1)
-            {
-                substring = substring.Replace("]", "");
-                substring = substring.Replace("[", "");
-                stringBuilder.Append(substring);
-            }
-
-            stringBuilder.Append(input[(nextOpeningBracket + 1)..]);
-            input = stringBuilder.ToString();
-        }
-
-        return stringBuilder.ToString();
+        BracketSimplifier simplifier = new BracketSimplifier([new BracketPair('(', ')'), new BracketPair('[', ']')]);
+        return simplifier.Simplify(input);
     }
 
     private string GetRenderedNoteGroup(NoteGroupToken noteGroup)
