@@ -21,73 +21,74 @@ public class BracketSimplifier
     {
         if (string.IsNullOrWhiteSpace(input)) return input;
 
-        // Example: "[1] (2) [3] [4] 5" -> "[1] (2) [3 4] 5"
-
-        // Find any closing bracket -> In this case the ']' at index 2.
-        // Print the string until index 1. (bracket - 1).
-
-        // Find the next opening bracket -> In this case the '(' at index 4.
-        // Do they match? If not, print until index 4.
-        // If they match, print until index 3 and continue at index 5. (Ignore the bracket basically.)
-
-        // Repeat from the last index until no more brackets are found.
-
         StringBuilder builder = new StringBuilder();
-        int currentIndex = 0;
-        while (currentIndex < input.Length)
+        BracketPair? currentBracketScope = null;
+        bool canBracketBeSkipped = false;
+        for (int index = 0; index < input.Length; index++)
         {
-            int nextClosingBracket = FindAnyNextClosingBracket(input, currentIndex);
-            if (nextClosingBracket < 0)
+            char currentCharacter = input[index];
+            bool isBracket = TryGetBracketPairFromBracket(currentCharacter, out BracketPair? currentPair);
+            if (!isBracket)
             {
-                builder.Append(input[currentIndex..]);
-                break;
+                builder.Append(currentCharacter);
+                continue;
+            }
+
+            bool isOpeningBracket = isBracket && currentPair!.IsOpeningBracket(currentCharacter); // pair is guaranteed to be not-null.
+            if (currentBracketScope == null)
+            {
+                // We're outside a bracket-scope right now!
+                if (!isOpeningBracket)
+                {
+                    // Example: "1 2 3]" is illegal.
+                    throw new InvalidOperationException("Closing brackets cannot exist without a matching opening bracket.");
+                }
+
+                currentBracketScope = currentPair;
+                if(!canBracketBeSkipped) builder.Append(currentCharacter);
+                continue;
+            }
+
+            // We're inside a bracket scope.
+            if (isOpeningBracket)
+            {
+                // Brackets cannot be nested.
+                throw new InvalidOperationException("Brackets cannot be nested.");
+            }
+
+            bool bracketsMatch = currentBracketScope.IsClosingBracket(currentCharacter);
+            if (!bracketsMatch)
+            {
+                // Example: "1 [2) 3" is illegal.
+                throw new InvalidOperationException("Closing brackets must match the opening bracket.");
+            }
+
+            // We're now dealing with a matching closing bracket!
+            int indexOfNextMatchingOpeningBracket = input.IndexOf(currentBracketScope.OpeningBracket, index);
+            currentBracketScope = null;
+            
+            if (indexOfNextMatchingOpeningBracket < 0)
+            {
+                builder.Append(currentCharacter);
+                continue;
             }
             
-            builder.Append(input.Substring(currentIndex, nextClosingBracket - currentIndex));
-            currentIndex = nextClosingBracket;
-            
-            int nextOpeningBracket = FindAnyNextOpeningBracket(input, currentIndex);
-            if (nextOpeningBracket < 0)
+            string contentUntilNextOpeningBracket = input[(index + 1)..indexOfNextMatchingOpeningBracket];
+            canBracketBeSkipped = contentUntilNextOpeningBracket.All(c => !char.IsNumber(c));
+            if (canBracketBeSkipped)
             {
-                builder.Append(input[currentIndex..]);
-                break;
+                continue;
             }
             
-            BracketPair closingPair = GetBracketPairFromBracket(input[nextClosingBracket]);
-            BracketPair openingPair = GetBracketPairFromBracket(input[nextOpeningBracket]);
-            bool bracketsMatch = closingPair.Equals(openingPair);
-            if (bracketsMatch)
-            {
-                // Find where original closing is
-                // 
-                builder.Append(input[(currentIndex + 1) .. nextOpeningBracket]);
-                currentIndex = nextOpeningBracket + 1;
-            }
-            else
-            {
-                builder.Append(input.Substring(currentIndex, nextOpeningBracket - currentIndex + 1));
-                currentIndex = nextOpeningBracket + 1;
-            }
+            builder.Append(currentCharacter);
         }
+
         return builder.ToString();
     }
 
-    private int FindAnyNextOpeningBracket(string input, int startIndex)
+    private bool TryGetBracketPairFromBracket(char bracket, out BracketPair? pair)
     {
-        char[] brackets = _bracketPairs.Select(b => b.OpeningBracket).ToArray();
-        return input.IndexOfAny(brackets, startIndex);
-    }
-    
-    private int FindAnyNextClosingBracket(string input, int startIndex)
-    {
-        char[] brackets = _bracketPairs.Select(b => b.ClosingBracket).ToArray();
-        return input.IndexOfAny(brackets, startIndex);
-    }
-
-    private BracketPair GetBracketPairFromBracket(char bracket)
-    {
-        BracketPair? pair = _bracketPairs.FirstOrDefault(b => b.Brackets.Contains(bracket));
-        if (pair == null) throw new InvalidOperationException($"No bracket pair found for the given bracket '{bracket}'.");
-        return pair;
+        pair = _bracketPairs.FirstOrDefault(b => b.Brackets.Contains(bracket));
+        return pair != null;
     }
 }

@@ -22,13 +22,16 @@ public class BracketSimplifierTests
     [TestCase("", "")]
     [TestCase("  ", "  ")]
     [TestCase("1 2 3", "1 2 3")]
+    [TestCase("1 2 3", "1 2 3")]
     [TestCase("[1 2 3]", "[1 2 3]")]
     [TestCase("(1 2 3)", "(1 2 3)")]
     [TestCase("[1] [2 3]", "[1 2 3]")]
     [TestCase("[1] [2] [3]", "[1 2 3]")]
+    [TestCase("[1] [#2] [3]", "[1 #2 3]")]
     [TestCase("[1] - [3]", "[1 - 3]")]
+    [TestCase("[1]/[2]/[3]", "[1/2/3]")]
     [TestCase("(1) (2 3)", "(1 2 3)")]
-    [TestCase("[1] (2) [3] [4] 5", "[1] (2) [3 4] 5")]
+    [TestCase("[1] (2) [3] [4] 5 [6]", "[1] (2) [3 4] 5 [6]")]
     public void Simplify_StandardGuildWars2Brackets(string input, string expected)
     {
         List<BracketPair> bracketPairs =
