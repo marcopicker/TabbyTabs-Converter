@@ -45,7 +45,7 @@ public class BracketSimplifier
                 }
 
                 currentBracketScope = currentPair;
-                if(!canBracketBeSkipped) builder.Append(currentCharacter);
+                if (!canBracketBeSkipped) builder.Append(currentCharacter);
                 continue;
             }
 
@@ -66,20 +66,20 @@ public class BracketSimplifier
             // We're now dealing with a matching closing bracket!
             int indexOfNextMatchingOpeningBracket = input.IndexOf(currentBracketScope.OpeningBracket, index);
             currentBracketScope = null;
-            
+
             if (indexOfNextMatchingOpeningBracket < 0)
             {
                 builder.Append(currentCharacter);
                 continue;
             }
-            
+
             string contentUntilNextOpeningBracket = input[(index + 1)..indexOfNextMatchingOpeningBracket];
             canBracketBeSkipped = contentUntilNextOpeningBracket.All(c => !char.IsNumber(c));
             if (canBracketBeSkipped)
             {
                 continue;
             }
-            
+
             builder.Append(currentCharacter);
         }
 
