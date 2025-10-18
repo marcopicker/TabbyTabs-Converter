@@ -1,0 +1,58 @@
+using System.Collections.Generic;
+using GW2MidiConverter.Rendering;
+using NUnit.Framework;
+
+namespace GW2MidiConverter.Tests.Rendering;
+
+[TestFixture]
+public class BracketSimplifierTests
+{
+    [Test]
+    public void Constructor_BracketPairsIsNull_Throws()
+    {
+        Assert.That(() => _ = new BracketSimplifier(null!), Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void Constructor_NoBracketPairsSpecified_Throws()
+    {
+        Assert.That(() => _ = new BracketSimplifier([]), Throws.ArgumentException);
+    }
+
+    [TestCase("", "")]
+    [TestCase("  ", "  ")]
+    [TestCase("1 2 3", "1 2 3")]
+    [TestCase("[1 2 3]", "[1 2 3]")]
+    [TestCase("(1 2 3)", "(1 2 3)")]
+    [TestCase("[1] [2 3]", "[1 2 3]")]
+    [TestCase("[1] [2] [3]", "[1 2 3]")]
+    [TestCase("[1] - [3]", "[1 - 3]")]
+    [TestCase("(1) (2 3)", "(1 2 3)")]
+    [TestCase("[1] (2) [3] [4] 5", "[1] (2) [3 4] 5")]
+    public void Simplify_StandardGuildWars2Brackets(string input, string expected)
+    {
+        List<BracketPair> bracketPairs =
+        [
+            new BracketPair('(', ')'),
+            new BracketPair('[', ']')
+        ];
+        BracketSimplifier bracketSimplifier = new BracketSimplifier(bracketPairs);
+        string output = bracketSimplifier.Simplify(input);
+        Assert.That(output, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    public void Simplify_StandardGuildWars2Brackets_UnmatchedPairs()
+    {
+        string input = "[1] (2] [3] [4] 5";
+        
+        List<BracketPair> bracketPairs =
+        [
+            new BracketPair('(', ')'),
+            new BracketPair('[', ']')
+        ];
+        BracketSimplifier bracketSimplifier = new BracketSimplifier(bracketPairs);
+        string output = bracketSimplifier.Simplify(input);
+        // Assert.That(output, Is.EqualTo(expected));
+    }
+}

@@ -35,7 +35,7 @@ internal class TrackRenderer(TabRendererSettings settings)
 
             RenderMeasureTimeSignature(measure.TimeSignature, previousTimeSignature);
             RenderMeasureDelimiter();
-            RenderMeasure(measure);
+            _stringBuilder.Append(GetRenderedMeasure(measure));
             RenderMeasureDelimiter();
 
             _stringBuilder.AppendLine();
@@ -76,23 +76,55 @@ internal class TrackRenderer(TabRendererSettings settings)
         }
     }
 
-    private void RenderMeasure(TabMeasure measure)
+    private string GetRenderedMeasure(TabMeasure measure)
     {
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < measure.Tokens.Length; i++)
         {
             TabToken token = measure.Tokens[i];
             switch (token)
             {
                 case NoteGroupToken noteGroup:
-                    _stringBuilder.Append(GetRenderedNoteGroup(noteGroup));
+                    stringBuilder.Append(GetRenderedNoteGroup(noteGroup));
                     break;
                 case RestToken restToken:
-                    _stringBuilder.Append(GetRenderedRest(restToken));
+                    stringBuilder.Append(GetRenderedRest(restToken));
                     break;
             }
 
-            if (i < measure.Tokens.Length) _stringBuilder.Append(' ');
+            if (i < measure.Tokens.Length) stringBuilder.Append(' ');
         }
+
+        string output = stringBuilder.ToString();
+        return RemoveUnnecessaryOctaveSymbols(output);
+    }
+
+    private string RemoveUnnecessaryOctaveSymbols(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return input;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        while (true)
+        {
+            int nextClosingBracket = input.IndexOf(']');
+            if (nextClosingBracket == -1) return input;
+
+            stringBuilder.Append(input[..nextClosingBracket]);
+            int nextOpeningBracket = input.IndexOf('[', nextClosingBracket);
+            if (nextOpeningBracket == -1) return stringBuilder.ToString();
+            string substring = input.Substring(nextClosingBracket, nextOpeningBracket - 1);
+            if (substring.IndexOfAny(['1', '2', '3', '4', '5', '6', '7', '8']) == -1)
+            {
+                substring = substring.Replace("]", "");
+                substring = substring.Replace("[", "");
+                stringBuilder.Append(substring);
+            }
+
+            stringBuilder.Append(input[(nextOpeningBracket + 1)..]);
+            input = stringBuilder.ToString();
+        }
+
+        return stringBuilder.ToString();
     }
 
     private string GetRenderedNoteGroup(NoteGroupToken noteGroup)
