@@ -39,7 +39,7 @@ internal class MidiTrackConverter
                                                        .Events
                                                        .GetTrackEvents(trackIndex)
                                                        .OfType<NoteOnEvent>()
-                                                       .Where(e => e.NoteLength >= _settings.MinimumNoteDuration)
+                                                       .Where(e => e.OffEvent != null && e.NoteLength >= _settings.MinimumNoteDuration)
                                                        .ToList();
         List<MidiMeasure> measures = [];
         foreach (MidiMeasureInfo measureInfo in _timingMap.Measures)

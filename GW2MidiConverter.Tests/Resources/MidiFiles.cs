@@ -99,4 +99,8 @@ public static class MidiFiles
     /// </list>
     /// </summary>
     public static string ChordTestFile => Path.Combine(RESOURCE_FOLDER, "chord_tests.mid");
+    
+    public static string CriticalRole => Path.Combine(RESOURCE_FOLDER, "Critical_Role_-_Your_Turn_To_Roll_(GW2).mid");
+
+    public static string Nightmare => Path.Combine(RESOURCE_FOLDER, "The Nightmare Before Christmas - This is Halloween (GW2) Piano.mid");
 }

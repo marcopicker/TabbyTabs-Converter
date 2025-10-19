@@ -35,6 +35,8 @@
       <None Update="Resources\chord_tests.mid">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Remove="Resources\Critical_Role_-_Your_Turn_To_Roll_(GW2).mid" />
+      <None Remove="Resources\The Nightmare Before Christmas - This is Halloween (GW2) Piano.mid" />
     </ItemGroup>
 
     <ItemGroup>

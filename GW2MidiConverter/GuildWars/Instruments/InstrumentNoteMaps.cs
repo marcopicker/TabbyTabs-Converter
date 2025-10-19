@@ -56,4 +56,30 @@ public static class InstrumentNoteMaps
             { new MidiNoteNumber(84), new GuildWarsNote(GuildWarsNoteKey.Note8, new Octave(1)) },
         }
     ];
+
+    public static readonly List<Dictionary<MidiNoteNumber, GuildWarsNote>> Bass =
+    [
+        new Dictionary<MidiNoteNumber, GuildWarsNote>()
+        {
+            { new MidiNoteNumber(36), new GuildWarsNote(GuildWarsNoteKey.Note1, new Octave(-1)) },
+            { new MidiNoteNumber(38), new GuildWarsNote(GuildWarsNoteKey.Note2, new Octave(-1)) },
+            { new MidiNoteNumber(40), new GuildWarsNote(GuildWarsNoteKey.Note3, new Octave(-1)) },
+            { new MidiNoteNumber(41), new GuildWarsNote(GuildWarsNoteKey.Note4, new Octave(-1)) },
+            { new MidiNoteNumber(43), new GuildWarsNote(GuildWarsNoteKey.Note5, new Octave(-1)) },
+            { new MidiNoteNumber(45), new GuildWarsNote(GuildWarsNoteKey.Note6, new Octave(-1)) },
+            { new MidiNoteNumber(47), new GuildWarsNote(GuildWarsNoteKey.Note7, new Octave(-1)) },
+            { new MidiNoteNumber(48), new GuildWarsNote(GuildWarsNoteKey.Note8, new Octave(-1)) },
+        },
+        new Dictionary<MidiNoteNumber, GuildWarsNote>()
+        {
+            { new MidiNoteNumber(48), new GuildWarsNote(GuildWarsNoteKey.Note1, new Octave(0)) },
+            { new MidiNoteNumber(50), new GuildWarsNote(GuildWarsNoteKey.Note2, new Octave(0)) },
+            { new MidiNoteNumber(52), new GuildWarsNote(GuildWarsNoteKey.Note3, new Octave(0)) },
+            { new MidiNoteNumber(53), new GuildWarsNote(GuildWarsNoteKey.Note4, new Octave(0)) },
+            { new MidiNoteNumber(55), new GuildWarsNote(GuildWarsNoteKey.Note5, new Octave(0)) },
+            { new MidiNoteNumber(57), new GuildWarsNote(GuildWarsNoteKey.Note6, new Octave(0)) },
+            { new MidiNoteNumber(59), new GuildWarsNote(GuildWarsNoteKey.Note7, new Octave(0)) },
+            { new MidiNoteNumber(60), new GuildWarsNote(GuildWarsNoteKey.Note8, new Octave(0)) },
+        }
+    ];
 }

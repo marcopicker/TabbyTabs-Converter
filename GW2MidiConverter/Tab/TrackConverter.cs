@@ -17,8 +17,8 @@ internal class TrackConverter
 
     private List<GuildWarsNote[]> _potentialNotes = [];
     private Octave[] _octaves = [];
-    
-    private int _currentNoteGroupIndex;
+
+    private int _currentNoteIndex;
 
     public TrackConverter(MidiTrack track, int ticksPerQuarterNote)
     {
@@ -32,24 +32,24 @@ internal class TrackConverter
     public bool CanConvert(Instrument instrument)
     {
         ArgumentNullException.ThrowIfNull(instrument);
-        
+
         List<MidiNoteNumber> allNoteNumbers = GetNoteNumbersInTrack();
         return allNoteNumbers.All(n => instrument.NoteMap.IsNoteMapped(n));
     }
-    
+
     public TabTrack Convert(Instrument instrument, IOctaveCalculator octaveCalculator)
     {
         ArgumentNullException.ThrowIfNull(instrument);
         ArgumentNullException.ThrowIfNull(octaveCalculator);
-        
+
         GetAllPotentialNotes(instrument);
         List<Octave[]> potentialOctaves = _potentialNotes.Select(n => n.Select(note => note.Octave).Distinct().ToArray())
                                                          .ToList();
         _octaves = octaveCalculator.CalculateOctaves(potentialOctaves);
 
-        _currentNoteGroupIndex = 0;
+        _currentNoteIndex = 0;
         List<TabMeasure> measures = _track.Measures.Select(m => ConvertMeasure(m, instrument.NoteMap)).ToList();
-        TrackInfo trackInfo = _track.Info with { InstrumentName = instrument.Name };
+        TrackInfo trackInfo = _track.Info;
         return new TabTrack(trackInfo, measures);
     }
 
@@ -66,7 +66,8 @@ internal class TrackConverter
     {
         _potentialNotes.Clear();
         List<MidiNoteNumber> allNoteNumbers = GetNoteNumbersInTrack();
-        List<GuildWarsNote[]> potentialNotes = allNoteNumbers.Select(n => instrument.NoteMap.MapMidiToNotes(n))
+        List<GuildWarsNote[]> potentialNotes = allNoteNumbers.Where(n => instrument.NoteMap.IsNoteMapped(n))
+                                                             .Select(n => instrument.NoteMap.MapMidiToNotes(n))
                                                              .ToList();
         _potentialNotes = potentialNotes;
     }
@@ -83,11 +84,21 @@ internal class TrackConverter
 
         List<TabToken> tokens = [];
 
+        // Check for a rest at the start of this measure.
+        if (midiMeasure.NoteGroups.Length > 0)
+        {
+            MidiNoteGroup firstGroup = midiMeasure.NoteGroups[0];
+            if (TryConvertRest(midiMeasure.MeasureInfo.StartTick, firstGroup.TimeSpan.StartTick, timeSignature, out RestToken? startRest))
+            {
+                tokens.Add(startRest!);
+            }
+        }
+        
         for (int i = 0; i < midiMeasure.NoteGroups.Length - 1; i++)
         {
             MidiNoteGroup group = midiMeasure.NoteGroups[i];
             MidiNoteGroup nextGroup = midiMeasure.NoteGroups[i + 1];
-
+            
             NoteGroupToken noteGroup = ConvertNoteGroup(group, noteMap, timeSignature);
             tokens.Add(noteGroup);
 
@@ -96,30 +107,46 @@ internal class TrackConverter
                 // Guaranteed to have a value.
                 tokens.Add(rest!);
             }
-
-            _currentNoteGroupIndex++;
         }
 
+        // Check for a rest at the end of this measure.
         MidiNoteGroup lastGroup = midiMeasure.NoteGroups.Last();
         tokens.Add(ConvertNoteGroup(lastGroup, noteMap, timeSignature));
-        if (TryConvertRest(lastGroup.TimeSpan.EndTick, midiMeasure.MeasureInfo.EndTick, timeSignature, out RestToken? lastRest))
+        bool doesLastNoteCarryOverIntoNextMeasure = lastGroup.TimeSpan.EndTick > midiMeasure.MeasureInfo.EndTick;
+        if (!doesLastNoteCarryOverIntoNextMeasure && TryConvertRest(lastGroup.TimeSpan.EndTick, midiMeasure.MeasureInfo.EndTick, timeSignature, out RestToken? lastRest))
         {
             // Guaranteed to have a value.
             tokens.Add(lastRest!);
         }
 
-        _currentNoteGroupIndex++;
+        // _currentNoteIndex += lastGroup.Notes.Length;
         return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, tokens);
     }
 
     private NoteGroupToken ConvertNoteGroup(MidiNoteGroup group, InstrumentNoteMap noteMap, TimeSignature timeSignature)
     {
-        GuildWarsNote[] notes = group.Notes.Where(noteMap.IsNoteMapped)
-                                    .Select(noteMap.MapMidiToNotes)
-                                    .Select(n => n.First(note => note.Octave == _octaves[_currentNoteGroupIndex]))
-                                    .ToArray();
+        List<GuildWarsNote> notes = [];
+        foreach (MidiNoteNumber midiNoteNumber in group.Notes)
+        {
+            if (!noteMap.IsNoteMapped(midiNoteNumber))
+            {
+                continue;
+            }
+
+            GuildWarsNote[] mappedNotes = noteMap.MapMidiToNotes(midiNoteNumber);
+            Octave octave = _octaves[_currentNoteIndex];
+            GuildWarsNote noteToAdd = mappedNotes.First(note => note.Octave == octave);
+            notes.Add(noteToAdd);
+            _currentNoteIndex++;
+            // validatedIndex++;
+        }
+
+        // GuildWarsNote[] notes = group.Notes.Where(noteMap.IsNoteMapped)
+        //                             .Select(noteMap.MapMidiToNotes)
+        //                             .Select(n => n.First(note => note.Octave == _octaves[_currentNoteIndex]))
+        //                             .ToArray();
         TabElementLength length = TabElementLength.FromMidiData(group.TimeSpan, _ticksPerQuarterNote, timeSignature);
-        NoteGroupToken noteGroup = new NoteGroupToken(notes, length);
+        NoteGroupToken noteGroup = new NoteGroupToken(notes.ToArray(), length);
         return noteGroup;
     }
 
@@ -127,7 +154,7 @@ internal class TrackConverter
     {
         restToken = null;
         MidiTimeSpan timeSpan = new MidiTimeSpan(endOfEvent, startOfNextEvent);
-        if (timeSpan.Length == 0) return false;
+        if (timeSpan.Length <= 10) return false;
         TabElementLength restLength = TabElementLength.FromMidiData(timeSpan, _ticksPerQuarterNote, timeSignature);
         restToken = new RestToken(restLength);
         return true;

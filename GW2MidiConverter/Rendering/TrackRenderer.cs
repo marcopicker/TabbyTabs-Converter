@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,22 +23,32 @@ internal class TrackRenderer(TabRendererSettings settings)
 
         _stringBuilder.Clear();
         TimeSignature previousTimeSignature = new TimeSignature(0, 0);
+        int measureInRowsCounter = 0;
         for (int i = 0; i < track.Measures.Length; i++)
         {
             TabMeasure measure = track.Measures[i];
 
             bool isLineBreakDue = i > 0 &&
                                   i < track.Measures.Length &&
-                                  i % settings.MaxMeasureCountBeforeSpacing == 0;
-            if (isLineBreakDue) _stringBuilder.AppendLine();
+                                  measureInRowsCounter % settings.MaxMeasureCountBeforeSpacing == 0;
+            if (isLineBreakDue)
+            {
+                _stringBuilder.AppendLine();
+                measureInRowsCounter = 0;
+            }
 
-            RenderMeasureTimeSignature(measure.TimeSignature, previousTimeSignature);
+            if (RenderMeasureTimeSignature(measure.TimeSignature, previousTimeSignature))
+            {
+                measureInRowsCounter = 0;
+            }
+
             RenderMeasureDelimiter();
             _stringBuilder.Append(GetRenderedMeasure(measure));
             RenderMeasureDelimiter();
 
             _stringBuilder.AppendLine();
             previousTimeSignature = measure.TimeSignature;
+            measureInRowsCounter++;
         }
 
         return _stringBuilder.ToString().TrimStart().TrimStart('\n');
@@ -51,13 +60,13 @@ internal class TrackRenderer(TabRendererSettings settings)
         _stringBuilder.Append(settings.MeasureDelimiter);
     }
 
-    private void RenderMeasureTimeSignature(TimeSignature timeSignature, TimeSignature previousTimeSignature)
+    private bool RenderMeasureTimeSignature(TimeSignature timeSignature, TimeSignature previousTimeSignature)
     {
         bool showTimeSignature = settings.TimeSignatureVisibility == TimeSignatureVisibility.AlwaysShow ||
                                  (settings.TimeSignatureVisibility == TimeSignatureVisibility.OnlyOnChanges && timeSignature != previousTimeSignature);
         if (!showTimeSignature)
         {
-            return;
+            return false;
         }
 
         string timeSignatureString = $"{timeSignature.Numerator}/{timeSignature.Denominator}: ";
@@ -74,11 +83,15 @@ internal class TrackRenderer(TabRendererSettings settings)
                 _stringBuilder.Append(timeSignatureString);
                 break;
         }
+
+        return true;
     }
 
     private string GetRenderedMeasure(TabMeasure measure)
     {
         StringBuilder stringBuilder = new StringBuilder();
+        // stringBuilder.Append($"{(measure.MeasureNumber + 1).ToString("D2")}: ");
+        bool skipNextSpace = false;
         for (int i = 0; i < measure.Tokens.Length; i++)
         {
             TabToken token = measure.Tokens[i];
@@ -86,13 +99,15 @@ internal class TrackRenderer(TabRendererSettings settings)
             {
                 case NoteGroupToken noteGroup:
                     stringBuilder.Append(GetRenderedNoteGroup(noteGroup));
+                    if (noteGroup.Length.Beats < 0.25m) skipNextSpace = true;
                     break;
                 case RestToken restToken:
                     stringBuilder.Append(GetRenderedRest(restToken));
                     break;
             }
 
-            if (i < measure.Tokens.Length) stringBuilder.Append(' ');
+            if (!skipNextSpace && i < measure.Tokens.Length) stringBuilder.Append(' ');
+            skipNextSpace = false;
         }
 
         string output = stringBuilder.ToString();
@@ -108,9 +123,14 @@ internal class TrackRenderer(TabRendererSettings settings)
     private string GetRenderedNoteGroup(NoteGroupToken noteGroup)
     {
         List<string> notes = noteGroup.Notes.Select(GetNoteString).ToList();
-        bool isDotted = noteGroup.Length.IsDotted;
-        string dotString = isDotted ? "." : string.Empty;
-        return string.Join("/", notes) + dotString;
+        string notesString = string.Join("/", notes);
+        string restString = string.Empty;
+        if (noteGroup.Length.Beats > 1m)
+        {
+            restString = GetRestSymbolForBeats(noteGroup.Length.Beats - 1m);
+        }
+
+        return notesString + restString;
     }
 
     private string GetNoteString(GuildWarsNote note)
@@ -123,18 +143,30 @@ internal class TrackRenderer(TabRendererSettings settings)
 
     private string GetRenderedRest(RestToken restToken)
     {
-        string rests = string.Empty;
-        decimal remainingBeats = restToken.Length;
+        return GetRestSymbolForBeats(restToken.Length.Beats);
+    }
+
+    private string GetRestSymbolForBeats(decimal durationInBeats)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        decimal remainingBeats = durationInBeats;
         while (remainingBeats > 0)
         {
             decimal decrement = remainingBeats >= 1 ? 1 : remainingBeats;
+            if (decrement < 0.5m)
+            {
+                remainingBeats -= decrement;
+                continue;
+            }
 
             string rest = decrement == 1 ? "—" : "-";
-            rests += rest + " ";
+
+            stringBuilder.Append(rest);
+            stringBuilder.Append(' ');
 
             remainingBeats -= decrement;
         }
 
-        return rests.TrimEnd();
+        return stringBuilder.ToString().Trim();
     }
 }
