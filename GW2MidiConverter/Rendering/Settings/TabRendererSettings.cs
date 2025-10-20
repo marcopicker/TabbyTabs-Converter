@@ -17,6 +17,12 @@ public class TabRendererSettings
     public char MeasureDelimiter { get; init; } = '|';
     public bool DrawMeasureDelimiters { get; init; } = false;
 
+    public Dictionary<Octave, BracketPair> BracketPairsPerOctave { get; init; } = new Dictionary<Octave, BracketPair>
+    {
+        [new Octave(-1)] = new BracketPair('[', ']'),
+        [new Octave(1)] = new BracketPair('(', ')'),
+    };
+    
     public Dictionary<decimal, char> RestSymbolsPerBeat { get; init; } = new Dictionary<decimal, char>
     {
         [1.00m] = '—',
