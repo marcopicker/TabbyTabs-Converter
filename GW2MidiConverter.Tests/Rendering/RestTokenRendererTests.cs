@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace GW2MidiConverter.Tests.Rendering;
 
 [TestFixture]
-public class RestRendererTests
+public class RestTokenRendererTests
 {
     [TestCase(0, "")]
     [TestCase(1, "—")]
@@ -31,7 +31,7 @@ public class RestRendererTests
             }
         };
         
-        RestRenderer renderer = new RestRenderer(settings);
+        RestTokenRenderer renderer = new RestTokenRenderer(settings);
         string output = renderer.RenderBeats(length);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -55,7 +55,7 @@ public class RestRendererTests
             }
         };
         
-        RestRenderer renderer = new RestRenderer(settings);
+        RestTokenRenderer renderer = new RestTokenRenderer(settings);
         string output = renderer.RenderBeats(length);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -83,7 +83,7 @@ public class RestRendererTests
 
         RestToken token = new RestToken(new TabElementLength(length));
         
-        RestRenderer renderer = new RestRenderer(settings);
+        RestTokenRenderer renderer = new RestTokenRenderer(settings);
         string output = renderer.RenderToken(token);
         Assert.That(output, Is.EqualTo(expected));
     }

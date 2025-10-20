@@ -6,7 +6,7 @@ using GW2MidiConverter.Tab.Tokens;
 
 namespace GW2MidiConverter.Rendering;
 
-public class RestRenderer(TabRendererSettings settings)
+public class RestTokenRenderer(TabRendererSettings settings)
 {
     private readonly TabRendererSettings _settings = settings;
 

@@ -12,7 +12,7 @@ namespace GW2MidiConverter.Rendering;
 internal class TrackRenderer(TabRendererSettings settings)
 {
     private readonly StringBuilder _stringBuilder = new StringBuilder();
-    private RestRenderer _restRenderer = new RestRenderer(settings);
+    private readonly RestTokenRenderer _restTokenRenderer = new RestTokenRenderer(settings);
 
     /// <summary>
     /// Renders the given track. This method only renders the actual content, and no headers like the instrument name.
@@ -104,7 +104,7 @@ internal class TrackRenderer(TabRendererSettings settings)
                     if (noteGroup.Length.Beats < 0.25m) skipNextSpace = true;
                     break;
                 case RestToken restToken:
-                    stringBuilder.Append(_restRenderer.RenderToken(restToken));
+                    stringBuilder.Append(_restTokenRenderer.RenderToken(restToken));
                     break;
             }
 
@@ -129,7 +129,7 @@ internal class TrackRenderer(TabRendererSettings settings)
         string restString = string.Empty;
         if (noteGroup.Length.Beats > 1m)
         {
-            restString = _restRenderer.RenderBeats(noteGroup.Length.Beats - 1m);
+            restString = _restTokenRenderer.RenderBeats(noteGroup.Length.Beats - 1m);
         }
 
         return notesString + restString;
