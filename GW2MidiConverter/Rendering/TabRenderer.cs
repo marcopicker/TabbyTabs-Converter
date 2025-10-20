@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.Rendering;

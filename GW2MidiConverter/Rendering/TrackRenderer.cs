@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.Midi;
+using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Tokens;
 
@@ -11,6 +12,7 @@ namespace GW2MidiConverter.Rendering;
 internal class TrackRenderer(TabRendererSettings settings)
 {
     private readonly StringBuilder _stringBuilder = new StringBuilder();
+    private RestRenderer _restRenderer = new RestRenderer(settings);
 
     /// <summary>
     /// Renders the given track. This method only renders the actual content, and no headers like the instrument name.
@@ -102,7 +104,7 @@ internal class TrackRenderer(TabRendererSettings settings)
                     if (noteGroup.Length.Beats < 0.25m) skipNextSpace = true;
                     break;
                 case RestToken restToken:
-                    stringBuilder.Append(GetRenderedRest(restToken));
+                    stringBuilder.Append(_restRenderer.RenderToken(restToken));
                     break;
             }
 
@@ -127,7 +129,7 @@ internal class TrackRenderer(TabRendererSettings settings)
         string restString = string.Empty;
         if (noteGroup.Length.Beats > 1m)
         {
-            restString = GetRestSymbolForBeats(noteGroup.Length.Beats - 1m);
+            restString = _restRenderer.RenderBeats(noteGroup.Length.Beats - 1m);
         }
 
         return notesString + restString;
@@ -139,34 +141,5 @@ internal class TrackRenderer(TabRendererSettings settings)
         if (note.Octave == 1) return $"({noteString})";
         if (note.Octave == -1) return $"[{noteString}]";
         return noteString;
-    }
-
-    private string GetRenderedRest(RestToken restToken)
-    {
-        return GetRestSymbolForBeats(restToken.Length.Beats);
-    }
-
-    private string GetRestSymbolForBeats(decimal durationInBeats)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-        decimal remainingBeats = durationInBeats;
-        while (remainingBeats > 0)
-        {
-            decimal decrement = remainingBeats >= 1 ? 1 : remainingBeats;
-            if (decrement < 0.5m)
-            {
-                remainingBeats -= decrement;
-                continue;
-            }
-
-            string rest = decrement == 1 ? "—" : "-";
-
-            stringBuilder.Append(rest);
-            stringBuilder.Append(' ');
-
-            remainingBeats -= decrement;
-        }
-
-        return stringBuilder.ToString().Trim();
     }
 }

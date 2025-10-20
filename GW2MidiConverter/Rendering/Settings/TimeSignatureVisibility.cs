@@ -1,4 +1,4 @@
-namespace GW2MidiConverter.Rendering;
+namespace GW2MidiConverter.Rendering.Settings;
 
 public enum TimeSignatureVisibility
 {

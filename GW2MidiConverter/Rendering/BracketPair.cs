@@ -1,5 +1,3 @@
-using System;
-
 namespace GW2MidiConverter.Rendering;
 
 public record BracketPair(char OpeningBracket, char ClosingBracket)

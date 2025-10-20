@@ -99,7 +99,7 @@ internal class TrackConverter
             MidiNoteGroup group = midiMeasure.NoteGroups[i];
             MidiNoteGroup nextGroup = midiMeasure.NoteGroups[i + 1];
             
-            NoteGroupToken noteGroup = ConvertNoteGroup(group, noteMap, timeSignature);
+            NoteGroupToken noteGroup = ConvertNoteGroup(group, noteMap, timeSignature, midiMeasure);
             tokens.Add(noteGroup);
 
             if (TryConvertRest(group.TimeSpan.EndTick, nextGroup.TimeSpan.StartTick, timeSignature, out RestToken? rest))
@@ -111,7 +111,7 @@ internal class TrackConverter
 
         // Check for a rest at the end of this measure.
         MidiNoteGroup lastGroup = midiMeasure.NoteGroups.Last();
-        tokens.Add(ConvertNoteGroup(lastGroup, noteMap, timeSignature));
+        tokens.Add(ConvertNoteGroup(lastGroup, noteMap, timeSignature, midiMeasure));
         bool doesLastNoteCarryOverIntoNextMeasure = lastGroup.TimeSpan.EndTick > midiMeasure.MeasureInfo.EndTick;
         if (!doesLastNoteCarryOverIntoNextMeasure && TryConvertRest(lastGroup.TimeSpan.EndTick, midiMeasure.MeasureInfo.EndTick, timeSignature, out RestToken? lastRest))
         {
@@ -123,7 +123,7 @@ internal class TrackConverter
         return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, tokens);
     }
 
-    private NoteGroupToken ConvertNoteGroup(MidiNoteGroup group, InstrumentNoteMap noteMap, TimeSignature timeSignature)
+    private NoteGroupToken ConvertNoteGroup(MidiNoteGroup group, InstrumentNoteMap noteMap, TimeSignature timeSignature, MidiMeasure measure)
     {
         List<GuildWarsNote> notes = [];
         foreach (MidiNoteNumber midiNoteNumber in group.Notes)
@@ -137,15 +137,14 @@ internal class TrackConverter
             Octave octave = _octaves[_currentNoteIndex];
             GuildWarsNote noteToAdd = mappedNotes.First(note => note.Octave == octave);
             notes.Add(noteToAdd);
+            
             _currentNoteIndex++;
-            // validatedIndex++;
         }
 
-        // GuildWarsNote[] notes = group.Notes.Where(noteMap.IsNoteMapped)
-        //                             .Select(noteMap.MapMidiToNotes)
-        //                             .Select(n => n.First(note => note.Octave == _octaves[_currentNoteIndex]))
-        //                             .ToArray();
-        TabElementLength length = TabElementLength.FromMidiData(group.TimeSpan, _ticksPerQuarterNote, timeSignature);
+        // Cut off notes that are tied to notes after this measure.
+        MidiTimeSpan timeSpan = group.TimeSpan with { EndTick = Math.Min(group.TimeSpan.EndTick, measure.MeasureInfo.EndTick) };
+        TabElementLength length = TabElementLength.FromMidiData(timeSpan, _ticksPerQuarterNote, timeSignature);
+        
         NoteGroupToken noteGroup = new NoteGroupToken(notes.ToArray(), length);
         return noteGroup;
     }
