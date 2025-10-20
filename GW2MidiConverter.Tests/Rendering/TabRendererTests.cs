@@ -12,15 +12,16 @@ namespace GW2MidiConverter.Tests.Rendering;
 public class TabRendererTests
 {
     [Test]
+    [Ignore("Uses non-existent files right now.")]
     public void Test1()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.Nightmare);
         TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
-        
+
         tabDocument.EnableTrack(0, new Instrument("Piano", new InstrumentNoteMap(InstrumentNoteMaps.Piano)));
         tabDocument.EnableTrack(1, new Instrument("Piano", new InstrumentNoteMap(InstrumentNoteMaps.Piano)));
         tabDocument.EnableTrack(2, new Instrument("Bass", new InstrumentNoteMap(InstrumentNoteMaps.Bass)));
-        
+
         TabRenderer renderer = new TabRenderer(tabDocument);
         string tab = renderer.Render();
     }

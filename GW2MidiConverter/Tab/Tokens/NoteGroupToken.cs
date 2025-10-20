@@ -4,9 +4,9 @@ using GW2MidiConverter.GuildWars;
 
 namespace GW2MidiConverter.Tab.Tokens;
 
-public class NoteGroupToken(GuildWarsNote[] notes, TabElementLength length) : TabToken
+public class NoteGroupToken(ICollection<GuildWarsNote> notes, TabElementLength length) : TabToken
 {
-    public IReadOnlyList<GuildWarsNote> Notes { get; } = notes;
+    public ICollection<GuildWarsNote> Notes { get; } = notes;
     public TabElementLength Length { get; } = length;
     
     public override string ToString()
