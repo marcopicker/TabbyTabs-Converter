@@ -98,21 +98,21 @@ public class MidiTrackConverterTests
             // Measure 1
             Assert.That(track.Measures[0].MeasureInfo.TimeSignature, Is.EqualTo(new TimeSignature(4, 4)));
             
-            Assert.That(track.Measures[0].NoteGroups[0].Notes, Has.Length.EqualTo(1));
+            Assert.That(track.Measures[0].NoteGroups[0].Notes, Has.Count.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[0].Notes, Has.Member(new MidiNoteNumber(60)));
             Assert.That(track.Measures[0].NoteGroups[0].Position, Is.EqualTo(new SongPosition(1, 1, 0)));
             Assert.That(track.Measures[0].NoteGroups[0].IsChord, Is.False);
             Assert.That(track.Measures[0].IsEmpty, Is.False);
             
-            Assert.That(track.Measures[0].NoteGroups[1].Notes, Has.Length.EqualTo(1));
+            Assert.That(track.Measures[0].NoteGroups[1].Notes, Has.Count.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[1].Notes, Has.Member(new MidiNoteNumber(62)));
             Assert.That(track.Measures[0].NoteGroups[1].Position, Is.EqualTo(new SongPosition(1, 2, 0)));
             
-            Assert.That(track.Measures[0].NoteGroups[2].Notes, Has.Length.EqualTo(1));
+            Assert.That(track.Measures[0].NoteGroups[2].Notes, Has.Count.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[2].Notes, Has.Member(new MidiNoteNumber(64)));
             Assert.That(track.Measures[0].NoteGroups[2].Position, Is.EqualTo(new SongPosition(1, 3, 0)));
             
-            Assert.That(track.Measures[0].NoteGroups[3].Notes, Has.Length.EqualTo(1));
+            Assert.That(track.Measures[0].NoteGroups[3].Notes, Has.Count.EqualTo(1));
             Assert.That(track.Measures[0].NoteGroups[3].Notes, Has.Member(new MidiNoteNumber(67)));
             Assert.That(track.Measures[0].NoteGroups[3].Position, Is.EqualTo(new SongPosition(1, 4, 0)));
 

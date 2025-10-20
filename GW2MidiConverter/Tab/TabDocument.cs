@@ -13,7 +13,7 @@ public class TabDocument
     private readonly Dictionary<int, Instrument> _instrumentsByTrackIds = new Dictionary<int, Instrument>();
     private readonly List<TabTrack> _tracks = [];
 
-    public TabTrack[] Tracks => _tracks.ToArray();
+    public IReadOnlyList<TabTrack> Tracks => _tracks;
 
     private TabDocument(MidiDocument midiDocument, IOctaveCalculator octaveCalculator)
     {

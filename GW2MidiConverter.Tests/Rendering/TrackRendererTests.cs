@@ -1,8 +1,8 @@
+using GW2MidiConverter.General;
 using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Rendering;
 using GW2MidiConverter.Rendering.Settings;
-using GW2MidiConverter.Shared;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Tokens;
 using NUnit.Framework;

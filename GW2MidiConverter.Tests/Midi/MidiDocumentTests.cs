@@ -1,6 +1,6 @@
 using System;
+using GW2MidiConverter.General;
 using GW2MidiConverter.Midi;
-using GW2MidiConverter.Shared;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
 

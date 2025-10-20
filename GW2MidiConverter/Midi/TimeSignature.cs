@@ -8,15 +8,16 @@ public readonly struct TimeSignature(int numerator, int denominator) : IEquatabl
     /// <summary>
     /// The top number of the fraction. 
     /// </summary>
-    public readonly int Numerator = numerator;
+    public int Numerator { get; } = numerator;
     
     /// <summary>
     /// The bottom number of the fraction.
     /// </summary>
-    public readonly int Denominator = denominator;
+    public int Denominator { get; } = denominator;
 
     public static TimeSignature FromTimeSignatureEvent(TimeSignatureEvent timeSignatureEvent)
     {
+        ArgumentNullException.ThrowIfNull(timeSignatureEvent);
         return new TimeSignature(timeSignatureEvent.Numerator, (int) Math.Pow(2, timeSignatureEvent.Denominator));   
     }
 

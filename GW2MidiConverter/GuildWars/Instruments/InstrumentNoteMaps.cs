@@ -5,7 +5,7 @@ namespace GW2MidiConverter.GuildWars.Instruments;
 
 public static class InstrumentNoteMaps
 {
-    public static readonly List<Dictionary<MidiNoteNumber, GuildWarsNote>> Piano =
+    public static readonly IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> Piano =
     [
         new Dictionary<MidiNoteNumber, GuildWarsNote>()
         {
@@ -57,7 +57,7 @@ public static class InstrumentNoteMaps
         }
     ];
 
-    public static readonly List<Dictionary<MidiNoteNumber, GuildWarsNote>> Bass =
+    public static readonly IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> Bass =
     [
         new Dictionary<MidiNoteNumber, GuildWarsNote>()
         {

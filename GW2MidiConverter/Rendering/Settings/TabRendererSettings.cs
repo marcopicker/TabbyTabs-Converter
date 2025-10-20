@@ -5,17 +5,17 @@ namespace GW2MidiConverter.Rendering.Settings;
 
 public class TabRendererSettings
 {
-    public int LineBreaksAfterTrackName { get; init; } = 0;
+    public int LineBreaksAfterTrackName { get; init; }
     public int LineBreaksBetweenTracks { get; init; } = 2;
     public OctaveRenderingMode OctaveRenderingMode { get; init; } = OctaveRenderingMode.PerMeasure;
     public TimeSignatureVisibility TimeSignatureVisibility { get; init; } = TimeSignatureVisibility.OnlyOnChanges;
     public TimeSignaturePositioning TimeSignaturePositioning { get; init; } = TimeSignaturePositioning.AboveMeasure;
     public int LinesBeforeTimeSignature { get; init; } = 1;
-    public int LinesAfterTimeSignature { get; init; } = 0;
+    public int LinesAfterTimeSignature { get; init; }
     public int MaxMeasureCountBeforeSpacing { get; init; } = 4;
 
     public char MeasureDelimiter { get; init; } = '|';
-    public bool DrawMeasureDelimiters { get; init; } = false;
+    public bool DrawMeasureDelimiters { get; init; }
 
     public Dictionary<Octave, BracketPair> BracketPairsPerOctave { get; init; } = new Dictionary<Octave, BracketPair>
     {

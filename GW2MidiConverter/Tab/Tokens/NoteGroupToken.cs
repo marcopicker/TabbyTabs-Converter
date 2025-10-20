@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.GuildWars;
 
@@ -5,7 +6,7 @@ namespace GW2MidiConverter.Tab.Tokens;
 
 public class NoteGroupToken(GuildWarsNote[] notes, TabElementLength length) : TabToken
 {
-    public GuildWarsNote[] Notes { get; } = notes;
+    public IReadOnlyList<GuildWarsNote> Notes { get; } = notes;
     public TabElementLength Length { get; } = length;
     
     public override string ToString()

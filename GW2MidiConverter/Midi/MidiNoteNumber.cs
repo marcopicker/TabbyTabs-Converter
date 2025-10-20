@@ -27,7 +27,7 @@ public readonly record struct MidiNoteNumber : IComparable<MidiNoteNumber>
         Value = value;
     }
 
-    public int Value { get; }
+    public int Value { get; } = -1;
 
     public override string ToString()
     {
@@ -48,5 +48,35 @@ public readonly record struct MidiNoteNumber : IComparable<MidiNoteNumber>
     public int CompareTo(MidiNoteNumber other)
     {
         return Value.CompareTo(other.Value);
+    }
+
+    public static bool operator <(MidiNoteNumber left, MidiNoteNumber right)
+    {
+        return left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(MidiNoteNumber left, MidiNoteNumber right)
+    {
+        return left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(MidiNoteNumber left, MidiNoteNumber right)
+    {
+        return left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(MidiNoteNumber left, MidiNoteNumber right)
+    {
+        return left.CompareTo(right) >= 0;
+    }
+
+    public int ToInt32()
+    {
+        return Value;
+    }
+
+    public static MidiNoteNumber FromInt32(int value)
+    {
+        return new MidiNoteNumber(value);
     }
 }

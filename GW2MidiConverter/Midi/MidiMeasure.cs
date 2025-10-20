@@ -1,15 +1,16 @@
 using System;
+using System.Collections.Generic;
 
 namespace GW2MidiConverter.Midi;
 
 public record MidiMeasure
 {
-    public MidiMeasureInfo MeasureInfo { get; init; }
-    public MidiNoteGroup[] NoteGroups { get; init; }
-    
-    public bool IsEmpty => NoteGroups.Length == 0;
-    
-    public MidiMeasure(MidiMeasureInfo measureInfo, MidiNoteGroup[] noteGroups)
+    public MidiMeasureInfo MeasureInfo { get; }
+    public IReadOnlyList<MidiNoteGroup> NoteGroups { get; }
+
+    public bool IsEmpty => NoteGroups.Count == 0;
+
+    public MidiMeasure(MidiMeasureInfo measureInfo, IReadOnlyList<MidiNoteGroup> noteGroups)
     {
         ArgumentNullException.ThrowIfNull(noteGroups);
         MeasureInfo = measureInfo;

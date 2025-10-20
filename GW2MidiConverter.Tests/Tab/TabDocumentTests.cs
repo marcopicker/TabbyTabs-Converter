@@ -23,6 +23,6 @@ public class TabDocumentTests
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
         TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
 
-        Assert.That(tabDocument.Tracks, Has.Length.EqualTo(1));
+        Assert.That(tabDocument.Tracks, Has.Count.EqualTo(1));
     }
 }

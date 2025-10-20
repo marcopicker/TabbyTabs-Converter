@@ -18,7 +18,7 @@ public class LookAheadOctaveCalculatorTests
             new[] { new Octave(0), new Octave(-1) },
         ];
 
-        Octave[] expected =
+        IList<Octave> expected =
         [
             new Octave(0),
             new Octave(0),
@@ -26,7 +26,7 @@ public class LookAheadOctaveCalculatorTests
         ];
 
         LookAheadOctaveCalculator calculator = new LookAheadOctaveCalculator();
-        Octave[] output = calculator.CalculateOctaves(input);
+        IReadOnlyList<Octave> output = calculator.CalculateOctaves(input);
         Assert.That(output, Is.EquivalentTo(expected));
     }
     
@@ -40,7 +40,7 @@ public class LookAheadOctaveCalculatorTests
             new[] { new Octave(0), new Octave(-1) },
         ];
 
-        Octave[] expected =
+        IList<Octave> expected =
         [
             new Octave(0),
             new Octave(0),
@@ -48,7 +48,7 @@ public class LookAheadOctaveCalculatorTests
         ];
 
         LookAheadOctaveCalculator calculator = new LookAheadOctaveCalculator();
-        Octave[] output = calculator.CalculateOctaves(input);
+        IReadOnlyList<Octave> output = calculator.CalculateOctaves(input);
         Assert.That(output, Is.EquivalentTo(expected));
     }
     
@@ -62,7 +62,7 @@ public class LookAheadOctaveCalculatorTests
             new[] { new Octave(1) },
         ];
 
-        Octave[] expected =
+        IList<Octave> expected =
         [
             new Octave(0),
             new Octave(1),
@@ -70,7 +70,7 @@ public class LookAheadOctaveCalculatorTests
         ];
 
         LookAheadOctaveCalculator calculator = new LookAheadOctaveCalculator();
-        Octave[] output = calculator.CalculateOctaves(input);
+        IReadOnlyList<Octave> output = calculator.CalculateOctaves(input);
         Assert.That(output, Is.EquivalentTo(expected));
     }
     
@@ -89,7 +89,7 @@ public class LookAheadOctaveCalculatorTests
             new[] { new Octave(-1) },
         ];
 
-        Octave[] expected =
+        IList<Octave> expected =
         [
             new Octave(0),
             new Octave(1),
@@ -102,7 +102,7 @@ public class LookAheadOctaveCalculatorTests
         ];
 
         LookAheadOctaveCalculator calculator = new LookAheadOctaveCalculator();
-        Octave[] output = calculator.CalculateOctaves(input);
+        IReadOnlyList<Octave> output = calculator.CalculateOctaves(input);
         Assert.That(output, Is.EquivalentTo(expected));
     }
 }

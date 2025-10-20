@@ -1,3 +1,3 @@
-namespace GW2MidiConverter.Shared;
+namespace GW2MidiConverter.General;
 
 public record TrackInfo(int TrackIndex, string InstrumentName);

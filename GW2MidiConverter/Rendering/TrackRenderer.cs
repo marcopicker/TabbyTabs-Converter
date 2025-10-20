@@ -21,17 +21,17 @@ internal class TrackRenderer(TabRendererSettings settings)
     /// <returns>The rendered track.</returns>
     public string Render(TabTrack track)
     {
-        if (track.Measures.Length == 0) return string.Empty;
+        if (track.Measures.Count == 0) return string.Empty;
 
         _stringBuilder.Clear();
         TimeSignature previousTimeSignature = new TimeSignature(0, 0);
         int measureInRowsCounter = 0;
-        for (int i = 0; i < track.Measures.Length; i++)
+        for (int i = 0; i < track.Measures.Count; i++)
         {
             TabMeasure measure = track.Measures[i];
 
             bool isLineBreakDue = i > 0 &&
-                                  i < track.Measures.Length &&
+                                  i < track.Measures.Count &&
                                   measureInRowsCounter % settings.MaxMeasureCountBeforeSpacing == 0;
             if (isLineBreakDue)
             {
@@ -94,7 +94,7 @@ internal class TrackRenderer(TabRendererSettings settings)
         StringBuilder stringBuilder = new StringBuilder();
         // stringBuilder.Append($"{(measure.MeasureNumber + 1).ToString("D2")}: ");
         bool skipNextSpace = false;
-        for (int i = 0; i < measure.Tokens.Length; i++)
+        for (int i = 0; i < measure.Tokens.Count; i++)
         {
             TabToken token = measure.Tokens[i];
             switch (token)
@@ -108,7 +108,7 @@ internal class TrackRenderer(TabRendererSettings settings)
                     break;
             }
 
-            if (!skipNextSpace && i < measure.Tokens.Length) stringBuilder.Append(' ');
+            if (!skipNextSpace && i < measure.Tokens.Count) stringBuilder.Append(' ');
             skipNextSpace = false;
         }
 
@@ -116,9 +116,10 @@ internal class TrackRenderer(TabRendererSettings settings)
         return RemoveUnnecessaryOctaveSymbols(output);
     }
 
+    // TODO MP: Store this in a member variable.
     private string RemoveUnnecessaryOctaveSymbols(string input)
     {
-        BracketSimplifier simplifier = new BracketSimplifier([new BracketPair('(', ')'), new BracketPair('[', ']')]);
+        BracketSimplifier simplifier = new BracketSimplifier(settings.BracketPairsPerOctave.Values.ToList());
         return simplifier.Simplify(input);
     }
 

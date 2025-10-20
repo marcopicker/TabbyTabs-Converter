@@ -8,14 +8,13 @@ namespace GW2MidiConverter.GuildWars.Instruments;
 
 public class InstrumentNoteMap
 {
-    private readonly List<Dictionary<MidiNoteNumber, GuildWarsNote>> _maps;
+    private readonly IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> _maps;
 
-    public InstrumentNoteMap(IEnumerable<Dictionary<MidiNoteNumber, GuildWarsNote>> maps)
+    public InstrumentNoteMap(IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> maps)
     {
         ArgumentNullException.ThrowIfNull(maps);
-        List<Dictionary<MidiNoteNumber, GuildWarsNote>> mapsList = maps.ToList();
-        if (mapsList.Count == 0) throw new ArgumentException("Maps must not be empty.", nameof(maps));
-        _maps = mapsList;
+        if (maps.Count == 0) throw new ArgumentException("Maps must not be empty.", nameof(maps));
+        _maps = maps;
     }
 
     public bool IsNoteMapped(MidiNoteNumber midiNote)

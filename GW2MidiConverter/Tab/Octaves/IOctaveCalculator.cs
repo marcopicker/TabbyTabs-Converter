@@ -5,5 +5,5 @@ namespace GW2MidiConverter.Tab.Octaves;
 
 public interface IOctaveCalculator
 {
-    Octave[] CalculateOctaves(List<Octave[]> potentialOctaves);
+    IReadOnlyList<Octave> CalculateOctaves(IReadOnlyList<Octave[]> potentialOctaves);
 }

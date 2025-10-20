@@ -22,4 +22,24 @@ public record SongPosition(int Measure, int Beat, long TicksInBeat) : IComparabl
     {
         return HashCode.Combine(Measure, Beat, TicksInBeat);
     }
+
+    public static bool operator <(SongPosition left, SongPosition right)
+    {
+        return ReferenceEquals(left, null) ? !ReferenceEquals(right, null) : left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(SongPosition left, SongPosition right)
+    {
+        return ReferenceEquals(left, null) || left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(SongPosition left, SongPosition right)
+    {
+        return !ReferenceEquals(left, null) && left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(SongPosition left, SongPosition right)
+    {
+        return ReferenceEquals(left, null) ? ReferenceEquals(right, null) : left.CompareTo(right) >= 0;
+    }
 }

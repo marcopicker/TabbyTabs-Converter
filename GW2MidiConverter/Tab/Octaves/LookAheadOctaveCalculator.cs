@@ -7,13 +7,12 @@ namespace GW2MidiConverter.Tab.Octaves;
 
 public class LookAheadOctaveCalculator : IOctaveCalculator
 {
-    public Octave[] CalculateOctaves(List<Octave[]> potentialOctaves)
+    public IReadOnlyList<Octave> CalculateOctaves(IReadOnlyList<Octave[]> potentialOctaves)
     {
-        return potentialOctaves.Select((_, i) => DetermineOctaveForIndexRecursive(potentialOctaves, i))
-                               .ToArray();
+        return potentialOctaves.Select((_, i) => DetermineOctaveForIndexRecursive(potentialOctaves, i)).ToList();
     }
 
-    private static Octave DetermineOctaveForIndexRecursive(List<Octave[]> potentialOctaves, int index)
+    private static Octave DetermineOctaveForIndexRecursive(IReadOnlyList<Octave[]> potentialOctaves, int index)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(index);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, potentialOctaves.Count);

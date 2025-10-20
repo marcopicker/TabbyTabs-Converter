@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GW2MidiConverter.General;
 using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
-using GW2MidiConverter.Shared;
 using GW2MidiConverter.Tab.Octaves;
 using GW2MidiConverter.Tab.Tokens;
 
@@ -15,8 +15,8 @@ internal class TrackConverter
     private readonly MidiTrack _track;
     private readonly int _ticksPerQuarterNote;
 
-    private List<GuildWarsNote[]> _potentialNotes = [];
-    private Octave[] _octaves = [];
+    private IReadOnlyList<GuildWarsNote[]> _potentialNotes = [];
+    private IReadOnlyList<Octave> _octaves = [];
 
     private int _currentNoteIndex;
 
@@ -64,7 +64,6 @@ internal class TrackConverter
 
     private void GetAllPotentialNotes(Instrument instrument)
     {
-        _potentialNotes.Clear();
         List<MidiNoteNumber> allNoteNumbers = GetNoteNumbersInTrack();
         List<GuildWarsNote[]> potentialNotes = allNoteNumbers.Where(n => instrument.NoteMap.IsNoteMapped(n))
                                                              .Select(n => instrument.NoteMap.MapMidiToNotes(n))
@@ -85,7 +84,7 @@ internal class TrackConverter
         List<TabToken> tokens = [];
 
         // Check for a rest at the start of this measure.
-        if (midiMeasure.NoteGroups.Length > 0)
+        if (midiMeasure.NoteGroups.Count > 0)
         {
             MidiNoteGroup firstGroup = midiMeasure.NoteGroups[0];
             if (TryConvertRest(midiMeasure.MeasureInfo.StartTick, firstGroup.TimeSpan.StartTick, timeSignature, out RestToken? startRest))
@@ -94,7 +93,7 @@ internal class TrackConverter
             }
         }
         
-        for (int i = 0; i < midiMeasure.NoteGroups.Length - 1; i++)
+        for (int i = 0; i < midiMeasure.NoteGroups.Count - 1; i++)
         {
             MidiNoteGroup group = midiMeasure.NoteGroups[i];
             MidiNoteGroup nextGroup = midiMeasure.NoteGroups[i + 1];
@@ -110,7 +109,7 @@ internal class TrackConverter
         }
 
         // Check for a rest at the end of this measure.
-        MidiNoteGroup lastGroup = midiMeasure.NoteGroups.Last();
+        MidiNoteGroup lastGroup = midiMeasure.NoteGroups[^1];
         tokens.Add(ConvertNoteGroup(lastGroup, noteMap, timeSignature, midiMeasure));
         bool doesLastNoteCarryOverIntoNextMeasure = lastGroup.TimeSpan.EndTick > midiMeasure.MeasureInfo.EndTick;
         if (!doesLastNoteCarryOverIntoNextMeasure && TryConvertRest(lastGroup.TimeSpan.EndTick, midiMeasure.MeasureInfo.EndTick, timeSignature, out RestToken? lastRest))

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Converters;
-using GW2MidiConverter.Shared;
+using GW2MidiConverter.General;
 using NAudio.Midi;
 
 namespace GW2MidiConverter.Midi;
@@ -40,7 +40,7 @@ public class MidiDocument
     /// <remarks>
     /// <i>Instrument-tracks</i> are tracks with at least one MIDI note event.
     /// </remarks>
-    public int[] InstrumentTrackIndexes => _instrumentTrackIndexes.ToArray();
+    public IReadOnlyCollection<int> InstrumentTrackIndexes => _instrumentTrackIndexes;
 
     public int TicksPerQuarterNote => _midiFile.DeltaTicksPerQuarterNote;
 

@@ -6,10 +6,15 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <AnalysisMode>All</AnalysisMode>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
     <ItemGroup>
-      <PackageReference Include="NAudio.Midi" Version="2.2.1" />
+        <PackageReference Include="NAudio.Midi" Version="2.2.1"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>GW2MidiConverter.Tests</_Parameter1>

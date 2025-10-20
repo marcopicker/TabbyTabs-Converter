@@ -7,9 +7,9 @@ namespace GW2MidiConverter.Rendering;
 
 public class BracketSimplifier
 {
-    private readonly List<BracketPair> _bracketPairs;
+    private readonly IReadOnlyCollection<BracketPair> _bracketPairs;
 
-    public BracketSimplifier(List<BracketPair> bracketPairs)
+    public BracketSimplifier(IReadOnlyCollection<BracketPair> bracketPairs)
     {
         ArgumentNullException.ThrowIfNull(bracketPairs);
         if (bracketPairs.Count == 0) throw new ArgumentException("Bracket pairs must not be empty.", nameof(bracketPairs));
@@ -88,7 +88,7 @@ public class BracketSimplifier
 
     private bool TryGetBracketPairFromBracket(char bracket, out BracketPair? pair)
     {
-        pair = _bracketPairs.FirstOrDefault(b => b.Brackets.Contains(bracket));
+        pair = _bracketPairs.FirstOrDefault(b => b.GetBracketCharacters().Contains(bracket));
         return pair != null;
     }
 }

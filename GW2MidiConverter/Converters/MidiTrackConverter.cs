@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GW2MidiConverter.General;
 using GW2MidiConverter.Midi;
-using GW2MidiConverter.Shared;
 using NAudio.Midi;
 
 namespace GW2MidiConverter.Converters;
