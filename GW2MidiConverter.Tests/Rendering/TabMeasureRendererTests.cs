@@ -67,7 +67,7 @@ public class TabMeasureRendererTests
         List<TabToken> tokens =
         [
             new NoteGroupToken([new GuildWarsNote(GuildWarsNoteKey.Note1, 0)], new SongPosition(1, 1), new TabElementLength(2)),
-            new RestToken(new SongPosition(1, 2), new TabElementLength(2))
+            new RestToken(new SongPosition(1, 3), new TabElementLength(2))
         ];
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, tokens);
         const string expected = "1    —    —    —";

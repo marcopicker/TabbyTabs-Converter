@@ -5,9 +5,9 @@ namespace GW2MidiConverter.Midi;
 
 public record MidiNoteGroup
 {
-    public IReadOnlyList<MidiNoteNumber> Notes { get; }
-    public SongPosition Position { get; }
-    public MidiTimeSpan TimeSpan { get; }
+    public IReadOnlyList<MidiNoteNumber> Notes { get; init; }
+    public SongPosition Position { get; init; }
+    public MidiTimeSpan TimeSpan { get; init; }
 
     public bool IsChord => Notes.Count > 1;
 

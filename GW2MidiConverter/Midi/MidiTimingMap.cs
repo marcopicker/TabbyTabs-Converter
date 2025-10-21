@@ -55,14 +55,15 @@ internal class MidiTimingMap
             TimeSignature lastTimeSignature = new TimeSignature(lastNumerator, lastDenominator);
 
             long timeSinceLastEvent = timeSignatureEvent.AbsoluteTime - lastTimeSignatureEvent.AbsoluteTime;
-            long currentTicksPerMeasure = CalculateTicksPerMeasure(lastTimeSignature);//(lastNumerator * TicksPerQuarterNote) / (4 / lastDenominator);
+            long currentTicksPerMeasure = CalculateTicksPerMeasure(lastTimeSignature);
             int elapsedMeasures = (int)(timeSinceLastEvent / currentTicksPerMeasure);
             measure += elapsedMeasures;
             lastTimeSignatureEvent = timeSignatureEvent;
         }
 
         // We have arrived at the current measure! Time to calculate the beat.
-        long ticksInCurrentMeasure = absoluteTime - lastTimeSignatureEvent.AbsoluteTime;
+        long ticksPerMeasure = CalculateTicksPerMeasure(TimeSignature.FromTimeSignatureEvent(lastTimeSignatureEvent));
+        long ticksInCurrentMeasure = (absoluteTime - lastTimeSignatureEvent.AbsoluteTime) % ticksPerMeasure;
         int beat = (int)(ticksInCurrentMeasure / TicksPerQuarterNote) + 1;
         
         long ticksInCurrentBeat = ticksInCurrentMeasure - (beat - 1) * TicksPerQuarterNote;

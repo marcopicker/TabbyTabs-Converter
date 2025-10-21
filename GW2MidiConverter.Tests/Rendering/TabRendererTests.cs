@@ -9,10 +9,10 @@ using NUnit.Framework;
 namespace GW2MidiConverter.Tests.Rendering;
 
 [TestFixture]
+[Ignore("Currently these are only or manual testing. Meow!")]
 public class TabRendererTests
 {
     [Test]
-    [Ignore("Uses non-existent files right now.")]
     public void Test1()
     {
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.Nightmare);

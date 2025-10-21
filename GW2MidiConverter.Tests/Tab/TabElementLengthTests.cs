@@ -28,4 +28,22 @@ public class TabElementLengthTests
         TabElementLength length = TabElementLength.FromMidiData(timeSpan, TICKS_PER_QUARTER_NOTE, timeSignature);
         Assert.That(length.Beats, Is.EqualTo(expectedBeats));
     }
+
+    [Test]
+    public void Equals_EqualLengths()
+    {
+        TabElementLength length1 = new TabElementLength(1.5m);
+        TabElementLength length2 = new TabElementLength(1.5m);
+        bool result = length1.Equals(length2);
+        Assert.That(result, Is.True);
+    }
+    
+    [Test]
+    public void Equals_Operator()
+    {
+        TabElementLength length1 = new TabElementLength(1.5m);
+        TabElementLength length2 = new TabElementLength(1.5m);
+        bool result = length1 == length2;
+        Assert.That(result, Is.True);
+    }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using GW2MidiConverter.Midi;
 
 namespace GW2MidiConverter.Tab;
@@ -16,6 +17,11 @@ public readonly struct TabElementLength(decimal beats) : IComparable<TabElementL
         decimal quarterNotesPerBeat = (decimal)4 / timeSignature.Denominator;
         decimal beats = quarterNotes / quarterNotesPerBeat;
         return new TabElementLength(beats);
+    }
+
+    public override string ToString()
+    {
+        return Beats.ToString("0.00", CultureInfo.InvariantCulture);
     }
 
     public int CompareTo(TabElementLength other)

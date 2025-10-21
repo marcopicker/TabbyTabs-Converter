@@ -17,7 +17,7 @@ internal class MidiTrackConverter
     {
         ArgumentNullException.ThrowIfNull(midiDocument);
         ArgumentNullException.ThrowIfNull(midiDocument.GetRawMidiFile().Events);
-        
+
         _midiDocument = midiDocument;
         _timingMap = MidiTimingMap.FromMidiFile(_midiDocument.GetRawMidiFile());
         _settings = settings ?? new MidiConverterSettings();
@@ -45,11 +45,12 @@ internal class MidiTrackConverter
         foreach (MidiMeasureInfo measureInfo in _timingMap.Measures)
         {
             MidiMeasure measure = ConvertMeasure(measureInfo, eventsOfTrack);
+            measure = FixEventLengths(measure);
             measures.Add(measure);
         }
 
         TrackInfo info = GetMidiTrackInfoForTrack(trackIndex);
-        return new MidiTrack(info, measures.ToArray());
+        return new MidiTrack(info, measures);
     }
 
     private TrackInfo GetMidiTrackInfoForTrack(int trackIndex)
@@ -66,8 +67,8 @@ internal class MidiTrackConverter
     private MidiMeasure ConvertMeasure(MidiMeasureInfo midiMeasureInfo, List<NoteOnEvent> noteEventsInTrack)
     {
         List<long> eventTimesInMeasure = noteEventsInTrack.Where(e => e.AbsoluteTime >= midiMeasureInfo.StartTick && e.AbsoluteTime < midiMeasureInfo.EndTick)
-                                                      .Select(e => e.AbsoluteTime)
-                                                      .Distinct().Order().ToList();
+                                                          .Select(e => e.AbsoluteTime)
+                                                          .Distinct().Order().ToList();
         List<MidiNoteGroup> noteGroups = [];
         foreach (long time in eventTimesInMeasure)
         {
@@ -92,7 +93,39 @@ internal class MidiTrackConverter
         MidiNoteNumber[] pitches = events.Select(e => (MidiNoteNumber)e.NoteNumber).Distinct().Order().ToArray();
         SongPosition position = _timingMap.GetPositionAtTick(firstEvent.AbsoluteTime);
         MidiTimeSpan timeSpan = new MidiTimeSpan(firstEvent.AbsoluteTime, firstEvent.AbsoluteTime + firstEvent.NoteLength);
-        
+
         return new MidiNoteGroup(pitches, position, timeSpan);
+    }
+
+    private static MidiMeasure FixEventLengths(MidiMeasure measure)
+    {
+        if (measure.NoteGroups.Count == 0) return measure;
+
+        List<MidiNoteGroup> fixedGroups = [];
+
+        for (int i = 0; i < measure.NoteGroups.Count - 1; i++)
+        {
+            MidiNoteGroup group = measure.NoteGroups[i];
+            MidiNoteGroup nextGroup = measure.NoteGroups[i + 1];
+
+            MidiNoteGroup fixedGroup = FixGroupLength(group, nextGroup.TimeSpan.StartTick);
+            fixedGroups.Add(fixedGroup);
+        }
+
+        MidiNoteGroup lastGroup = measure.NoteGroups[^1];
+        fixedGroups.Add(FixGroupLength(lastGroup, measure.MeasureInfo.EndTick));
+
+        return measure with { NoteGroups = fixedGroups };
+    }
+    
+    private static MidiNoteGroup FixGroupLength(MidiNoteGroup group, long nextEventTick)
+    {
+        long tickDelta = nextEventTick - group.TimeSpan.EndTick;
+        if (tickDelta <= 3)
+        {
+            return group with { TimeSpan = group.TimeSpan with { EndTick = nextEventTick } };
+        }
+
+        return group;
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
@@ -12,6 +13,7 @@ public class TabMeasureRenderer
     private readonly TabRendererSettings _settings;
     private readonly NoteRenderer _noteRenderer;
     private readonly RestRenderer _restRenderer;
+    private readonly BracketSimplifier _bracketSimplifier;
 
     private readonly StringBuilder _measureStringBuilder = new StringBuilder();
 
@@ -21,6 +23,7 @@ public class TabMeasureRenderer
         ArgumentNullException.ThrowIfNull(settings);
         _noteRenderer = new NoteRenderer(settings);
         _restRenderer = new RestRenderer(settings);
+        _bracketSimplifier = new BracketSimplifier(settings.BracketPairsPerOctave.Values.ToList());
     }
 
     public string RenderMeasure(TabMeasure measure)
@@ -56,7 +59,8 @@ public class TabMeasureRenderer
             stringBuilder.Append(_settings.GetTrailingSpacesForBeatLength(token.Length));
         }
 
-        return stringBuilder.ToString().Trim();
+        string renderedBeat = stringBuilder.ToString().Trim();
+        return _bracketSimplifier.Simplify(renderedBeat);
     }
     
     private string RenderToken(TabToken token)
@@ -88,9 +92,8 @@ public class TabMeasureRenderer
 
     private static List<TabToken> PrepareTokensForBeat(TabMeasure measure, int beat)
     {
-        IReadOnlyList<TabToken> tokens = GetAllTokensThatTouchBeat(measure, beat);
         List<TabToken> output = [];
-        foreach (TabToken token in tokens)
+        foreach (TabToken token in measure.Tokens)
         {
             TabToken tokenToAdd = token;
             
@@ -106,32 +109,6 @@ public class TabMeasureRenderer
             
             if (TabTokenUtility.TryCutTokenToFitBeat(tokenToAdd, beat, out TabToken? cutToken)) output.Add(cutToken!);
         }
-        return output;
-    }
-    
-    private static List<TabToken> GetAllTokensThatTouchBeat(TabMeasure measure, int beat)
-    {
-        List<TabToken> tokens = [];
-
-        foreach (TabToken token in measure.Tokens)
-        {
-            // If they start in the given beat, it's straightforward. :)
-            if (token.Position.Beat == beat)
-            {
-                tokens.Add(token);
-                continue;
-            }
-
-            // Ignore tokens that start after the given beat.
-            if (token.Position.Beat > beat) continue;
-
-            // The token now begins before this beat.
-            if (token.Position.Beat + token.Length.Beats >= beat)
-            {
-                tokens.Add(token);
-            }
-        }
-
-        return tokens;
+        return output.Distinct().OrderBy(t => t.Position).ToList();
     }
 }

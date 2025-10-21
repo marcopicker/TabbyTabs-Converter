@@ -77,11 +77,10 @@ internal class TrackConverter
 
         if (midiMeasure.IsEmpty)
         {
-            SongPosition emptyMeasureSongPosition = new SongPosition(midiMeasure.MeasureInfo.MeasureNumber, 0);
+            SongPosition emptyMeasureSongPosition = new SongPosition(midiMeasure.MeasureInfo.MeasureNumber, 1);
             RestToken fullRest = new RestToken(emptyMeasureSongPosition, new TabElementLength(timeSignature.Denominator));
             return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, [fullRest]);
         }
-        
         
         List<TabToken> tokens = [];
 

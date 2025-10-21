@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
@@ -12,7 +9,7 @@ namespace GW2MidiConverter.Rendering;
 internal class TabTrackRenderer(TabRendererSettings settings)
 {
     private readonly StringBuilder _stringBuilder = new StringBuilder();
-    private readonly RestRenderer _restRenderer = new RestRenderer(settings);
+    private readonly TabMeasureRenderer _measureRenderer = new TabMeasureRenderer(settings);
 
     /// <summary>
     /// Renders the given track. This method only renders the actual content, and no headers like the instrument name.
@@ -45,7 +42,7 @@ internal class TabTrackRenderer(TabRendererSettings settings)
             }
 
             RenderMeasureDelimiter();
-            _stringBuilder.Append(GetRenderedMeasure(measure));
+            _stringBuilder.Append(_measureRenderer.RenderMeasure(measure));
             RenderMeasureDelimiter();
 
             _stringBuilder.AppendLine();
@@ -53,7 +50,7 @@ internal class TabTrackRenderer(TabRendererSettings settings)
             measureInRowsCounter++;
         }
 
-        return _stringBuilder.ToString().TrimStart().TrimStart('\n');
+        return _stringBuilder.ToString().Trim().TrimStart('\n');
     }
 
     private void RenderMeasureDelimiter()
@@ -87,60 +84,5 @@ internal class TabTrackRenderer(TabRendererSettings settings)
         }
 
         return true;
-    }
-
-    private string GetRenderedMeasure(TabMeasure measure)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-        // stringBuilder.Append($"{(measure.MeasureNumber + 1).ToString("D2")}: ");
-        bool skipNextSpace = false;
-        for (int i = 0; i < measure.Tokens.Count; i++)
-        {
-            TabToken token = measure.Tokens[i];
-            switch (token)
-            {
-                case NoteGroupToken noteGroup:
-                    stringBuilder.Append(GetRenderedNoteGroup(noteGroup));
-                    if (noteGroup.Length.Beats < 0.25m) skipNextSpace = true;
-                    break;
-                case RestToken restToken:
-                    stringBuilder.Append(_restRenderer.RenderBeats(restToken.Length.Beats));
-                    break;
-            }
-
-            if (!skipNextSpace && i < measure.Tokens.Count) stringBuilder.Append(' ');
-            skipNextSpace = false;
-        }
-
-        string output = stringBuilder.ToString();
-        return RemoveUnnecessaryOctaveSymbols(output);
-    }
-
-    // TODO MP: Store this in a member variable.
-    private string RemoveUnnecessaryOctaveSymbols(string input)
-    {
-        BracketSimplifier simplifier = new BracketSimplifier(settings.BracketPairsPerOctave.Values.ToList());
-        return simplifier.Simplify(input);
-    }
-
-    private string GetRenderedNoteGroup(NoteGroupToken noteGroup)
-    {
-        List<string> notes = noteGroup.Notes.Select(GetNoteString).ToList();
-        string notesString = string.Join("/", notes);
-        string restString = string.Empty;
-        if (noteGroup.Length.Beats > 1m)
-        {
-            restString = _restRenderer.RenderBeats(noteGroup.Length.Beats - 1m);
-        }
-
-        return notesString + restString;
-    }
-
-    private string GetNoteString(GuildWarsNote note)
-    {
-        string noteString = settings.KeyNames[note.Key];
-        if (note.Octave == 1) return $"({noteString})";
-        if (note.Octave == -1) return $"[{noteString}]";
-        return noteString;
     }
 }

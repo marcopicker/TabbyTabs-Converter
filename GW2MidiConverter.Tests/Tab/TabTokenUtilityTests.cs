@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Tokens;
@@ -78,6 +80,21 @@ public class TabTokenUtilityTests
             Assert.That(cutToken, Is.Not.Null);
             Assert.That(cutToken.Position, Is.EqualTo(new SongPosition(1, 1, 0.5m)));
             Assert.That(cutToken.Length, Is.EqualTo(new TabElementLength(0.5m)));
+        }
+    }
+
+    [Test]
+    public void TryCutTokenToFitBeat_TokenFromTwoBeatsPriorThatFillsOutBar()
+    {
+        TestToken token = new TestToken(new SongPosition(1, 2), new TabElementLength(2));
+        bool result = TabTokenUtility.TryCutTokenToFitBeat(token, 3, out TestToken? cutToken);
+        
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result, Is.True);
+            Assert.That(cutToken, Is.Not.Null);
+            Assert.That(cutToken.Position, Is.EqualTo(new SongPosition(1, 3)));
+            Assert.That(cutToken.Length, Is.EqualTo(new TabElementLength(1)));
         }
     }
 }

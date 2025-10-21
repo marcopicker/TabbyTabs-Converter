@@ -5,8 +5,8 @@ namespace GW2MidiConverter.Midi;
 
 public record MidiMeasure
 {
-    public MidiMeasureInfo MeasureInfo { get; }
-    public IReadOnlyList<MidiNoteGroup> NoteGroups { get; }
+    public MidiMeasureInfo MeasureInfo { get; init; }
+    public IReadOnlyList<MidiNoteGroup> NoteGroups { get; init; }
 
     public bool IsEmpty => NoteGroups.Count == 0;
 

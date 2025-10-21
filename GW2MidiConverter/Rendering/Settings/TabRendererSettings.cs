@@ -51,7 +51,7 @@ public class TabRendererSettings
 
     public IReadOnlyDictionary<TabElementLength, int> TrailingSpacesPerBeatLength { get; init; } = new Dictionary<TabElementLength, int>
     {
-        [new TabElementLength(1.00m)] = 4,
+        [new TabElementLength(1.00m)] = 3,
         [new TabElementLength(0.50m)] = 2,
         [new TabElementLength(0.25m)] = 1,
     };
@@ -60,8 +60,11 @@ public class TabRendererSettings
     {
         if (TrailingSpacesPerBeatLength.Count == 0) return string.Empty;
         
-        TabElementLength length = TrailingSpacesPerBeatLength.Keys.Where(length => length <= beatLength).MaxBy(length => length);
-        int spaceCount = TrailingSpacesPerBeatLength[length];
+        List<TabElementLength> lengths = TrailingSpacesPerBeatLength.Keys.Where(length => length.Beats <= beatLength.Beats).ToList();
+        if(lengths.Count == 0) return string.Empty;
+
+        TabElementLength fittingLength = lengths.OrderByDescending(length => length.Beats).MaxBy(l => l);
+        int spaceCount = TrailingSpacesPerBeatLength[fittingLength];
         return new string(' ', spaceCount);
     }
     

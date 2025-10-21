@@ -43,20 +43,4 @@ public class BracketSimplifierTests
         string output = bracketSimplifier.Simplify(input);
         Assert.That(output, Is.EqualTo(expected));
     }
-    
-    [Test]
-    [Ignore("Assumes old logic!")]
-    public void Simplify_StandardGuildWars2Brackets_UnmatchedPairs()
-    {
-        string input = "[1] (2] [3] [4] 5";
-        
-        List<BracketPair> bracketPairs =
-        [
-            new BracketPair('(', ')'),
-            new BracketPair('[', ']')
-        ];
-        BracketSimplifier bracketSimplifier = new BracketSimplifier(bracketPairs);
-        string output = bracketSimplifier.Simplify(input);
-        // Assert.That(output, Is.EqualTo(expected));
-    }
 }

@@ -8,6 +8,32 @@ namespace GW2MidiConverter.Tests.Midi;
 public class SongPositionTests
 {
     [Test]
+    public void Constructor()
+    {
+        SongPosition position = new SongPosition(1, 2, 0.33m);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(position.Measure, Is.EqualTo(1));
+            Assert.That(position.Beat, Is.EqualTo(2));
+            Assert.That(position.BeatFraction, Is.EqualTo(0.33m));   
+        }
+    }
+    
+    [Test]
+    public void Constructor_CombinedBeatAndFraction()
+    {
+        SongPosition position = new SongPosition(1, 2.33m);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(position.Measure, Is.EqualTo(1));
+            Assert.That(position.Beat, Is.EqualTo(2));
+            Assert.That(position.BeatFraction, Is.EqualTo(0.33m));   
+        }
+    }
+    
+    [Test]
     [SuppressMessage("Assertion", "NUnit2009:The same value has been provided as both the actual and the expected argument", Justification = "Of course they're the same. That's what the test is about.")]
     public void IsEqualTo_IsEqual()
     {
