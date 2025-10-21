@@ -5,10 +5,8 @@ using GW2MidiConverter.Midi;
 
 namespace GW2MidiConverter.Tab.Tokens;
 
-public class NoteGroupToken(ICollection<GuildWarsNote> notes, SongPosition position, TabElementLength length) : TabToken(position, length)
+public record NoteGroupToken(ICollection<GuildWarsNote> Notes, SongPosition Position, TabElementLength Length) : TabToken(Position, Length)
 {
-    public ICollection<GuildWarsNote> Notes { get; } = notes;
-    
     public override string ToString()
     {
         string notes = string.Join("/", Notes.Select(n => n.ToString()));

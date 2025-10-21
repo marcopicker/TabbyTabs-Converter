@@ -124,10 +124,10 @@ public class TabMeasureRendererTests
         Assert.That(output, Is.EqualTo(expected));
     }
 
-    [TestCase(0, "1  1")]
-    [TestCase(1, "—")]
-    [TestCase(2, "1")]
-    [TestCase(3, "—")]
+    [TestCase(1, "1  1")]
+    [TestCase(2, "—")]
+    [TestCase(3, "1")]
+    [TestCase(4, "—")]
     public void RenderBeat_CommonTimeMeasure_NormalLengths(int beat, string expected)
     {
         List<TabToken> tokens =

@@ -2,7 +2,7 @@ using GW2MidiConverter.Midi;
 
 namespace GW2MidiConverter.Tab.Tokens;
 
-public class RestToken(SongPosition position, TabElementLength length) : TabToken(position, length)
+public record RestToken(SongPosition Position, TabElementLength Length) : TabToken(Position, Length)
 {
     public override string ToString()
     {

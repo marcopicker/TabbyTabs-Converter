@@ -28,6 +28,21 @@ public readonly struct SongPosition : IEquatable<SongPosition>, IComparable<Song
     }
 
     /// <summary>
+    /// Initialises a new instance of the <see cref="SongPosition"/> struct.
+    /// </summary>
+    /// <param name="measure">The measure of the position within the piece.</param>
+    /// <param name="beat">The beat within the <paramref name="measure"/>, starting at 1, including the beat-fraction.</param>
+    public SongPosition(int measure, decimal beat)
+    {
+        // Negative measures are allowed, but negative beats and fractions do not make sense.
+        ArgumentOutOfRangeException.ThrowIfLessThan(beat, 1, nameof(beat));
+        
+        Measure = measure;
+        Beat = (int) beat;
+        BeatFraction = beat - Beat;
+    }
+
+    /// <summary>
     /// The measure of the position in the piece.
     /// </summary>
     public int Measure { get; } = 0;

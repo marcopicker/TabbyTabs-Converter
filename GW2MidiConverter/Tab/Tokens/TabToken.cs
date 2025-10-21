@@ -2,8 +2,11 @@ using GW2MidiConverter.Midi;
 
 namespace GW2MidiConverter.Tab.Tokens;
 
-public abstract class TabToken(SongPosition position, TabElementLength length)
+public abstract record TabToken(SongPosition Position, TabElementLength Length)
 {
-    public SongPosition Position { get; } = position;
-    public TabElementLength Length { get; } = length;
+    public void Deconstruct(out SongPosition position, out TabElementLength length)
+    {
+        position = Position;
+        length = Length;
+    }
 }
