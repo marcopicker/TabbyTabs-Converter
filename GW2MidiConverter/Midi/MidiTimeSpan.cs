@@ -11,7 +11,7 @@ public readonly record struct MidiTimeSpan
         EndTick = endTick;
     }
 
-    public long Length => EndTick - StartTick;
+    public long TickLength => EndTick - StartTick;
     public long StartTick { get; init; }
     public long EndTick { get; init; }
 };

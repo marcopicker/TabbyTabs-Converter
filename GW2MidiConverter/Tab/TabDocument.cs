@@ -26,7 +26,7 @@ public class TabDocument
     {
         foreach (MidiTrack track in _midiDocument.GetTracks())
         {
-            _trackConvertersByTrackIds[track.Info.TrackIndex] = new TrackConverter(track, _midiDocument.TicksPerQuarterNote);
+            _trackConvertersByTrackIds[track.Info.TrackIndex] = new TrackConverter(track, _midiDocument.TimingMap);
         }
     }
 

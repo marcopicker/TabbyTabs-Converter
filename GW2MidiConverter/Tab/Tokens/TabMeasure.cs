@@ -5,7 +5,7 @@ using GW2MidiConverter.Midi;
 
 namespace GW2MidiConverter.Tab.Tokens;
 
-public class TabMeasure(int measureNumber, TimeSignature timeSignature, IReadOnlyList<TabToken> tokens) : TabToken
+public class TabMeasure(int measureNumber, TimeSignature timeSignature, IReadOnlyList<TabToken> tokens)
 {
     public int MeasureNumber { get; } = measureNumber;
     public TimeSignature TimeSignature { get; } = timeSignature;

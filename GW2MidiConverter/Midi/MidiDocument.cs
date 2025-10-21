@@ -19,6 +19,7 @@ public class MidiDocument
     private MidiDocument(MidiFile midiFile, MidiConverterSettings? settings = null)
     {
         _midiFile = midiFile;
+        TimingMap = MidiTimingMap.FromMidiFile(midiFile);
         FindInstrumentTracks();
 
         if (_instrumentTrackIndexes.Count == 0) return;
@@ -26,6 +27,9 @@ public class MidiDocument
         _tracks = converter.ConvertTracks(_instrumentTrackIndexes).Values.ToArray();
     }
 
+    // TODO MP: Make this public.
+    internal MidiTimingMap TimingMap { get; }
+    
     /// <summary>
     /// Returns the count of instrument-tracks in this MIDI document.
     /// </summary>

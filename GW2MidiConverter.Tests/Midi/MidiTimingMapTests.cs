@@ -96,7 +96,7 @@ public class MidiTimingMapTests
     }
 
     [Test]
-    public void GetPositionAtTick_ValidTests()
+    public void GetPositionAtTick_Common_Time_ValidTests()
     {
         MidiFile midiFile = new MidiFile(MidiFiles.TimingTestFile);
         MidiTimingMap map = MidiTimingMap.FromMidiFile(midiFile);
@@ -105,16 +105,19 @@ public class MidiTimingMapTests
 
         using (Assert.EnterMultipleScope())
         {
+            // 4/4 Time
             Assert.That(map.GetPositionAtTick(0 * quarterNote), Is.EqualTo(new SongPosition(1, 1, 0)));
             Assert.That(map.GetPositionAtTick(1 * quarterNote), Is.EqualTo(new SongPosition(1, 2, 0)));
             Assert.That(map.GetPositionAtTick(2 * quarterNote), Is.EqualTo(new SongPosition(1, 3, 0)));
-            Assert.That(map.GetPositionAtTick((int)(2.5f * quarterNote)), Is.EqualTo(new SongPosition(1, 3, quarterNote / 2)));
+            Assert.That(map.GetPositionAtTick((int)(2.5f * quarterNote)), Is.EqualTo(new SongPosition(1, 3, 0.5m)));
             Assert.That(map.GetPositionAtTick(3 * quarterNote), Is.EqualTo(new SongPosition(1, 4, 0)));
 
+            // 3/3 Time
             Assert.That(map.GetPositionAtTick(4 * quarterNote), Is.EqualTo(new SongPosition(2, 1, 0)));
             Assert.That(map.GetPositionAtTick(5 * quarterNote), Is.EqualTo(new SongPosition(2, 2, 0)));
             Assert.That(map.GetPositionAtTick(6 * quarterNote), Is.EqualTo(new SongPosition(2, 3, 0)));
 
+            // Back to 4/4
             Assert.That(map.GetPositionAtTick(7 * quarterNote), Is.EqualTo(new SongPosition(3, 1, 0)));
         }
     }

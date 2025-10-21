@@ -1,20 +1,13 @@
-using System;
 using System.Linq;
 using System.Text;
 using GW2MidiConverter.Rendering.Settings;
-using GW2MidiConverter.Tab.Tokens;
+using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.Rendering;
 
-public class RestTokenRenderer(TabRendererSettings settings)
+public class RestRenderer(TabRendererSettings settings)
 {
     private readonly TabRendererSettings _settings = settings;
-
-    public string RenderToken(RestToken token)
-    {
-        ArgumentNullException.ThrowIfNull(token);
-        return RenderBeats(token.Length);
-    }
 
     public string RenderBeats(decimal beats)
     {
@@ -35,7 +28,7 @@ public class RestTokenRenderer(TabRendererSettings settings)
 
             char restSymbol = _settings.RestSymbolsPerBeat[maxFittingRest];
             builder.Append(restSymbol);
-            builder.Append(' '); // Appending a space here is safe, as we trim the output anyway.
+            builder.Append(_settings.GetTrailingSpacesForBeatLength(new TabElementLength(maxFittingRest)));
             remainingBeats -= maxFittingRest;
         }
 

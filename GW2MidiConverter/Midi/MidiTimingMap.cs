@@ -5,19 +5,22 @@ using NAudio.Midi;
 
 namespace GW2MidiConverter.Midi;
 
+// TODO MP: Make this public.
 internal class MidiTimingMap
 {
     private readonly MidiFile _midiFile;
-    private readonly int _resolution;
     private List<TimeSignatureEvent> _timeSignatureEvents = [];
     private List<TempoEvent> _tempoEvents = [];
 
+    public int TicksPerQuarterNote { get; }
+    
     public MidiMeasureInfo[] Measures { get; private set; }
+    
 
     private MidiTimingMap(MidiFile midiFile)
     {
         _midiFile = midiFile;
-        _resolution = midiFile.DeltaTicksPerQuarterNote;
+        TicksPerQuarterNote = midiFile.DeltaTicksPerQuarterNote;
         Measures = [];
     }
 
@@ -49,9 +52,10 @@ internal class MidiTimingMap
         {
             int lastNumerator = lastTimeSignatureEvent.Numerator;
             int lastDenominator = (int)MathF.Pow(2, lastTimeSignatureEvent.Denominator);
+            TimeSignature lastTimeSignature = new TimeSignature(lastNumerator, lastDenominator);
 
             long timeSinceLastEvent = timeSignatureEvent.AbsoluteTime - lastTimeSignatureEvent.AbsoluteTime;
-            long currentTicksPerMeasure = (lastNumerator * _resolution) / (4 / lastDenominator);
+            long currentTicksPerMeasure = CalculateTicksPerMeasure(lastTimeSignature);//(lastNumerator * TicksPerQuarterNote) / (4 / lastDenominator);
             int elapsedMeasures = (int)(timeSinceLastEvent / currentTicksPerMeasure);
             measure += elapsedMeasures;
             lastTimeSignatureEvent = timeSignatureEvent;
@@ -59,10 +63,21 @@ internal class MidiTimingMap
 
         // We have arrived at the current measure! Time to calculate the beat.
         long ticksInCurrentMeasure = absoluteTime - lastTimeSignatureEvent.AbsoluteTime;
-        int beat = (int)(ticksInCurrentMeasure / _resolution) + 1;
-        long ticksInCurrentBeat = ticksInCurrentMeasure - (beat - 1) * _resolution;
+        int beat = (int)(ticksInCurrentMeasure / TicksPerQuarterNote) + 1;
+        
+        long ticksInCurrentBeat = ticksInCurrentMeasure - (beat - 1) * TicksPerQuarterNote;
+        decimal beatFraction = ticksInCurrentBeat / (decimal)TicksPerQuarterNote;
 
-        return new SongPosition(measure, beat, ticksInCurrentBeat);
+        return new SongPosition(measure, beat, beatFraction);
+    }
+
+    private long CalculateTicksPerMeasure(TimeSignature timeSignature)
+    {
+        // n/d, n beats of d notes. 
+        int beatCount = timeSignature.Numerator;
+        long beatLength = TicksPerQuarterNote * (4 / timeSignature.Denominator);
+        return beatCount * beatLength;
+        // return (timeSignature.Numerator * TicksPerQuarterNote) / (4 / timeSignature.Denominator);
     }
 
     private void BuildMaps()
@@ -87,7 +102,7 @@ internal class MidiTimingMap
 
     private void CalculateMeasures()
     {
-        MeasureSpanListBuilder builder = new MeasureSpanListBuilder(_resolution, _timeSignatureEvents.First().AbsoluteTime);
+        MeasureSpanListBuilder builder = new MeasureSpanListBuilder(TicksPerQuarterNote, _timeSignatureEvents.First().AbsoluteTime);
 
         TimeSignatureEvent previousTimeSignatureEvent = _timeSignatureEvents.First();
         TimeSignature previousTimeSignature = TimeSignature.FromTimeSignatureEvent(previousTimeSignatureEvent);

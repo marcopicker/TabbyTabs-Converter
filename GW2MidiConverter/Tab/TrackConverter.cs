@@ -13,20 +13,20 @@ namespace GW2MidiConverter.Tab;
 internal class TrackConverter
 {
     private readonly MidiTrack _track;
-    private readonly int _ticksPerQuarterNote;
+    private readonly MidiTimingMap _timingMap;
 
     private IReadOnlyList<GuildWarsNote[]> _potentialNotes = [];
     private IReadOnlyList<Octave> _octaves = [];
 
     private int _currentNoteIndex;
 
-    public TrackConverter(MidiTrack track, int ticksPerQuarterNote)
+    public TrackConverter(MidiTrack track, MidiTimingMap timingMap)
     {
         ArgumentNullException.ThrowIfNull(track);
-        ArgumentOutOfRangeException.ThrowIfLessThan(ticksPerQuarterNote, 0, nameof(ticksPerQuarterNote));
+        ArgumentNullException.ThrowIfNull(timingMap);
 
         _track = track;
-        _ticksPerQuarterNote = ticksPerQuarterNote;
+        _timingMap = timingMap;
     }
 
     public bool CanConvert(Instrument instrument)
@@ -77,10 +77,12 @@ internal class TrackConverter
 
         if (midiMeasure.IsEmpty)
         {
-            RestToken fullRest = new RestToken(timeSignature.Denominator);
+            SongPosition emptyMeasureSongPosition = new SongPosition(midiMeasure.MeasureInfo.MeasureNumber, 0);
+            RestToken fullRest = new RestToken(emptyMeasureSongPosition, new TabElementLength(timeSignature.Denominator));
             return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, [fullRest]);
         }
-
+        
+        
         List<TabToken> tokens = [];
 
         // Check for a rest at the start of this measure.
@@ -142,19 +144,23 @@ internal class TrackConverter
 
         // Cut off notes that are tied to notes after this measure.
         MidiTimeSpan timeSpan = group.TimeSpan with { EndTick = Math.Min(group.TimeSpan.EndTick, measure.MeasureInfo.EndTick) };
-        TabElementLength length = TabElementLength.FromMidiData(timeSpan, _ticksPerQuarterNote, timeSignature);
+        TabElementLength length = TabElementLength.FromMidiData(timeSpan, _timingMap.TicksPerQuarterNote, timeSignature);
         
-        NoteGroupToken noteGroup = new NoteGroupToken(notes.ToArray(), length);
+        NoteGroupToken noteGroup = new NoteGroupToken(notes.ToArray(), group.Position, length);
         return noteGroup;
     }
 
     private bool TryConvertRest(long endOfEvent, long startOfNextEvent, TimeSignature timeSignature, out RestToken? restToken)
     {
         restToken = null;
+        // TODO MP: This is a workaround for mini-rests that result from MIDI events ending one tick before the next.
         MidiTimeSpan timeSpan = new MidiTimeSpan(endOfEvent, startOfNextEvent);
-        if (timeSpan.Length <= 10) return false;
-        TabElementLength restLength = TabElementLength.FromMidiData(timeSpan, _ticksPerQuarterNote, timeSignature);
-        restToken = new RestToken(restLength);
+        if (timeSpan.TickLength <= 10) return false;
+        
+        SongPosition position = _timingMap.GetPositionAtTick(endOfEvent);
+        TabElementLength restLength = TabElementLength.FromMidiData(timeSpan, _timingMap.TicksPerQuarterNote, timeSignature);
+        
+        restToken = new RestToken(position, restLength);
         return true;
     }
 }

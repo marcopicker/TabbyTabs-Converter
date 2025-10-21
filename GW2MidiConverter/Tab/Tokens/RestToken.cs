@@ -1,9 +1,9 @@
+using GW2MidiConverter.Midi;
+
 namespace GW2MidiConverter.Tab.Tokens;
 
-public class RestToken(TabElementLength length) : TabToken
+public class RestToken(SongPosition position, TabElementLength length) : TabToken(position, length)
 {
-    public TabElementLength Length { get; } = length;
-
     public override string ToString()
     {
         string beatWord = Length.Beats == 1 ? "beat" : "beats";

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using GW2MidiConverter.Midi;
 using NUnit.Framework;
 
@@ -7,16 +8,50 @@ namespace GW2MidiConverter.Tests.Midi;
 public class SongPositionTests
 {
     [Test]
-    public void ComparisonTests()
+    [SuppressMessage("Assertion", "NUnit2009:The same value has been provided as both the actual and the expected argument", Justification = "Of course they're the same. That's what the test is about.")]
+    public void IsEqualTo_IsEqual()
     {
         Assert.That(new SongPosition(1, 1, 0), Is.EqualTo(new SongPosition(1, 1, 0)));
+    }
+    
+    [TestCase(2, 1, 0)]
+    [TestCase(1, 2, 0)]
+    [TestCase(1, 1, 0.5)]
+    public void IsEqualTo_IsNotEqual_1_1_00(int measure, int beat, decimal beatFraction)
+    {
+        SongPosition testPosition = new SongPosition(measure, beat, beatFraction);
+        SongPosition other = new SongPosition(1, 1, 0);
+        Assert.That(testPosition, Is.Not.EqualTo(other));
+    }
 
-        Assert.That(new SongPosition(2, 1, 0), Is.GreaterThan(new SongPosition(1, 0, 0)));
-        Assert.That(new SongPosition(1, 2, 0), Is.GreaterThan(new SongPosition(1, 0, 0)));
-        Assert.That(new SongPosition(1, 1, 1), Is.GreaterThan(new SongPosition(1, 0, 0)));
+    [TestCase(2, 1, 0)]
+    [TestCase(1, 2, 0)]
+    [TestCase(1, 1, 0.5)]
+    public void IsGreaterThan_Position_1_1_00(int measure, int beat, decimal beatFraction)
+    {
+        SongPosition testPosition = new SongPosition(measure, beat, beatFraction);
+        SongPosition other = new SongPosition(1, 1, 0);
+        Assert.That(testPosition, Is.GreaterThan(other));
+    }
+    
+    [TestCase(1, 2, 0.5)]
+    [TestCase(2, 1, 0.5)]
+    [TestCase(2, 2, 0)]
+    public void IsLessThan_Position_2_2_05(int measure, int beat, decimal beatFraction)
+    {
+        SongPosition testPosition = new SongPosition(measure, beat, beatFraction);
+        SongPosition other = new SongPosition(2, 2, 0.5m);
+        Assert.That(testPosition, Is.LessThan(other));
+    }
 
-        Assert.That(new SongPosition(1, 1, 0), Is.LessThan(new SongPosition(2, 1, 0)));
-        Assert.That(new SongPosition(1, 1, 0), Is.LessThan(new SongPosition(1, 2, 0)));
-        Assert.That(new SongPosition(1, 1, 0), Is.LessThan(new SongPosition(1, 1, 1)));
+    [TestCase(1, 1, 0, "1:1:00")]
+    [TestCase(1, 3, 0, "1:3:00")]
+    [TestCase(2, 1, 0, "2:1:00")]
+    [TestCase(1, 1, 0.25, "1:1:25")]
+    public void ToStringTests(int measure, int beat, decimal beatFraction, string expected)
+    {
+        SongPosition position = new SongPosition(measure, beat, beatFraction);
+        string actual = position.ToString();
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }

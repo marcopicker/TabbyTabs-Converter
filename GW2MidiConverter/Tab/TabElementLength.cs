@@ -12,7 +12,7 @@ public readonly struct TabElementLength(decimal beats) : IComparable<TabElementL
 
     public static TabElementLength FromMidiData(MidiTimeSpan timeSpan, int ticksPerQuarterNote, TimeSignature timeSignature)
     {
-        decimal quarterNotes = (decimal)timeSpan.Length / ticksPerQuarterNote;
+        decimal quarterNotes = (decimal)timeSpan.TickLength / ticksPerQuarterNote;
         decimal quarterNotesPerBeat = (decimal)4 / timeSignature.Denominator;
         decimal beats = quarterNotes / quarterNotesPerBeat;
         return new TabElementLength(beats);

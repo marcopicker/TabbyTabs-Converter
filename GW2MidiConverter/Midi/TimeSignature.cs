@@ -20,6 +20,8 @@ public readonly struct TimeSignature(int numerator, int denominator) : IEquatabl
         ArgumentNullException.ThrowIfNull(timeSignatureEvent);
         return new TimeSignature(timeSignatureEvent.Numerator, (int) Math.Pow(2, timeSignatureEvent.Denominator));   
     }
+    
+    public static TimeSignature CommonTime => new TimeSignature(4, 4);
 
     public override string ToString() => $"{Numerator}/{Denominator}";
 

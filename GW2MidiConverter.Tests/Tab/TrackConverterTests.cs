@@ -20,7 +20,7 @@ public class TrackConverterTests
         InstrumentNoteMap pianoMap = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
         Instrument piano = new Instrument("Piano", pianoMap);
         
-        TrackConverter trackConverter = new TrackConverter(midiTrack, midiDocument.TicksPerQuarterNote);
+        TrackConverter trackConverter = new TrackConverter(midiTrack, midiDocument.TimingMap);
         TabTrack track = trackConverter.Convert(piano, new LookAheadOctaveCalculator());
         
         using (Assert.EnterMultipleScope())

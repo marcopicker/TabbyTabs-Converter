@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using GW2MidiConverter.GuildWars;
+using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.Rendering.Settings;
 
@@ -30,20 +32,38 @@ public class TabRendererSettings
         [0.25m] = '∙'
     };
 
-    public Dictionary<GuildWarsNoteKey, string> KeyNames { get; private set; } = new Dictionary<GuildWarsNoteKey, string>()
+    public Dictionary<GuildWarsNoteKey, string> KeyNames { get; private set; } = new Dictionary<GuildWarsNoteKey, string>
     {
-        { GuildWarsNoteKey.Note1, "1" },
-        { GuildWarsNoteKey.Note1Sharp, "#1" },
-        { GuildWarsNoteKey.Note2, "2" },
-        { GuildWarsNoteKey.Note2Sharp, "#2" },
-        { GuildWarsNoteKey.Note3, "3" },
-        { GuildWarsNoteKey.Note4, "4" },
-        { GuildWarsNoteKey.Note4Sharp, "#4" },
-        { GuildWarsNoteKey.Note5, "5" },
-        { GuildWarsNoteKey.Note5Sharp, "#5" },
-        { GuildWarsNoteKey.Note6, "6" },
-        { GuildWarsNoteKey.Note6Sharp, "#6" },
-        { GuildWarsNoteKey.Note7, "7" },
-        { GuildWarsNoteKey.Note8, "8" },
+        [GuildWarsNoteKey.Note1] = "1",
+        [GuildWarsNoteKey.Note1Sharp] = "#1",
+        [GuildWarsNoteKey.Note2] = "2",
+        [GuildWarsNoteKey.Note2Sharp] = "#2",
+        [GuildWarsNoteKey.Note3] = "3",
+        [GuildWarsNoteKey.Note4] = "4",
+        [GuildWarsNoteKey.Note4Sharp] = "#4",
+        [GuildWarsNoteKey.Note5] = "5",
+        [GuildWarsNoteKey.Note5Sharp] = "#5",
+        [GuildWarsNoteKey.Note6] = "6",
+        [GuildWarsNoteKey.Note6Sharp] = "#6",
+        [GuildWarsNoteKey.Note7] = "7",
+        [GuildWarsNoteKey.Note8] = "8",
     };
+
+    public IReadOnlyDictionary<TabElementLength, int> TrailingSpacesPerBeatLength { get; init; } = new Dictionary<TabElementLength, int>
+    {
+        [new TabElementLength(1.00m)] = 4,
+        [new TabElementLength(0.50m)] = 2,
+        [new TabElementLength(0.25m)] = 1,
+    };
+    
+    public string GetTrailingSpacesForBeatLength(TabElementLength beatLength)
+    {
+        if (TrailingSpacesPerBeatLength.Count == 0) return string.Empty;
+        
+        TabElementLength length = TrailingSpacesPerBeatLength.Keys.Where(length => length <= beatLength).MaxBy(length => length);
+        int spaceCount = TrailingSpacesPerBeatLength[length];
+        return new string(' ', spaceCount);
+    }
+    
+    public int SpacesBetweenBeats { get; init; } = 4;
 }

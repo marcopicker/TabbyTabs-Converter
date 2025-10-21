@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.GuildWars;
+using GW2MidiConverter.Midi;
 
 namespace GW2MidiConverter.Tab.Tokens;
 
-public class NoteGroupToken(ICollection<GuildWarsNote> notes, TabElementLength length) : TabToken
+public class NoteGroupToken(ICollection<GuildWarsNote> notes, SongPosition position, TabElementLength length) : TabToken(position, length)
 {
     public ICollection<GuildWarsNote> Notes { get; } = notes;
-    public TabElementLength Length { get; } = length;
     
     public override string ToString()
     {
