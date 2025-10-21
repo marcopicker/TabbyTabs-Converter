@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace GW2MidiConverter.Tests.Rendering;
 
 [TestFixture]
-public class TrackRendererTests
+public class TabTrackRendererTests
 {
     [Test]
     public void Render_DefaultSettings()
@@ -65,7 +65,7 @@ public class TrackRendererTests
             ]),            
         ]);
 
-        TrackRenderer renderer = new TrackRenderer(new TabRendererSettings());
+        TabTrackRenderer renderer = new TabTrackRenderer(new TabRendererSettings());
         string output = renderer.Render(track);
     }
 }

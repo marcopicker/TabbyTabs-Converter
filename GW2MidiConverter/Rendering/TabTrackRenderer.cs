@@ -9,7 +9,7 @@ using GW2MidiConverter.Tab.Tokens;
 
 namespace GW2MidiConverter.Rendering;
 
-internal class TrackRenderer(TabRendererSettings settings)
+internal class TabTrackRenderer(TabRendererSettings settings)
 {
     private readonly StringBuilder _stringBuilder = new StringBuilder();
     private readonly RestRenderer _restRenderer = new RestRenderer(settings);

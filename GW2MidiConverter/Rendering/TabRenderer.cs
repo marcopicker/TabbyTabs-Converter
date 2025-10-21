@@ -10,7 +10,7 @@ public class TabRenderer
 {
     private readonly TabDocument _tabDocument;
     private readonly TabRendererSettings _settings;
-    private readonly TrackRenderer _trackRenderer;
+    private readonly TabTrackRenderer _trackRenderer;
     
     private readonly StringBuilder _stringBuilder = new StringBuilder();
 
@@ -20,7 +20,7 @@ public class TabRenderer
 
         _tabDocument = tabDocument;
         _settings = settings ?? new TabRendererSettings();
-        _trackRenderer = new TrackRenderer(_settings);
+        _trackRenderer = new TabTrackRenderer(_settings);
     }
 
     public string Render()
