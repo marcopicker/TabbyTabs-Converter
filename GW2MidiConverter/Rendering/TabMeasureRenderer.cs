@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Text;
 using GW2MidiConverter.Rendering.Settings;
-using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Tokens;
 
 namespace GW2MidiConverter.Rendering;
@@ -23,7 +21,7 @@ public class TabMeasureRenderer
         _restRenderer = new RestRenderer(settings);
     }
 
-    public string Render(TabMeasure measure)
+    public string RenderMeasure(TabMeasure measure)
     {
         ArgumentNullException.ThrowIfNull(measure);
         if (measure.Tokens.Count == 0) return string.Empty;

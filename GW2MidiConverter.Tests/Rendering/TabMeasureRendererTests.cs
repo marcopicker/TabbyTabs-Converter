@@ -20,7 +20,7 @@ public class TabMeasureRendererTests
 
         TabRendererSettings settings = new TabRendererSettings();
         TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
-        string output = renderer.Render(measure);
+        string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
 
@@ -39,7 +39,7 @@ public class TabMeasureRendererTests
 
         TabRendererSettings settings = new TabRendererSettings();
         TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
-        string output = renderer.Render(measure);
+        string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
 
@@ -57,7 +57,7 @@ public class TabMeasureRendererTests
 
         TabRendererSettings settings = new TabRendererSettings();
         TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
-        string output = renderer.Render(measure);
+        string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
 
@@ -74,7 +74,7 @@ public class TabMeasureRendererTests
 
         TabRendererSettings settings = new TabRendererSettings();
         TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
-        string output = renderer.Render(measure);
+        string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
 
@@ -103,7 +103,7 @@ public class TabMeasureRendererTests
 
         TabRendererSettings settings = new TabRendererSettings();
         TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
-        string output = renderer.Render(measure);
+        string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
 
@@ -120,7 +120,7 @@ public class TabMeasureRendererTests
 
         TabRendererSettings settings = new TabRendererSettings();
         TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
-        string output = renderer.Render(measure);
+        string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
 
