@@ -17,11 +17,8 @@ public class TrackConverterTests
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
         MidiTrack midiTrack = midiDocument.GetTrack(1);
         
-        InstrumentNoteMap pianoMap = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
-        Instrument piano = new Instrument("Piano", pianoMap);
-        
         TrackConverter trackConverter = new TrackConverter(midiTrack, midiDocument.TimingMap);
-        TabTrack track = trackConverter.Convert(piano, new LookAheadOctaveCalculator());
+        TabTrack track = trackConverter.Convert(Instrument.Piano, new LookAheadOctaveCalculator());
         
         using (Assert.EnterMultipleScope())
         {

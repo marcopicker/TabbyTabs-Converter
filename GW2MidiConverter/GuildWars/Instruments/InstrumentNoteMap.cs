@@ -8,29 +8,30 @@ namespace GW2MidiConverter.GuildWars.Instruments;
 
 public class InstrumentNoteMap
 {
-    private readonly IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> _maps;
+    private readonly IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> _mappings;
 
-    public InstrumentNoteMap(IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> maps)
+    public InstrumentNoteMap(IReadOnlyList<IReadOnlyDictionary<MidiNoteNumber, GuildWarsNote>> mappings)
     {
-        ArgumentNullException.ThrowIfNull(maps);
-        if (maps.Count == 0) throw new ArgumentException("Maps must not be empty.", nameof(maps));
-        _maps = maps;
+        ArgumentNullException.ThrowIfNull(mappings);
+        if (mappings.Count == 0) throw new ArgumentException("Maps must not be empty.", nameof(mappings));
+        _mappings = mappings;
     }
 
     public bool IsNoteMapped(MidiNoteNumber midiNote)
     {
-        return _maps.Any(m => m.ContainsKey(midiNote));
+        return _mappings.Any(m => m.ContainsKey(midiNote));
     }
 
     public GuildWarsNote[] MapMidiToNotes(MidiNoteNumber midiNote)
     {
         if (!IsNoteMapped(midiNote)) throw new ArgumentOutOfRangeException(nameof(midiNote), "The given MidiNoteNumber is not mapped to anything.");
-        GuildWarsNote[] notes = _maps.Where(m => m.ContainsKey(midiNote))
+        GuildWarsNote[] notes = _mappings.Where(m => m.ContainsKey(midiNote))
                                      .Select(m => m[midiNote])
                                      .ToArray();
         return notes;
     }
 
+    [Obsolete("This is not implemented yet.", false)]
     public static InstrumentNoteMap FromFile(string path)
     {
         if (!File.Exists(path)) throw new FileNotFoundException("The given file does not exist.", path);

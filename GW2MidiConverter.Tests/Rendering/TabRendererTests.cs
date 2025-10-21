@@ -18,9 +18,9 @@ public class TabRendererTests
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.Nightmare);
         TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
 
-        tabDocument.EnableTrack(0, new Instrument("Piano", new InstrumentNoteMap(InstrumentNoteMaps.Piano)));
-        tabDocument.EnableTrack(1, new Instrument("Piano", new InstrumentNoteMap(InstrumentNoteMaps.Piano)));
-        tabDocument.EnableTrack(2, new Instrument("Bass", new InstrumentNoteMap(InstrumentNoteMaps.Bass)));
+        tabDocument.EnableTrack(0, Instrument.Piano);
+        tabDocument.EnableTrack(1, Instrument.Piano);
+        tabDocument.EnableTrack(2, Instrument.Bass);
 
         TabRenderer renderer = new TabRenderer(tabDocument);
         string tab = renderer.Render();

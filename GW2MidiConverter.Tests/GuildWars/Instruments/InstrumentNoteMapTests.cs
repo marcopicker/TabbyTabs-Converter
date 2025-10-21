@@ -24,7 +24,7 @@ public class InstrumentNoteMapTests
     [Test]
     public void IsNoteMapped_CorrectReturnValues()
     {
-        InstrumentNoteMap map = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
+        InstrumentNoteMap map = InstrumentNoteMaps.TripleOctaveChromatic;
         using (Assert.EnterMultipleScope())
         {
             Assert.That(map.IsNoteMapped(new MidiNoteNumber(60)), Is.True);
@@ -39,7 +39,7 @@ public class InstrumentNoteMapTests
     [Test]
     public void MapMidiToNotes_UnmappedNote_Throws()
     {
-        InstrumentNoteMap map = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
+        InstrumentNoteMap map = InstrumentNoteMaps.TripleOctaveChromatic;
 
         using (Assert.EnterMultipleScope())
         {
@@ -51,7 +51,7 @@ public class InstrumentNoteMapTests
     [Test]
     public void MapMidiToNotes_SingleMappedNote_ReturnsKey()
     {
-        InstrumentNoteMap map = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
+        InstrumentNoteMap map = InstrumentNoteMaps.TripleOctaveChromatic;
         using (Assert.EnterMultipleScope())
         {
             Assert.That(map.MapMidiToNotes(new MidiNoteNumber(65)), Has.Length.EqualTo(1));
@@ -64,7 +64,7 @@ public class InstrumentNoteMapTests
     [Test]
     public void MapMidiToNotes_DoubleMappedNote_ReturnsTwoKeys()
     {
-        InstrumentNoteMap map = new InstrumentNoteMap(InstrumentNoteMaps.Piano);
+        InstrumentNoteMap map = InstrumentNoteMaps.TripleOctaveChromatic;
         using (Assert.EnterMultipleScope())
         {
             Assert.That(map.MapMidiToNotes(new MidiNoteNumber(72)), Has.Length.EqualTo(2));

@@ -23,7 +23,7 @@ public class TabDocumentTests
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
         TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
 
-        tabDocument.EnableTrack(1, new Instrument("Piano", new InstrumentNoteMap(InstrumentNoteMaps.Piano)));
+        tabDocument.EnableTrack(1, Instrument.Piano);
         
         Assert.That(tabDocument.Tracks, Has.Count.EqualTo(1));
     }
