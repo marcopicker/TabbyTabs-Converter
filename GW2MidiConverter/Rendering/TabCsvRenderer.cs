@@ -23,16 +23,19 @@ public class TabCsvRenderer
         _settings = settings ?? new TabRendererSettings();
         _measureRenderer = new TabMeasureRenderer(_settings);
     }
-    
+
     public void ToCsv(string outputPath)
     {
         if (_tabDocument.Tracks.Count == 0) return;
 
-        using StreamWriter writer = new StreamWriter(outputPath);
-        using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
         foreach (TabTrack track in _tabDocument.Tracks)
         {
+            string path = Path.Combine(outputPath, $"{track.TrackInfo.TrackIndex} - {track.TrackInfo.InstrumentName}.csv");
+            
+            using StreamWriter writer = new StreamWriter(path);
+            using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
             csv.WriteField(track.TrackInfo.InstrumentName);
+            csv.NextRecord();
             foreach (TabMeasure measure in track.Measures)
             {
                 IReadOnlyList<string> beats = _measureRenderer.RenderBeats(measure);
@@ -40,8 +43,8 @@ public class TabCsvRenderer
                 {
                     csv.WriteField(beat);
                 }
+                csv.NextRecord();
             }
-            csv.NextRecord();
         }
     }
 }

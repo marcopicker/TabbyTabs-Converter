@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace GW2MidiConverter.Tests.Rendering;
 
 [TestFixture]
-[Ignore("Currently these are only or manual testing. Meow!")]
+// [Ignore("Currently these are only or manual testing. Meow!")]
 public class TabRendererTests
 {
     [Test]
@@ -26,6 +26,6 @@ public class TabRendererTests
         // string tab = renderer.Render();
         
         TabCsvRenderer renderer = new TabCsvRenderer(tabDocument);
-        renderer.ToCsv("OUTPUT.csv");
+        renderer.ToCsv("Output");
     }
 }
