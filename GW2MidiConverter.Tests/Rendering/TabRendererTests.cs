@@ -22,7 +22,10 @@ public class TabRendererTests
         tabDocument.EnableTrack(1, Instrument.Piano);
         tabDocument.EnableTrack(2, Instrument.Bass);
 
-        TabRenderer renderer = new TabRenderer(tabDocument);
-        string tab = renderer.Render();
+        // TabRenderer renderer = new TabRenderer(tabDocument);
+        // string tab = renderer.Render();
+        
+        TabCsvRenderer renderer = new TabCsvRenderer(tabDocument);
+        renderer.ToCsv("OUTPUT.csv");
     }
 }

@@ -42,6 +42,20 @@ public class TabMeasureRenderer
         return _measureStringBuilder.ToString().Trim();
     }
 
+    public IReadOnlyList<string> RenderBeats(TabMeasure measure)
+    {
+        ArgumentNullException.ThrowIfNull(measure);
+        if (measure.Tokens.Count == 0) return [];
+        
+        int beats = measure.TimeSignature.Numerator;
+        List<string> renderedBeats = new List<string>(beats);
+        for (int i = 0; i < beats; i++)
+        {
+            renderedBeats.Add(RenderBeat(measure, i + 1));
+        }
+        return renderedBeats;
+    }
+
     public string RenderBeat(TabMeasure measure, int beat)
     {
         ArgumentNullException.ThrowIfNull(measure);
