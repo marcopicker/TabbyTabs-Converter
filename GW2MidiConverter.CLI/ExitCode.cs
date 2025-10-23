@@ -1,6 +1,6 @@
 namespace GW2MidiConverter.CLI;
 
-public enum ExitCode
+internal enum ExitCode
 {
     UnspecifiedError = -1,
     Success = 0,

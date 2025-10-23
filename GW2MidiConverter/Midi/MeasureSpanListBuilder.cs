@@ -35,6 +35,6 @@ internal class MeasureSpanListBuilder(long resolution, long startTime)
 
     private long CalculateTicksPerMeasure(TimeSignature timeSignature)
     {
-        return (timeSignature.Numerator * resolution) / (4 / timeSignature.Denominator);
+        return MidiUtilities.CalculateTicksForMeasure(timeSignature, resolution);
     }
 }

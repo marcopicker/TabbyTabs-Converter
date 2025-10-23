@@ -74,11 +74,7 @@ internal class MidiTimingMap
 
     private long CalculateTicksPerMeasure(TimeSignature timeSignature)
     {
-        // n/d, n beats of d notes. 
-        int beatCount = timeSignature.Numerator;
-        long beatLength = TicksPerQuarterNote * (4 / timeSignature.Denominator);
-        return beatCount * beatLength;
-        // return (timeSignature.Numerator * TicksPerQuarterNote) / (4 / timeSignature.Denominator);
+        return MidiUtilities.CalculateTicksForMeasure(timeSignature, TicksPerQuarterNote);
     }
 
     private void BuildMaps()

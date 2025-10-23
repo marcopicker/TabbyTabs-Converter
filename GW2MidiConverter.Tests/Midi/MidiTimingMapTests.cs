@@ -122,6 +122,33 @@ public class MidiTimingMapTests
         }
     }
 
+    [TestCase(00, 1, 1)]
+    [TestCase(01, 1, 2)]
+    [TestCase(02, 1, 3)]
+    [TestCase(03, 1, 4)]
+    [TestCase(04, 1, 5)]
+    [TestCase(05, 1, 6)]
+    [TestCase(06, 1, 7)]
+    [TestCase(07, 1, 8)]
+    [TestCase(08, 1, 9)]
+    
+    [TestCase(09, 2, 1)]
+    [TestCase(10, 2, 2)]
+    [TestCase(11, 2, 3)]
+    [TestCase(12, 2, 4)]
+    public void GetPositionAtTick_OddTimeSignatures(decimal eighths, int expectedMeasure, decimal expectedBeat)
+    {
+        MidiFile midiFile = new MidiFile(MidiFiles.OddTimeSignatures);
+        MidiTimingMap map = MidiTimingMap.FromMidiFile(midiFile);
+        
+        SongPosition expectedPosition = new SongPosition(expectedMeasure, expectedBeat);
+
+        long eighthNote = midiFile.DeltaTicksPerQuarterNote / 2;
+        long ticks = (long)(eighthNote * eighths);
+        
+        Assert.That(map.GetPositionAtTick(ticks), Is.EqualTo(expectedPosition));
+    }
+    
     #endregion
 
     [Test]
