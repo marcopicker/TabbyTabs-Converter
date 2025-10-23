@@ -168,8 +168,8 @@ public class MidiTrackConverterTests
             // Measure 4
             Assert.That(track.Measures[3].MeasureInfo.TimeSignature, Is.EqualTo(new TimeSignature(5, 8)));
             AssertThatMeasureHasNotesAtIndex(track.Measures[3], 0, [76], new SongPosition(4, 1));
-            AssertThatMeasureHasNotesAtIndex(track.Measures[3], 1, [74], new SongPosition(4, 4));
-            AssertThatMeasureHasNotesAtIndex(track.Measures[3], 2, [72], new SongPosition(4, 5));
+            AssertThatMeasureHasNotesAtIndex(track.Measures[3], 1, [72], new SongPosition(4, 4));
+            AssertThatMeasureHasNotesAtIndex(track.Measures[3], 2, [74], new SongPosition(4, 5));
         }
     }
 

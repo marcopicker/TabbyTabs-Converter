@@ -13,9 +13,9 @@ internal class MidiTimingMap
     private List<TempoEvent> _tempoEvents = [];
 
     public int TicksPerQuarterNote { get; }
-    
+
     public MidiMeasureInfo[] Measures { get; private set; }
-    
+
 
     private MidiTimingMap(MidiFile midiFile)
     {
@@ -45,36 +45,30 @@ internal class MidiTimingMap
         ArgumentOutOfRangeException.ThrowIfNegative(absoluteTime);
         List<TimeSignatureEvent> leadingTimeSignatureEvents = _timeSignatureEvents.Where(t => t.AbsoluteTime <= absoluteTime).ToList();
 
-        // Count all measures leading up to the tick.
         int measure = 1;
-        TimeSignatureEvent lastTimeSignatureEvent = leadingTimeSignatureEvents.First();
-        foreach (TimeSignatureEvent timeSignatureEvent in leadingTimeSignatureEvents)
+        decimal beats = 1m;
+        for (int i = 0; i < leadingTimeSignatureEvents.Count; i++)
         {
-            int lastNumerator = lastTimeSignatureEvent.Numerator;
-            int lastDenominator = (int)MathF.Pow(2, lastTimeSignatureEvent.Denominator);
-            TimeSignature lastTimeSignature = new TimeSignature(lastNumerator, lastDenominator);
+            bool isLastEvent = i == leadingTimeSignatureEvents.Count - 1;
 
-            long timeSinceLastEvent = timeSignatureEvent.AbsoluteTime - lastTimeSignatureEvent.AbsoluteTime;
-            long currentTicksPerMeasure = CalculateTicksPerMeasure(lastTimeSignature);
-            int elapsedMeasures = (int)(timeSinceLastEvent / currentTicksPerMeasure);
-            measure += elapsedMeasures;
-            lastTimeSignatureEvent = timeSignatureEvent;
+            TimeSignatureEvent currentEvent = leadingTimeSignatureEvents[i];
+            TimeSignature timeSignature = TimeSignature.FromTimeSignatureEvent(currentEvent);
+
+            long nextEventTime = isLastEvent ? absoluteTime : leadingTimeSignatureEvents[i + 1].AbsoluteTime;
+            long ticksInThisTimeSignature = nextEventTime - currentEvent.AbsoluteTime;
+            long ticksPerMeasure = MidiUtilities.CalculateTicksForMeasure(timeSignature, TicksPerQuarterNote);
+
+            int measuresInThisTimeSignature = (int)(ticksInThisTimeSignature / ticksPerMeasure);
+            measure += measuresInThisTimeSignature;
+            if (!isLastEvent) continue;
+
+            long leftoverTicks = ticksInThisTimeSignature % ticksPerMeasure;
+            long ticksPerBeat = MidiUtilities.CalculateTicksPerBeat(timeSignature, TicksPerQuarterNote);
+            beats = 1m + (decimal)leftoverTicks / ticksPerBeat;
+            break;
         }
 
-        // We have arrived at the current measure! Time to calculate the beat.
-        long ticksPerMeasure = CalculateTicksPerMeasure(TimeSignature.FromTimeSignatureEvent(lastTimeSignatureEvent));
-        long ticksInCurrentMeasure = (absoluteTime - lastTimeSignatureEvent.AbsoluteTime) % ticksPerMeasure;
-        int beat = (int)(ticksInCurrentMeasure / TicksPerQuarterNote) + 1;
-        
-        long ticksInCurrentBeat = ticksInCurrentMeasure - (beat - 1) * TicksPerQuarterNote;
-        decimal beatFraction = ticksInCurrentBeat / (decimal)TicksPerQuarterNote;
-
-        return new SongPosition(measure, beat, beatFraction);
-    }
-
-    private long CalculateTicksPerMeasure(TimeSignature timeSignature)
-    {
-        return MidiUtilities.CalculateTicksForMeasure(timeSignature, TicksPerQuarterNote);
+        return new SongPosition(measure, beats);
     }
 
     private void BuildMaps()
@@ -100,21 +94,23 @@ internal class MidiTimingMap
     private void CalculateMeasures()
     {
         MeasureSpanListBuilder builder = new MeasureSpanListBuilder(TicksPerQuarterNote, _timeSignatureEvents.First().AbsoluteTime);
-
-        TimeSignatureEvent previousTimeSignatureEvent = _timeSignatureEvents.First();
-        TimeSignature previousTimeSignature = TimeSignature.FromTimeSignatureEvent(previousTimeSignatureEvent);
-        foreach (TimeSignatureEvent timeSignatureEvent in _timeSignatureEvents.Skip(1))
+        
+        long lastEventTime = GetLastEventTime();
+        for (int i = 0; i < _timeSignatureEvents.Count; i++)
         {
-            long timeSinceLastEvent = timeSignatureEvent.AbsoluteTime - previousTimeSignatureEvent.AbsoluteTime;
-            builder.AppendMeasuresFromTicks(previousTimeSignature, timeSinceLastEvent);
+            bool isLastEvent = i == _timeSignatureEvents.Count - 1;
 
-            previousTimeSignatureEvent = timeSignatureEvent;
-            previousTimeSignature = TimeSignature.FromTimeSignatureEvent(timeSignatureEvent);
+            TimeSignatureEvent currentEvent = _timeSignatureEvents[i];
+            TimeSignature timeSignature = TimeSignature.FromTimeSignatureEvent(currentEvent);
+
+            long nextEventTime = isLastEvent ? lastEventTime : _timeSignatureEvents[i + 1].AbsoluteTime;
+            long ticksInThisTimeSignature = nextEventTime - currentEvent.AbsoluteTime;
+            long ticksPerMeasure = MidiUtilities.CalculateTicksForMeasure(timeSignature, TicksPerQuarterNote);
+
+            int measuresInThisTimeSignature = (int)Math.Ceiling((decimal)ticksInThisTimeSignature / ticksPerMeasure);
+            builder.AppendMeasures(timeSignature, measuresInThisTimeSignature);
         }
-
-        long remainingTime = GetLastEventTime() - previousTimeSignatureEvent.AbsoluteTime;
-        builder.AppendMeasuresFromTicks(previousTimeSignature, remainingTime);
-
+        
         Measures = builder.Build();
     }
 

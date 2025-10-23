@@ -5,7 +5,12 @@ internal static class MidiUtilities
     public static long CalculateTicksForMeasure(TimeSignature timeSignature, long ticksPerQuarterNote)
     {
         int beats = timeSignature.Numerator;
-        decimal ticksPerBeat = ticksPerQuarterNote * (4.0m / timeSignature.Denominator);
-        return (long)(ticksPerBeat * beats);
+        long ticksPerBeat = CalculateTicksPerBeat(timeSignature, ticksPerQuarterNote);
+        return ticksPerBeat * beats;
+    }
+
+    public static long CalculateTicksPerBeat(TimeSignature timeSignature, long ticksPerQuarterNote)
+    {
+        return (long)(ticksPerQuarterNote * (4.0m / timeSignature.Denominator));
     }
 }
