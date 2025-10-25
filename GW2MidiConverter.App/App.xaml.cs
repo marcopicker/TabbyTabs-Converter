@@ -6,6 +6,7 @@ using GW2MidiConverter.App.ViewModels.Pages;
 using GW2MidiConverter.App.Views;
 using GW2MidiConverter.App.Views.Pages;
 using Wpf.Ui;
+using Wpf.Ui.Controls;
 
 namespace GW2MidiConverter.App;
 

@@ -5,6 +5,8 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
+                 xmlns:pages="clr-namespace:GW2MidiConverter.App.ViewModels.Pages"
+                 xmlns:pages1="clr-namespace:GW2MidiConverter.App.Views.Pages"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
@@ -13,39 +15,221 @@
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Default"
-                 WindowStartupLocation="CenterScreen"
-                 SizeChanged="OnSizeChanged">
+                 WindowStartupLocation="CenterScreen">
+    <ui:FluentWindow.Resources>
+        <DataTemplate DataType="{x:Type pages:MyPageViewModel}">
+            <pages1:MyPage />
+        </DataTemplate>
+    </ui:FluentWindow.Resources>
     <Grid>
-        <ui:NavigationView x:Name="NavigationView"
-                           MinHeight="300"
-                           Padding="42,0,42,0"
-                           FrameMargin="0"
-                           PaneDisplayMode="Left"
-                           IsBackButtonVisible="Visible"
-                           IsPaneToggleVisible="True"
-                           Transition="FadeInWithSlide"
-                           OpenPaneLength="150"
-                           MenuItemsSource="{Binding MenuItems, Mode=OneWay}"
-                           FooterMenuItemsSource="{Binding FooterMenuItems, Mode=OneWay}"
-                           BreadcrumbBar="{Binding ElementName=BreadcrumbBar}"
-                           TitleBar="{Binding ElementName=TitleBar}"
-                           PaneClosed="NavigationView_OnPaneClosed"
-                           PaneOpened="NavigationView_OnPaneOpened"
-                           SelectionChanged="NavigationView_OnSelectionChanged">
-            <ui:NavigationView.Header>
-                <StackPanel Margin="42,32,42,20">
-                    <ui:BreadcrumbBar x:Name="BreadcrumbBar" />
-                </StackPanel>
-            </ui:NavigationView.Header>
-            <ui:NavigationView.ContentOverlay>
-                <Grid>
-                    <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
+        <!-- <ContentControl Content="{Binding CurrentViewModel}" /> -->
+        <!-- <ui:Card HorizontalAlignment="Center" -->
+        <!--          VerticalAlignment="Center" -->
+        <!--          Margin="0,0,0,10"> -->
+        <!--     <StackPanel Orientation="Vertical" -->
+        <!--                 VerticalAlignment="Center" -->
+        <!--                 HorizontalAlignment="Center"> -->
+        <!--         <ui:SymbolIcon Symbol="MailInboxArrowDown20" -->
+        <!--                        FontSize="32" -->
+        <!--                        Foreground="{ui:ThemeResource AccentTextFillColorPrimaryBrush}" -->
+        <!--                        Margin="0,0,0,5"/> -->
+        <!--         <ui:TextBlock Appearance="Primary" FontTypography="BodyStrong" Text="Drag your MIDI or MuseScore file here to start converting." -->
+        <!--                       TextAlignment="Center" -->
+        <!--                       Margin="0,0,0,10"/> -->
+        <!--         <Grid> -->
+        <!--             <Grid.ColumnDefinitions> -->
+        <!--                 <ColumnDefinition Width="*"/> -->
+        <!--                 <ColumnDefinition Width="Auto"/> -->
+        <!--                 <ColumnDefinition Width="*"/> -->
+        <!--             </Grid.ColumnDefinitions> -->
+        <!--             <Rectangle Grid.Column="0"  -->
+        <!--                        HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}" -->
+        <!--                        Margin="0, 5" -->
+        <!--                        Height="1" /> -->
+        <!--             <ui:TextBlock Grid.Column="1" -->
+        <!--                           Margin="8,0" -->
+        <!--                           Appearance="Primary" -->
+        <!--                           FontTypography="Caption" -->
+        <!--                           Text="OR" -->
+        <!--                           HorizontalAlignment="Center" -->
+        <!--                           TextAlignment="Center" /> -->
+        <!--             <Rectangle Grid.Column="2"  -->
+        <!--                        HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}" -->
+        <!--                        Margin="0, 5" -->
+        <!--                        Height="1" />                     -->
+        <!--         </Grid> -->
+        <!--         <ui:Button HorizontalAlignment="Center" -->
+        <!--                    VerticalAlignment="Center" -->
+        <!--                    Margin="0,10,0,0" -->
+        <!--                    Content="Select file..." /> -->
+        <!--     </StackPanel> -->
+        <!-- </ui:Card> -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="300" />
+                <ColumnDefinition Width="*" MinWidth="300" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" BorderThickness="0, 0, 1, 0">
+                <Grid Margin="0,40,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="0"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="0,0,10,0">
+                        <StackPanel Orientation="Vertical"
+                                    Margin="10, 0, 10, 10">
+                            <Expander Header="Measure Styles" ExpandDirection="Down">
+                                <StackPanel Orientation="Vertical">
+                                    <ui:TextBlock Text="Measure spacing:"
+                                                  FontTypography="BodyStrong"
+                                                  Margin="0,0,0,0" />
+                                    <ui:TextBlock Text="The number of spaces between measures."
+                                                  FontTypography="Caption"
+                                                  Margin="0,0,0,5" />
+                                    <ui:NumberBox Value="1337"
+                                                  Minimum="0"
+                                                  MaxDecimalPlaces="0"
+                                                  PlaceholderText="AAAA" />
+
+                                    <ui:TextBlock Text="Measure spacing:"
+                                                  FontTypography="BodyStrong"
+                                                  Margin="0,20,0,0" />
+                                    <ui:TextBlock Text="The number of spaces between measures."
+                                                  FontTypography="Caption"
+                                                  Margin="0,0,0,5" />
+                                    <ui:NumberBox Value="1337"
+                                                  Minimum="0"
+                                                  MaxDecimalPlaces="0"
+                                                  PlaceholderText="AAAA" />
+                                </StackPanel>
+                            </Expander>
+                            <ui:TextBlock Text="Measure spacing:"
+                                          FontTypography="BodyStrong"
+                                          Margin="0,20,0,0" />
+                            <ui:TextBlock Text="The number of spaces between measures."
+                                          FontTypography="Caption"
+                                          Margin="0,0,0,5" />
+                            <ui:NumberBox Value="1337"
+                                          Minimum="0"
+                                          MaxDecimalPlaces="0"
+                                          PlaceholderText="AAAA" />
+
+                            <ui:TextBlock Text="Measure spacing:"
+                                          FontTypography="BodyStrong"
+                                          Margin="0,20,0,0" />
+                            <ui:TextBlock Text="The number of spaces between measures."
+                                          FontTypography="Caption"
+                                          Margin="0,0,0,5" />
+                            <ui:ToggleSwitch OnContent="On"
+                                             OffContent="Off"/>
+                            
+                            <ui:TextBlock Text="Measure spacing:"
+                                          FontTypography="BodyStrong"
+                                          Margin="0,20,0,0" />
+                            <ui:TextBlock Text="The number of spaces between measures."
+                                          FontTypography="Caption"
+                                          Margin="0,0,0,5" />
+                            <ui:NumberBox Value="1337"
+                                          Minimum="0"
+                                          MaxDecimalPlaces="0"
+                                          PlaceholderText="AAAA" />
+                            
+                            <ui:TextBlock Text="Measure spacing:"
+                                          FontTypography="BodyStrong"
+                                          Margin="0,20,0,0" />
+                            <ui:TextBlock Text="The number of spaces between measures."
+                                          FontTypography="Caption"
+                                          Margin="0,0,0,5" />
+                            <ui:NumberBox Value="1337"
+                                          Minimum="0"
+                                          MaxDecimalPlaces="0"
+                                          PlaceholderText="AAAA" />
+                            
+                            <ui:TextBlock Text="Measure spacing:"
+                                          FontTypography="BodyStrong"
+                                          Margin="0,20,0,0" />
+                            <ui:TextBlock Text="The number of spaces between measures."
+                                          FontTypography="Caption"
+                                          Margin="0,0,0,5" />
+                            <ui:NumberBox Value="1337"
+                                          Minimum="0"
+                                          MaxDecimalPlaces="0"
+                                          PlaceholderText="AAAA" />
+                        </StackPanel>
+                    </ScrollViewer>
+                    <Border Grid.Row="1"
+                            Margin="0,10,0,0"
+                            Padding="5">
+                        <ui:Button Content="Export" />
+                    </Border>
                 </Grid>
-            </ui:NavigationView.ContentOverlay>
-        </ui:NavigationView>
-
+            </Border>
+            <Border Grid.Column="1" Background="Black">
+                <ScrollViewer
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalScrollBarVisibility="Auto"
+                    Margin="0,00,0,0"
+                    Padding="10,0,10,0"
+                    Loaded="TabScrollViewer_OnLoaded"
+                    ScrollChanged="TabScrollViewer_OnScrollChanged">
+                    <ScrollViewer.Template>
+                        <ControlTemplate TargetType="ScrollViewer">
+                            <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
+                                                        CanContentScroll="{TemplateBinding CanContentScroll}"
+                                                        CanHorizontallyScroll="False" CanVerticallyScroll="False"
+                                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                        Content="{TemplateBinding Content}" Grid.Column="0"
+                                                        Margin="{TemplateBinding Padding}" Grid.Row="0" />
+                                <Rectangle Grid.Row="0" Grid.Column="0"
+                                           x:Name="TabGradient"
+                                           Height="50" IsHitTestVisible="False"
+                                           Opacity="0"
+                                           VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#FF000000" Offset="0" />
+                                            <GradientStop Color="#7F000000" Offset="0.75" />
+                                            <GradientStop Color="#00000000" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <ScrollBar x:Name="PART_VerticalScrollBar"
+                                           AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow"
+                                           Margin="0,40,0,0"
+                                           Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0"
+                                           Grid.Row="0"
+                                           Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                           Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                           ViewportSize="{TemplateBinding ViewportHeight}" />
+                                <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                           AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow"
+                                           Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0"
+                                           Orientation="Horizontal" Grid.Row="1"
+                                           Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                           Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                           ViewportSize="{TemplateBinding ViewportWidth}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </ScrollViewer.Template>
+                    <TextBlock FontFamily="Lucida Console" xml:space="preserve" Text="{Binding TabText}"
+                               Padding="0,20,0,0" />
+                </ScrollViewer>
+            </Border>
+        </Grid>
         <ContentPresenter x:Name="RootContentDialog" />
-
+        <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
         <ui:TitleBar x:Name="TitleBar"
                      Title="{Binding ApplicationTitle}"
                      CloseWindowByDoubleClickOnIcon="True"
