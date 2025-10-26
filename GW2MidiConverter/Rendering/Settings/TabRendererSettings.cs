@@ -16,6 +16,8 @@ public class TabRendererSettings
     public int LinesAfterTimeSignature { get; init; }
     public int MaxMeasureCountBeforeSpacing { get; init; } = 4;
 
+    public bool ShowMeasureNumbers { get; init; }
+    
     public char MeasureDelimiter { get; init; } = '|';
     public bool DrawMeasureDelimiters { get; init; }
 

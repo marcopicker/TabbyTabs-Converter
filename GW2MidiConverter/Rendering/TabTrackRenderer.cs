@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Rendering.Settings;
@@ -42,6 +43,7 @@ internal class TabTrackRenderer(TabRendererSettings settings)
             }
 
             RenderMeasureDelimiter();
+            RenderMeasureNumber(measure.MeasureNumber);
             _stringBuilder.Append(_measureRenderer.RenderMeasure(measure));
             RenderMeasureDelimiter();
 
@@ -51,6 +53,12 @@ internal class TabTrackRenderer(TabRendererSettings settings)
         }
 
         return _stringBuilder.ToString().Trim().TrimStart('\n');
+    }
+
+    private void RenderMeasureNumber(int measureMeasureNumber)
+    {
+        if (!settings.ShowMeasureNumbers) return;
+        _stringBuilder.Append(CultureInfo.InvariantCulture, $"{(measureMeasureNumber + 1).ToString("D2", CultureInfo.InvariantCulture)}: ");
     }
 
     private void RenderMeasureDelimiter()
