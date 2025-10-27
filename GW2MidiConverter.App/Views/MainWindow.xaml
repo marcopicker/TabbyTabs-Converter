@@ -167,19 +167,19 @@
                                             Margin="0"
                                             FontTypography="BodyStrong"
                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
+                                            Text="Beat Spacing"
                                             TextWrapping="WrapWithOverflow" />
                                         <ui:TextBlock
                                             Appearance="Secondary"
                                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
+                                            Text="The number of spaces between beats."
                                             TextWrapping="WrapWithOverflow" />
                                     </StackPanel>
                                 </ui:CardControl.Header>
-                                <ui:NumberBox Value="{Binding MeasureSpaces, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
+                                <ui:NumberBox
+                                    Value="{Binding MeasureSpaces, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Minimum="0"
+                                    MaxDecimalPlaces="0"/>
                             </ui:CardControl>
                             <ui:CardControl Margin="0, 0, 0, 8">
                                 <ui:CardControl.Header>
@@ -188,18 +188,18 @@
                                             Margin="0"
                                             FontTypography="BodyStrong"
                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
+                                            Text="Show Measure Numbers"
                                             TextWrapping="WrapWithOverflow" />
                                         <ui:TextBlock
                                             Appearance="Secondary"
                                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
+                                            Text="Shows the measure numbers in front of each measure."
                                             TextWrapping="WrapWithOverflow" />
                                     </StackPanel>
                                 </ui:CardControl.Header>
                                 <ui:ToggleSwitch OnContent="Show"
                                                  OffContent="Hide"
-                                                 IsChecked="{Binding ShowMeasureNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                 IsChecked="{Binding ShowMeasureNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </ui:CardControl>
                             <ui:CardControl Margin="0, 0, 0, 8">
                                 <ui:CardControl.Header>

@@ -12,16 +12,16 @@ namespace GW2MidiConverter.Rendering;
 public class TabCsvRenderer
 {
     private readonly TabDocument _tabDocument;
-    private readonly TabRendererSettings _settings;
+    private readonly TabRenderingSettings _settings;
     private readonly TabMeasureRenderer _measureRenderer;
 
-    public TabCsvRenderer(TabDocument tabDocument, TabRendererSettings? settings = null)
+    public TabCsvRenderer(TabDocument tabDocument, TabRenderingSettings? settings = null)
     {
         ArgumentNullException.ThrowIfNull(tabDocument);
 
         _tabDocument = tabDocument;
-        _settings = settings ?? new TabRendererSettings();
-        _measureRenderer = new TabMeasureRenderer(_settings);
+        _settings = settings ?? new TabRenderingSettings();
+        _measureRenderer = new TabMeasureRenderer(_settings.MeasureRenderingSettings, _settings.NoteRenderingSettings);
     }
     
     public void ToCsv(string outputPath)

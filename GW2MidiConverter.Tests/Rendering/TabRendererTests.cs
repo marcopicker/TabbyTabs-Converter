@@ -15,11 +15,10 @@ public class TabRendererTests
     [Test]
     public void Test1()
     {
-        MidiDocument midiDocument = MidiDocument.LoadFromMidiFile("""C:\Users\pocra\Downloads\Corpse Bride - The Piano Duet (GW2) Duet.mid""");
+        MidiDocument midiDocument = MidiDocument.LoadFromMidiFile("H:\\Private\\Coding\\GW2 Midi Converter\\GW2MidiConverter.Tests\\Resources\\Coraline - Exploration (GW2) Merged parts.mid");
         TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
 
         tabDocument.EnableTrack(0, Instrument.Piano);
-        tabDocument.EnableTrack(1, Instrument.Piano);
         // tabDocument.EnableTrack(2, Instrument.Bass);
 
         TabRenderer renderer = new TabRenderer(tabDocument);

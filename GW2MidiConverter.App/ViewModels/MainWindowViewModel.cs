@@ -7,13 +7,16 @@ using GW2MidiConverter.Rendering;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Octaves;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
 
 namespace GW2MidiConverter.App.ViewModels;
 
 public class MainWindowViewModel : ObservableObject
 {
+    private readonly ISnackbarService _snackbarService;
     private readonly TabDocument _tabDocument;
-    
+
     private object _currentViewModel;
     private string _tabText;
     private int _measureSpaces;
@@ -38,7 +41,7 @@ public class MainWindowViewModel : ObservableObject
         get => _measureSpaces;
         set
         {
-            if(!SetProperty(ref _measureSpaces, value)) return;
+            if (!SetProperty(ref _measureSpaces, value)) return;
             RebuildTab();
         }
     }
@@ -53,25 +56,50 @@ public class MainWindowViewModel : ObservableObject
         }
     }
 
-    public MainWindowViewModel(IServiceProvider serviceProvider)
+    public MainWindowViewModel(IServiceProvider serviceProvider,
+                               ISnackbarService snackbarService)
     {
-        MidiDocument midiDocument = MidiDocument.LoadFromMidiFile("H:\\Private\\Coding\\GW2 Midi Converter\\GW2MidiConverter.Tests\\Resources\\The Nightmare Before Christmas - This is Halloween (GW2) Notedrop Ver.mid");
+        _snackbarService = snackbarService;
+        MeasureSpaces = 4;
+
+        MidiDocument midiDocument = MidiDocument.LoadFromMidiFile("H:\\Private\\Coding\\GW2 Midi Converter\\GW2MidiConverter.Tests\\Resources\\Coraline - Exploration (GW2) Merged parts.mid");
         _tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
         // _tabRenderer = new TabRenderer(_tabDocument);
-        _tabDocument.EnableTrack(1, Instrument.Piano);
-        
+        _tabDocument.EnableTrack(0, Instrument.Piano);
+
         RebuildTab();
     }
 
     private void RebuildTab()
     {
-        TabRendererSettings settings = new TabRendererSettings()
+        if (_tabDocument == null!) return;
+        TabRenderingSettings settings = BuildSettings();
+
+        try
+        {
+            TabRenderer renderer = new TabRenderer(_tabDocument, settings);
+            TabText = renderer.Render();
+        }
+        catch (Exception e)
+        {
+            bool hasSnackbarPresenter = _snackbarService.GetSnackbarPresenter() != null;
+            if(hasSnackbarPresenter) _snackbarService.Show("Rendering Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(30));
+            TabText = string.Empty;
+            Console.WriteLine(e);
+        }
+    }
+
+    private TabRenderingSettings BuildSettings()
+    {
+        MeasureRenderingSettings measureRenderingSettings = new MeasureRenderingSettings()
         {
             SpacesBetweenBeats = MeasureSpaces,
             ShowMeasureNumbers = ShowMeasureNumbers
         };
         
-        TabRenderer renderer = new TabRenderer(_tabDocument, settings);
-        TabText = renderer.Render();
+        return new TabRenderingSettings()
+        {
+            MeasureRenderingSettings = measureRenderingSettings
+        };
     }
 }

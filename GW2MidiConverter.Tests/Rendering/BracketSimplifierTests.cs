@@ -32,6 +32,7 @@ public class BracketSimplifierTests
     [TestCase("[1]/[2]/[3]", "[1/2/3]")]
     [TestCase("(1) (2 3)", "(1 2 3)")]
     [TestCase("[1] (2) [3] [4] 5 [6]", "[1] (2) [3 4] 5 [6]")]
+    [TestCase("[1]/[2]/2/(3)", "[1/2]/2/(3)")]
     public void Simplify_StandardGuildWars2Brackets(string input, string expected)
     {
         List<BracketPair> bracketPairs =

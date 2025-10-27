@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using GW2MidiConverter.Midi;
@@ -7,21 +8,28 @@ using GW2MidiConverter.Tab.Tokens;
 
 namespace GW2MidiConverter.Rendering;
 
-internal class TabTrackRenderer(TabRendererSettings settings)
+internal class TabTrackRenderer(TrackRenderingSettings trackRenderingSettings,
+                                MeasureRenderingSettings measureRenderingSettings,
+                                NoteRenderingSettings noteRenderingSettings,
+                                TimeSignatureRenderingSettings timeSignatureRenderingSettings)
 {
     private readonly StringBuilder _stringBuilder = new StringBuilder();
-    private readonly TabMeasureRenderer _measureRenderer = new TabMeasureRenderer(settings);
+    private readonly TabMeasureRenderer _measureRenderer = new TabMeasureRenderer(measureRenderingSettings, noteRenderingSettings);
 
     /// <summary>
     /// Renders the given track. This method only renders the actual content, and no headers like the instrument name.
     /// </summary>
     /// <param name="track">The track to render.</param>
     /// <returns>The rendered track.</returns>
+    [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The instrument name is invariant.")]
     public string Render(TabTrack track)
     {
         if (track.Measures.Count == 0) return string.Empty;
-
         _stringBuilder.Clear();
+
+        _stringBuilder.AppendLine($"{track.TrackInfo.InstrumentName}:");
+        _stringBuilder.Append(new string('\n', trackRenderingSettings.LineBreaksAfterTrackName));
+        
         TimeSignature previousTimeSignature = new TimeSignature(0, 0);
         int measureInRowsCounter = 0;
         for (int i = 0; i < track.Measures.Count; i++)
@@ -30,7 +38,7 @@ internal class TabTrackRenderer(TabRendererSettings settings)
 
             bool isLineBreakDue = i > 0 &&
                                   i < track.Measures.Count &&
-                                  measureInRowsCounter % settings.MaxMeasureCountBeforeSpacing == 0;
+                                  measureInRowsCounter % trackRenderingSettings.MaxMeasureCountBeforeLineBreak == 0;
             if (isLineBreakDue)
             {
                 _stringBuilder.AppendLine();
@@ -57,36 +65,36 @@ internal class TabTrackRenderer(TabRendererSettings settings)
 
     private void RenderMeasureNumber(int measureMeasureNumber)
     {
-        if (!settings.ShowMeasureNumbers) return;
+        if (!measureRenderingSettings.ShowMeasureNumbers) return;
         _stringBuilder.Append(CultureInfo.InvariantCulture, $"{(measureMeasureNumber + 1).ToString("D2", CultureInfo.InvariantCulture)}: ");
     }
 
     private void RenderMeasureDelimiter()
     {
-        if (!settings.DrawMeasureDelimiters) return;
-        _stringBuilder.Append(settings.MeasureDelimiter);
+        if (!measureRenderingSettings.DrawMeasureDelimiters) return;
+        _stringBuilder.Append(measureRenderingSettings.MeasureDelimiter);
     }
 
     private bool RenderMeasureTimeSignature(TimeSignature timeSignature, TimeSignature previousTimeSignature)
     {
-        bool showTimeSignature = settings.TimeSignatureVisibility == TimeSignatureVisibility.AlwaysShow ||
-                                 (settings.TimeSignatureVisibility == TimeSignatureVisibility.OnlyOnChanges && timeSignature != previousTimeSignature);
+        bool showTimeSignature = timeSignatureRenderingSettings.TimeSignatureVisibility == TimeSignatureVisibility.AlwaysShow ||
+                                 (timeSignatureRenderingSettings.TimeSignatureVisibility == TimeSignatureVisibility.OnlyOnChanges && timeSignature != previousTimeSignature);
         if (!showTimeSignature)
         {
             return false;
         }
 
         string timeSignatureString = $"{timeSignature.Numerator}/{timeSignature.Denominator}: ";
-        switch (settings.TimeSignaturePositioning)
+        switch (timeSignatureRenderingSettings.TimeSignaturePositioning)
         {
             default:
             case TimeSignaturePositioning.AboveMeasure:
-                _stringBuilder.Append(new string('\n', settings.LinesBeforeTimeSignature));
+                _stringBuilder.Append(new string('\n', trackRenderingSettings.LinesBeforeTimeSignature));
                 _stringBuilder.AppendLine(timeSignatureString);
-                _stringBuilder.Append(new string('\n', settings.LinesAfterTimeSignature));
+                _stringBuilder.Append(new string('\n', trackRenderingSettings.LinesAfterTimeSignature));
                 break;
             case TimeSignaturePositioning.InFrontOfMeasure:
-                _stringBuilder.Append(new string('\n', settings.LinesBeforeTimeSignature));
+                _stringBuilder.Append(new string('\n', trackRenderingSettings.LinesBeforeTimeSignature));
                 _stringBuilder.Append(timeSignatureString);
                 break;
         }

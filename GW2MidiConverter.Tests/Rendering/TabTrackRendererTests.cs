@@ -65,7 +65,7 @@ public class TabTrackRendererTests
             ]),            
         ]);
 
-        TabTrackRenderer renderer = new TabTrackRenderer(new TabRendererSettings());
+        TabTrackRenderer renderer = new TabTrackRenderer(new TrackRenderingSettings(), new MeasureRenderingSettings(), new NoteRenderingSettings(), new TimeSignatureRenderingSettings());
         string output = renderer.Render(track);
     }
 }

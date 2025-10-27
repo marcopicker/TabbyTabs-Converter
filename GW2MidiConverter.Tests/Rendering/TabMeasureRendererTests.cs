@@ -17,9 +17,8 @@ public class TabMeasureRendererTests
     {
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, []);
         string expected = string.Empty;
-
-        TabRendererSettings settings = new TabRendererSettings();
-        TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
+        
+        TabMeasureRenderer renderer = new TabMeasureRenderer(new MeasureRenderingSettings(), new NoteRenderingSettings());
         string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -36,9 +35,8 @@ public class TabMeasureRendererTests
         ];
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, tokens);
         const string expected = "1    2    3    —";
-
-        TabRendererSettings settings = new TabRendererSettings();
-        TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
+        
+        TabMeasureRenderer renderer = new TabMeasureRenderer(new MeasureRenderingSettings(), new NoteRenderingSettings());
         string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -54,9 +52,8 @@ public class TabMeasureRendererTests
         ];
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, tokens);
         const string expected = "1    2    —    —";
-
-        TabRendererSettings settings = new TabRendererSettings();
-        TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
+        
+        TabMeasureRenderer renderer = new TabMeasureRenderer(new MeasureRenderingSettings(), new NoteRenderingSettings());
         string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -72,8 +69,7 @@ public class TabMeasureRendererTests
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, tokens);
         const string expected = "1    —    —    —";
 
-        TabRendererSettings settings = new TabRendererSettings();
-        TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
+        TabMeasureRenderer renderer = new TabMeasureRenderer(new MeasureRenderingSettings(), new NoteRenderingSettings());
         string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -101,8 +97,7 @@ public class TabMeasureRendererTests
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, tokens);
         const string expected = "1  1    —    1 1 1 1    1 1 1 1";
 
-        TabRendererSettings settings = new TabRendererSettings();
-        TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
+        TabMeasureRenderer renderer = new TabMeasureRenderer(new MeasureRenderingSettings(), new NoteRenderingSettings());
         string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -118,8 +113,7 @@ public class TabMeasureRendererTests
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, tokens);
         const string expected = "—    —    1    —";
 
-        TabRendererSettings settings = new TabRendererSettings();
-        TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
+        TabMeasureRenderer renderer = new TabMeasureRenderer(new MeasureRenderingSettings(), new NoteRenderingSettings());
         string output = renderer.RenderMeasure(measure);
         Assert.That(output, Is.EqualTo(expected));
     }
@@ -140,8 +134,7 @@ public class TabMeasureRendererTests
         ];
         TabMeasure measure = new TabMeasure(0, TimeSignature.CommonTime, tokens);
 
-        TabRendererSettings settings = new TabRendererSettings();
-        TabMeasureRenderer renderer = new TabMeasureRenderer(settings);
+        TabMeasureRenderer renderer = new TabMeasureRenderer(new MeasureRenderingSettings(), new NoteRenderingSettings());
         string output = renderer.RenderBeat(measure, beat);
         Assert.That(output, Is.EqualTo(expected));
     }

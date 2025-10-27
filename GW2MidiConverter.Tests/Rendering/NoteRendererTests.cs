@@ -17,7 +17,7 @@ public class NoteRendererTests
     [TestCase(GuildWarsNoteKey.Note2Sharp, 1, "(#2)")]
     public void RenderToken_SingleNotes_DefaultSettings_ValidInputs(GuildWarsNoteKey key, int octave, string expected)
     {
-        TabRendererSettings settings = new TabRendererSettings()
+        NoteRenderingSettings settings = new NoteRenderingSettings()
         {
             BracketPairsPerOctave = new Dictionary<Octave, BracketPair>
             {
@@ -43,7 +43,7 @@ public class NoteRendererTests
         ];
         const string expected = "1/3/5";
         
-        TabRendererSettings settings = new TabRendererSettings()
+        NoteRenderingSettings settings = new NoteRenderingSettings()
         {
             BracketPairsPerOctave = new Dictionary<Octave, BracketPair>
             {
@@ -67,7 +67,7 @@ public class NoteRendererTests
         ];
         const string expected = "[1]/3/(5)";
         
-        TabRendererSettings settings = new TabRendererSettings()
+        NoteRenderingSettings settings = new NoteRenderingSettings()
         {
             BracketPairsPerOctave = new Dictionary<Octave, BracketPair>
             {
@@ -91,7 +91,7 @@ public class NoteRendererTests
         ];
         const string expected = "(1/3/5)";
         
-        TabRendererSettings settings = new TabRendererSettings()
+        NoteRenderingSettings settings = new NoteRenderingSettings()
         {
             BracketPairsPerOctave = new Dictionary<Octave, BracketPair>
             {

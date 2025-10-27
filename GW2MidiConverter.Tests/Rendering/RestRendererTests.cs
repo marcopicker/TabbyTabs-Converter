@@ -21,7 +21,7 @@ public class RestRendererTests
     [TestCase(0.125, "")]
     public void RenderBeats_DefaultSettings_ValidInputs(decimal length, string expected)
     {
-        TabRendererSettings settings = new TabRendererSettings()
+        NoteRenderingSettings settings = new NoteRenderingSettings()
         {
             TrailingSpacesPerBeatLength = new Dictionary<TabElementLength, int>
             {
@@ -53,7 +53,7 @@ public class RestRendererTests
     [TestCase(0.125, "")]
     public void RenderBeats_NoSymbolsSet_ValidInputs(decimal length, string expected)
     {
-        TabRendererSettings settings = new TabRendererSettings()
+        NoteRenderingSettings settings = new NoteRenderingSettings()
         {
             RestSymbolsPerBeat = new Dictionary<decimal, char>()
             {
