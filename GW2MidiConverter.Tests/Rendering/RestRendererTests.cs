@@ -29,7 +29,7 @@ public class RestRendererTests
                 [new TabElementLength(0.50m)] = 2,
                 [new TabElementLength(0.25m)] = 1,
             },
-            RestSymbolsPerBeat = new Dictionary<decimal, char>()
+            RestSymbolsPerBeat = new Dictionary<TabElementLength, char>()
             {
                 [1.00m] = '—',
                 [0.50m] = '-',
@@ -55,7 +55,7 @@ public class RestRendererTests
     {
         NoteRenderingSettings settings = new NoteRenderingSettings()
         {
-            RestSymbolsPerBeat = new Dictionary<decimal, char>()
+            RestSymbolsPerBeat = new Dictionary<TabElementLength, char>()
             {
                 // Empty dictionary!
             }

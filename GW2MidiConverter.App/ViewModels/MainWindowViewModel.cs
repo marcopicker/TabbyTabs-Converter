@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
+using GW2MidiConverter.App.ViewModels.Settings;
+using GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Rendering;
@@ -12,7 +14,7 @@ using Wpf.Ui.Controls;
 
 namespace GW2MidiConverter.App.ViewModels;
 
-public class MainWindowViewModel : ObservableObject
+internal class MainWindowViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbarService;
     private readonly TabDocument _tabDocument;
@@ -21,6 +23,7 @@ public class MainWindowViewModel : ObservableObject
     private string _tabText;
     private int _measureSpaces;
     private bool _showMeasureNumbers;
+    private NoteRendererSettingsViewModel _noteRenderingSettingsViewModel;
 
     public object ApplicationTitle => "GW2 Tab Converter";
 
@@ -56,6 +59,12 @@ public class MainWindowViewModel : ObservableObject
         }
     }
 
+    public NoteRendererSettingsViewModel NoteRenderingSettingsViewModel
+    {
+        get => _noteRenderingSettingsViewModel;
+        set => SetProperty(ref _noteRenderingSettingsViewModel, value);
+    }
+
     public MainWindowViewModel(IServiceProvider serviceProvider,
                                ISnackbarService snackbarService)
     {
@@ -66,6 +75,9 @@ public class MainWindowViewModel : ObservableObject
         _tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
         // _tabRenderer = new TabRenderer(_tabDocument);
         _tabDocument.EnableTrack(0, Instrument.Piano);
+
+        NoteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings());
+        NoteRenderingSettingsViewModel.SubSettingChanged += (_, _) => RebuildTab();
 
         RebuildTab();
     }
@@ -99,7 +111,8 @@ public class MainWindowViewModel : ObservableObject
         
         return new TabRenderingSettings()
         {
-            MeasureRenderingSettings = measureRenderingSettings
+            MeasureRenderingSettings = measureRenderingSettings,
+            NoteRenderingSettings = NoteRenderingSettingsViewModel.CreateSettings()
         };
     }
 }

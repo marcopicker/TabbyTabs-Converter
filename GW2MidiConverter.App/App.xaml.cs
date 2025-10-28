@@ -2,11 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using GW2MidiConverter.App.ViewModels;
-using GW2MidiConverter.App.ViewModels.Pages;
 using GW2MidiConverter.App.Views;
-using GW2MidiConverter.App.Views.Pages;
 using Wpf.Ui;
-using Wpf.Ui.Controls;
 
 namespace GW2MidiConverter.App;
 
@@ -34,16 +31,6 @@ public partial class App : Application
         // Windows
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainWindowViewModel>();
-
-        // Pages
-        services.AddSingleton<MyPage>();
-        services.AddSingleton<MyPageViewModel>();
-
-        services.AddSingleton<PreferencePageViewModel>();
-        services.AddSingleton<PreferencesPage>();
-
-        services.AddSingleton<AboutPage>();
-        services.AddSingleton<AboutPageViewModel>();
     }
 
     public static T GetRequiredService<T>() where T : class

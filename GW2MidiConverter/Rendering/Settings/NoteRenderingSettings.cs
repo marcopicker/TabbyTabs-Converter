@@ -29,7 +29,7 @@ public record NoteRenderingSettings
         [new Octave(1)] = new BracketPair('(', ')'),
     };
     
-    public IReadOnlyDictionary<decimal, char> RestSymbolsPerBeat { get; init; } = new Dictionary<decimal, char>
+    public IReadOnlyDictionary<TabElementLength, char> RestSymbolsPerBeat { get; init; } = new Dictionary<TabElementLength, char>
     {
         [1.00m] = '—',
         [0.50m] = '-',

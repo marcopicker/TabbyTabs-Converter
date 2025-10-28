@@ -11,7 +11,7 @@ public class RestRenderer(NoteRenderingSettings settings)
     {
         if (beats <= 0) return string.Empty;
 
-        decimal[] registeredLengths = settings.RestSymbolsPerBeat.Keys.OrderByDescending(d => d).ToArray();
+        TabElementLength[] registeredLengths = settings.RestSymbolsPerBeat.Keys.OrderByDescending(d => d).ToArray();
         StringBuilder builder = new StringBuilder();
 
         decimal remainingBeats = beats;

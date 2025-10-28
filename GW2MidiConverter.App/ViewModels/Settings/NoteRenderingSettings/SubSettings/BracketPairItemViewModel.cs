@@ -1,0 +1,34 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using GW2MidiConverter.GuildWars;
+using GW2MidiConverter.Rendering;
+
+namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
+
+public class BracketPairItemViewModel(Octave octave, BracketPair pair) : ObservableObject
+{
+    private int _octave = octave.ToInt32();
+    private char _openingBracket = pair.OpeningBracket;
+    private char _closingBracket = pair.ClosingBracket;
+
+    public int Octave
+    {
+        get => _octave;
+        set => SetProperty(ref _octave, value);
+    }
+
+    public char OpeningBracket
+    {
+        get => _openingBracket;
+        set => SetProperty(ref _openingBracket, value);
+    }
+
+    public char ClosingBracket
+    {
+        get => _closingBracket;
+        set => SetProperty(ref _closingBracket, value);
+    }
+    
+    public Octave GetOctave() => new Octave(Octave);
+
+    public BracketPair GetBracketPair() => new BracketPair(OpeningBracket, ClosingBracket);
+}

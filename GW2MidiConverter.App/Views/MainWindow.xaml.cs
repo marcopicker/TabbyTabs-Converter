@@ -10,7 +10,7 @@ using Wpf.Ui;
 
 namespace GW2MidiConverter.App.Views;
 
-public partial class MainWindow
+internal partial class MainWindow
 {
     private ScrollContentPresenter? _tabScrollPresenter;
     private bool _previousIsScrolled;

@@ -23,9 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Converters\"/>
         <Folder Include="Extensions\"/>
-        <Folder Include="Models\"/>
     </ItemGroup>
 
     <ItemGroup>
