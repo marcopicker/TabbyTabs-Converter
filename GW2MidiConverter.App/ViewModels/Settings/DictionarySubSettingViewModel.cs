@@ -47,7 +47,9 @@ internal abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> 
 
     public sealed override bool VerifySetting()
     {
-        return VerifyAllItems() && VerifySubSettingInContext();
+        bool itemsAreValid = VerifyAllItems();
+        bool subSettingIsValid = VerifySubSettingInContext();
+        return itemsAreValid && subSettingIsValid;
     }
 
     private bool VerifyAllItems()
