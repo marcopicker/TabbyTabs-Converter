@@ -5,13 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
-             xmlns:settings="clr-namespace:GW2MidiConverter.App.ViewModels.Settings"
              xmlns:noteRenderingSettings="clr-namespace:GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance noteRenderingSettings:NoteRendererSettingsViewModel}">
     <UserControl.Resources>
         <converters:GuildWarsKeyToStringConverter x:Key="KeyToStringConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"
+                                                 True="Hidden"
+                                                 False="Visible"/>
     </UserControl.Resources>
     <StackPanel>
         <ui:TextBlock Text="Note Names"
@@ -29,6 +31,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="8" />
                             <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ui:TextBlock Grid.Column="0"
                                       Text="{Binding Key, Converter={StaticResource KeyToStringConverter}, StringFormat={}{0} symbol:}"
@@ -39,6 +42,14 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="4" />
+                        <ui:SymbolIcon Grid.Column="3"
+                                       Symbol="ErrorCircle12"
+                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:SymbolIcon.Foreground>
+                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
+                            </ui:SymbolIcon.Foreground>
+                        </ui:SymbolIcon>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -59,6 +70,7 @@
                             <ColumnDefinition Width="1.5*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
                                       Value="{Binding Octave, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -76,6 +88,14 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
+                        <ui:SymbolIcon Grid.Column="3"
+                                       Symbol="ErrorCircle12"
+                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:SymbolIcon.Foreground>
+                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
+                            </ui:SymbolIcon.Foreground>
+                        </ui:SymbolIcon>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -95,6 +115,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
                                       Value="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -106,11 +127,19 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
+                        <ui:SymbolIcon Grid.Column="2"
+                                       Symbol="ErrorCircle12"
+                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:SymbolIcon.Foreground>
+                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
+                            </ui:SymbolIcon.Foreground>
+                        </ui:SymbolIcon>                        
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        
+
         <ui:TextBlock Text="Trailing Spaces Pet Beat"
                       FontTypography="BodyStrong"
                       Margin="0,0,0,8" />
@@ -125,6 +154,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
                                       Value="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -137,6 +167,14 @@
                                       HorizontalAlignment="Stretch"
                                       MaxDecimalPlaces="0"
                                       Minimum="0" />
+                        <ui:SymbolIcon Grid.Column="2"
+                                       Symbol="ErrorCircle12"
+                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ui:SymbolIcon.Foreground>
+                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
+                            </ui:SymbolIcon.Foreground>
+                        </ui:SymbolIcon>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

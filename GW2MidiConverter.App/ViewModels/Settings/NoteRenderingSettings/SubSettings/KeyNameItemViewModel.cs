@@ -1,9 +1,8 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using GW2MidiConverter.GuildWars;
 
 namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
 
-internal class KeyNameItemViewModel(GuildWarsNoteKey key, string token) : ObservableObject
+internal class KeyNameItemViewModel(GuildWarsNoteKey key, string token) : DictionarySubSettingItemViewModel
 {
     private string _token = token;
 

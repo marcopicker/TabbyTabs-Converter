@@ -1,9 +1,8 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
 
-internal class TrailingSpacesPerBeatItemViewModel(TabElementLength length, int spaceCount) : ObservableObject
+internal class TrailingSpacesPerBeatItemViewModel(TabElementLength length, int spaceCount) : DictionarySubSettingItemViewModel
 {
     private decimal _length = length.ToDecimal();
     private int _spaceCount = spaceCount;

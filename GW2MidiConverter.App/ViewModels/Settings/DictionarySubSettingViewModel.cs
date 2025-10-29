@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -5,10 +6,11 @@ using GW2MidiConverter.App.Models;
 
 namespace GW2MidiConverter.App.ViewModels.Settings;
 
-public abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> : SubSettingViewModel<IReadOnlyDictionary<TKey, TValue>> where TViewModel : INotifyPropertyChanged
-                                                                                                                                           where TKey : notnull
+internal abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> : SubSettingViewModel<IReadOnlyDictionary<TKey, TValue>> where TViewModel : DictionarySubSettingItemViewModel
+                                                                                                                                         where TKey : notnull
 {
     private FullyObservableCollection<TViewModel> _items = [];
+    private bool _isVerifyingSetting;
 
     public FullyObservableCollection<TViewModel> Items
     {
@@ -17,7 +19,7 @@ public abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> : 
         {
             if (!SetProperty(ref _items, value)) return;
             _items.ItemPropertyChanged += ItemsOnItemPropertyChanged;
-            OnSettingChanged();
+            NotifySettingChanged();
         }
     }
 
@@ -43,15 +45,39 @@ public abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> : 
         return output;
     }
 
-    public override bool VerifySetting()
+    public sealed override bool VerifySetting()
     {
-        return Items.All(VerifyItem); 
+        return VerifyAllItems() && VerifySubSettingInContext();
     }
 
-    protected abstract bool VerifyItem(TViewModel item);
+    private bool VerifyAllItems()
+    {
+        bool allItemsAreValid = true;
+        foreach (TViewModel item in Items)
+        {
+            bool itemIsValid = VerifyItem(item, out string errorMessage);
+            if (itemIsValid)
+            {
+                item.SetValid();
+                continue;
+            }
+
+            allItemsAreValid = false;
+            item.SetInvalid(errorMessage);
+        }
+
+        return allItemsAreValid;
+    }
+
+    protected virtual bool VerifySubSettingInContext()
+    {
+        return true;
+    }
     
+    protected abstract bool VerifyItem(TViewModel item, out string errorMessage);
+
     private void ItemsOnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        OnSettingChanged();
+        NotifySettingChanged();
     }
 }

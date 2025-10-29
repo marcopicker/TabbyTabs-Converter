@@ -5,9 +5,16 @@ namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSett
 
 internal class KeyNamesSubSettingViewModel : DictionarySubSettingViewModel<GuildWarsNoteKey, string, KeyNameItemViewModel>
 {
-    protected override bool VerifyItem(KeyNameItemViewModel item)
+    protected override bool VerifyItem(KeyNameItemViewModel item, out string errorMessage)
     {
-        return !string.IsNullOrWhiteSpace(item.Token);
+        if (string.IsNullOrWhiteSpace(item.Token))
+        {
+            errorMessage = "Text must not be empty.";
+            return false;
+        }
+
+        errorMessage = string.Empty;
+        return true;
     }
 
     protected override KeyNameItemViewModel CreateItemViewModel(GuildWarsNoteKey key, string value)

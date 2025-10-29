@@ -1,10 +1,9 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.Rendering;
 
 namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
 
-public class BracketPairItemViewModel(Octave octave, BracketPair pair) : ObservableObject
+internal class BracketPairItemViewModel(Octave octave, BracketPair pair) : DictionarySubSettingItemViewModel
 {
     private int _octave = octave.ToInt32();
     private char _openingBracket = pair.OpeningBracket;

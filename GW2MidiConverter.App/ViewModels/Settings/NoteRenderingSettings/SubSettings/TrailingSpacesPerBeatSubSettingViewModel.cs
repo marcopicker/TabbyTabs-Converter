@@ -15,8 +15,15 @@ internal class TrailingSpacesPerBeatSubSettingViewModel : DictionarySubSettingVi
         return new KeyValuePair<TabElementLength, int>(new TabElementLength(item.Length), item.SpaceCount);
     }
 
-    protected override bool VerifyItem(TrailingSpacesPerBeatItemViewModel item)
+    protected override bool VerifyItem(TrailingSpacesPerBeatItemViewModel item, out string errorMessage)
     {
-        return item.Length >= 0;
+        if (item.Length < 0)
+        {
+            errorMessage = "Length must not be negative.";
+            return false;
+        }
+
+        errorMessage = string.Empty;
+        return true;
     }
 }

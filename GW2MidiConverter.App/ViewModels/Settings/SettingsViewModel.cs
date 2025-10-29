@@ -11,6 +11,7 @@ internal abstract class SettingsViewModel : ObservableObject, ISetting
 {
     public event EventHandler? SubSettingChanged;
 
+    private bool _isVerifyingSubSettings;
     private readonly ObservableCollection<ISubSetting> _subSettings = [];
 
     protected IReadOnlyCollection<ISubSetting> SubSettings => _subSettings;
@@ -25,18 +26,13 @@ internal abstract class SettingsViewModel : ObservableObject, ISetting
         _subSettings.Add(subSetting);
     }
 
-    protected virtual bool VerifySubSettings()
-    {
-        return _subSettings.All(s => s.VerifySetting());
-    }
-
     private void SubSettingsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.OldItems != null)
         {
             foreach (ISubSetting item in e.OldItems)
             {
-                item.SettingChanged -= SubSettingItemChanged;
+                item.SettingChanged -= HandleSubSettingChanged;
             }
         }
 
@@ -44,19 +40,30 @@ internal abstract class SettingsViewModel : ObservableObject, ISetting
         {
             foreach (ISubSetting item in e.NewItems)
             {
-                item.SettingChanged += SubSettingItemChanged;
+                item.SettingChanged += HandleSubSettingChanged;
             }
         }
     }
 
-    private void SubSettingItemChanged(object? sender, EventArgs e)
+    private bool VerifySubSettings()
     {
-        if (!VerifySubSettings()) return;
-        OnSubSettingChanged();
+        if (_isVerifyingSubSettings) return false;
+        _isVerifyingSubSettings = true;
+
+        // We don't want to use Linq.All(...) because we want to iterate over all subsettings, regardless of failures. 
+        bool areAllSubSettingsValid = true;
+        foreach (ISubSetting setting in SubSettings)
+        {
+            if (!setting.VerifySetting()) areAllSubSettingsValid = false;
+        }
+
+        _isVerifyingSubSettings = false;
+        return areAllSubSettingsValid;
     }
 
-    private void OnSubSettingChanged()
+    private void HandleSubSettingChanged(object? sender, EventArgs e)
     {
-        SubSettingChanged?.Invoke(this, EventArgs.Empty);
+        if (!VerifySubSettings()) return;
+        SubSettingChanged?.Invoke(this, e);
     }
 }

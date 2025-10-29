@@ -1,9 +1,8 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
 
-public class RestSymbolsPerBeatItemViewModel(TabElementLength length, char symbol) : ObservableObject
+internal class RestSymbolsPerBeatItemViewModel(TabElementLength length, char symbol) : DictionarySubSettingItemViewModel
 {
     private decimal _length = length.ToDecimal();
     private char _symbol = symbol;

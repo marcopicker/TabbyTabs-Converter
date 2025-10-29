@@ -1,21 +1,39 @@
 using System.Collections.Generic;
+using System.Linq;
 using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
 
-public class RestSymbolsPerBeatSubSettingViewModel : DictionarySubSettingViewModel<TabElementLength, char, RestSymbolsPerBeatItemViewModel>
+internal class RestSymbolsPerBeatSubSettingViewModel : DictionarySubSettingViewModel<TabElementLength, char, RestSymbolsPerBeatItemViewModel>
 {
-    public override bool VerifySetting()
+    protected override bool VerifySubSettingInContext()
     {
-        // TODO MP: Verify!
-        return true;
+        bool areAllSettingsValid = true;
+        List<IGrouping<decimal, RestSymbolsPerBeatItemViewModel>> lengthGroups = Items.GroupBy(i => i.Length).ToList();
+        foreach (List<RestSymbolsPerBeatItemViewModel> list in lengthGroups.Select(group => group.ToList()))
+        {
+            if(list.Count == 1) continue;
+            foreach (RestSymbolsPerBeatItemViewModel item in list)
+            {
+                item.SetInvalid("Lengths must be unique.");
+                areAllSettingsValid = false;
+            }
+        }
+        return areAllSettingsValid;
     }
 
-    protected override bool VerifyItem(RestSymbolsPerBeatItemViewModel item)
+    protected override bool VerifyItem(RestSymbolsPerBeatItemViewModel item, out string errorMessage)
     {
-        return item.Length >= 0 &&
-               item.Symbol != '\0' &&
-               item.Symbol != ' ';
+        if (item.Length < 0 ||
+            item.Symbol == '\0' ||
+            item.Symbol == ' ')
+        {
+            errorMessage = "Invalid character for symbol.";
+            return false;
+        }
+        
+        errorMessage = string.Empty;
+        return true;
     }
     
     protected override RestSymbolsPerBeatItemViewModel CreateItemViewModel(TabElementLength key, char value)
