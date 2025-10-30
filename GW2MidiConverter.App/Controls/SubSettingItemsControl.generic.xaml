@@ -3,14 +3,17 @@
                     xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <Style TargetType="{x:Type controls:SubSettingItemsControl}">
-        <Setter Property="AlternationCount" Value="{Binding Path=Items.Count, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="AlternationCount" Value="{Binding Path=Items.Count, RelativeSource={RelativeSource Self}}"/>
+        <Setter Property="Focusable" Value="False"></Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:SubSettingItemsControl}">
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical"
+                                Focusable="False">
                         <ui:TextBlock Text="{TemplateBinding HeaderText}"
                                       FontTypography="BodyStrong"
-                                      Margin="0,0,0,8">
+                                      Margin="0,0,0,8"
+                                      Focusable="False">
                             <ui:TextBlock.Style>
                                 <Style TargetType="{x:Type ui:TextBlock}">
                                     <Style.Triggers>
@@ -27,13 +30,16 @@
                                 Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{ui:ThemeResource CardStrokeColorDefaultBrush}"
                                 BorderThickness="1"
-                                CornerRadius="8">
-                            <StackPanel Orientation="Vertical">
-                                <ItemsPresenter />
+                                CornerRadius="8"
+                                Focusable="False">
+                            <StackPanel Orientation="Vertical"
+                                        Focusable="False">
+                                <ItemsPresenter Focusable="False" />
                                 <ContentPresenter Content="{TemplateBinding EmptyContent}"
                                                   ContentTemplate="{TemplateBinding EmptyContentTemplate}"
                                                   HorizontalAlignment="Stretch"
-                                                  VerticalAlignment="Center">
+                                                  VerticalAlignment="Center"
+                                                  Focusable="False">
                                     <ContentPresenter.Style>
                                         <Style TargetType="ContentPresenter">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -58,15 +64,17 @@
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="ContentControl">
+                    <Setter Property="Focusable" Value="False"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ContentControl">
-                                <StackPanel>
+                                <StackPanel Focusable="False">
                                     <Rectangle x:Name="Separator"
                                                HorizontalAlignment="Stretch"
                                                Margin="-16, 8"
                                                Height="1"
-                                               Fill="{DynamicResource WindowBackground}" />
+                                               Fill="{DynamicResource WindowBackground}" 
+                                               Focusable="False"/>
                                     <ContentPresenter />
                                 </StackPanel>
                                 <ControlTemplate.Triggers>

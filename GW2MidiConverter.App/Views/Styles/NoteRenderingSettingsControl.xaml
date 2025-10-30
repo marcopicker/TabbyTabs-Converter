@@ -9,7 +9,8 @@
              xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             d:DataContext="{d:DesignInstance noteRenderingSettings:NoteRendererSettingsViewModel}">
+             d:DataContext="{d:DesignInstance noteRenderingSettings:NoteRendererSettingsViewModel}"
+             Focusable="False">
     <UserControl.Resources>
         <converters:GuildWarsKeyToStringConverter x:Key="KeyToStringConverter" />
         <converters:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"
@@ -25,7 +26,8 @@
                                        Margin="0,0,0,16">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Vertical"
+                                Focusable="False">
                         <Grid HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -34,9 +36,10 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ui:TextBlock Grid.Column="0"
-                                          Text="{Binding Key, Converter={StaticResource KeyToStringConverter}, StringFormat={}{0} symbol:}"
+                                          Text="{Binding Key, Converter={StaticResource KeyToStringConverter}}"
                                           VerticalAlignment="Center"
-                                          HorizontalAlignment="Left" />
+                                          HorizontalAlignment="Left" 
+                                          Focusable="False"/>
                             <ui:TextBox Grid.Column="2"
                                         Text="{Binding Token, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         VerticalAlignment="Center"
@@ -45,7 +48,8 @@
                             <ui:SymbolIcon Grid.Column="3"
                                            Symbol="ErrorCircle12"
                                            Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                           ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                           ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                           Focusable="False">
                                 <ui:SymbolIcon.Foreground>
                                     <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
                                 </ui:SymbolIcon.Foreground>
