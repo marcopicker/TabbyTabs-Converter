@@ -17,25 +17,16 @@
                                                  False="Visible" />
     </UserControl.Resources>
     <StackPanel Margin="0,0,8,0">
-        <ui:TextBlock Text="Note Names"
-                      FontTypography="BodyStrong"
-                      Margin="0,0,0,8" />
-        <controls:EditableItemsControl ItemsSource="{Binding KeyNamesSubSetting.Items}"
-                                       AlternationCount="{Binding RelativeSource={RelativeSource Self}, Path=Items.Count}"
+        <controls:SubSettingItemsControl ItemsSource="{Binding KeyNamesSubSetting.Items}"
                                        Grid.IsSharedSizeScope="True"
                                        HorizontalAlignment="Stretch"
                                        AddButtonVisibility="Collapsed"
-                                       Margin="0,0,0,8">
+                                       HeaderText="Note Names"
+                                       Margin="0,0,0,16">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">
-                        <Rectangle x:Name="Separator"
-                                   HorizontalAlignment="Stretch"
-                                   Margin="-16,8"
-                                   Height="1"
-                                   Fill="{ui:ThemeResource CardStrokeColorDefaultBrush}" />
-                        <Grid Margin="0,0,0,8"
-                              HorizontalAlignment="Stretch">
+                        <Grid HorizontalAlignment="Stretch">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="8" />
@@ -61,29 +52,27 @@
                             </ui:SymbolIcon>
                         </Grid>
                     </StackPanel>
-                    <DataTemplate.Triggers>
-                        <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                            <Setter TargetName="Separator" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
-                    </DataTemplate.Triggers>
+                    <!-- <DataTemplate.Triggers> -->
+                    <!--     <Trigger Property="ItemsControl.AlternationIndex" Value="0"> -->
+                    <!--         <Setter TargetName="Separator" Property="Visibility" Value="Collapsed"/> -->
+                    <!--     </Trigger> -->
+                    <!-- </DataTemplate.Triggers> -->
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </controls:EditableItemsControl>
+        </controls:SubSettingItemsControl>
 
-        <ui:TextBlock Text="Bracket Pairs"
-                      FontTypography="BodyStrong"
-                      Margin="0,0,0,16" />
-        <controls:EditableItemsControl ItemsSource="{Binding BracketPairSubSetting.Items}"
+        <controls:SubSettingItemsControl ItemsSource="{Binding BracketPairSubSetting.Items}"
                                        AddCommand="{Binding BracketPairSubSetting.AddCommand}"
                                        Grid.IsSharedSizeScope="True"
+                                       HeaderText="Octaves Brackets"
                                        HorizontalAlignment="Stretch"
-                                       Margin="0,0,0,8">
-            <controls:EditableItemsControl.EmptyContentTemplate>
+                                       Margin="0,0,0,16">
+            <controls:SubSettingItemsControl.EmptyContentTemplate>
                 <DataTemplate>
                     <ui:TextBlock FontTypography="Caption"
                                   Text="Add stuff, nya :3" />
                 </DataTemplate>
-            </controls:EditableItemsControl.EmptyContentTemplate>
+            </controls:SubSettingItemsControl.EmptyContentTemplate>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -112,7 +101,7 @@
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
                         <ui:Button Grid.Column="3" Content="X"
-                                   Command="{Binding Path=DataContext.BracketPairSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:EditableItemsControl}}}"
+                                   Command="{Binding Path=DataContext.BracketPairSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
                         <ui:SymbolIcon Grid.Column="4"
                                        Symbol="ErrorCircle12"
@@ -125,16 +114,14 @@
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </controls:EditableItemsControl>
+        </controls:SubSettingItemsControl>
 
-        <ui:TextBlock Text="Rest Symbols Per Beat"
-                      FontTypography="BodyStrong"
-                      Margin="0,0,0,8" />
-        <controls:EditableItemsControl ItemsSource="{Binding RestSymbolsPerBeatSubSetting.Items}"
+        <controls:SubSettingItemsControl ItemsSource="{Binding RestSymbolsPerBeatSubSetting.Items}"
                                        AddCommand="{Binding RestSymbolsPerBeatSubSetting.AddCommand}"
                                        Grid.IsSharedSizeScope="True"
+                                       HeaderText="Rest Symbols"
                                        HorizontalAlignment="Stretch"
-                                       Margin="0,0,0,8">
+                                       Margin="0,0,0,16">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -156,7 +143,7 @@
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
                         <ui:Button Grid.Column="2" Content="X"
-                                   Command="{Binding Path=DataContext.RestSymbolsPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:EditableItemsControl}}}"
+                                   Command="{Binding Path=DataContext.RestSymbolsPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
                         <ui:SymbolIcon Grid.Column="3"
                                        Symbol="ErrorCircle12"
@@ -169,16 +156,14 @@
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </controls:EditableItemsControl>
+        </controls:SubSettingItemsControl>
 
-        <ui:TextBlock Text="Trailing Spaces Pet Beat"
-                      FontTypography="BodyStrong"
-                      Margin="0,0,0,8" />
-        <controls:EditableItemsControl ItemsSource="{Binding TrailingSpacesPerBeatSubSetting.Items}"
+        <controls:SubSettingItemsControl ItemsSource="{Binding TrailingSpacesPerBeatSubSetting.Items}"
                                        AddCommand="{Binding TrailingSpacesPerBeatSubSetting.AddCommand}"
                                        Grid.IsSharedSizeScope="True"
+                                       HeaderText="Trailing Spaces"
                                        HorizontalAlignment="Stretch"
-                                       Margin="0,0,0,8">
+                                       Margin="0,0,0,16">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -201,7 +186,7 @@
                                       MaxDecimalPlaces="0"
                                       Minimum="0" />
                         <ui:Button Grid.Column="2" Content="X"
-                                   Command="{Binding Path=DataContext.TrailingSpacesPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:EditableItemsControl}}}"
+                                   Command="{Binding Path=DataContext.TrailingSpacesPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
                         <ui:SymbolIcon Grid.Column="3"
                                        Symbol="ErrorCircle12"
@@ -214,6 +199,6 @@
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </controls:EditableItemsControl>
+        </controls:SubSettingItemsControl>
     </StackPanel>
 </UserControl>

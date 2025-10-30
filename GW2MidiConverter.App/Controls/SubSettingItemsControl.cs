@@ -4,34 +4,46 @@ using System.Windows.Input;
 
 namespace GW2MidiConverter.App.Controls;
 
-internal class EditableItemsControl : ItemsControl
+internal class SubSettingItemsControl : ItemsControl
 {
-    static EditableItemsControl()
+    static SubSettingItemsControl()
     {
-        DefaultStyleKeyProperty.OverrideMetadata(typeof(EditableItemsControl),
-                                                 new FrameworkPropertyMetadata(typeof(EditableItemsControl)));
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(SubSettingItemsControl),
+                                                 new FrameworkPropertyMetadata(typeof(SubSettingItemsControl)));
     }
 
     public static readonly DependencyProperty AddCommandProperty = DependencyProperty.Register(nameof(AddCommand),
                                                                                                typeof(ICommand),
-                                                                                               typeof(EditableItemsControl));
+                                                                                               typeof(SubSettingItemsControl));
 
     public static readonly DependencyProperty RemoveCommandProperty = DependencyProperty.Register(nameof(RemoveCommand),
                                                                                                   typeof(ICommand),
-                                                                                                  typeof(EditableItemsControl));
+                                                                                                  typeof(SubSettingItemsControl));
 
     public static readonly DependencyProperty EmptyContentProperty = DependencyProperty.Register(nameof(EmptyContent),
                                                                                                  typeof(object),
-                                                                                                 typeof(EditableItemsControl),
+                                                                                                 typeof(SubSettingItemsControl),
                                                                                                  new PropertyMetadata(default(object)));
 
     public static readonly DependencyProperty EmptyContentTemplateProperty = DependencyProperty.Register(nameof(EmptyContentTemplate),
                                                                                                          typeof(DataTemplate),
-                                                                                                         typeof(EditableItemsControl),
+                                                                                                         typeof(SubSettingItemsControl),
                                                                                                          new PropertyMetadata(default(DataTemplate)));
 
-    public static readonly DependencyProperty AddButtonVisibilityProperty = DependencyProperty.Register(
-        nameof(AddButtonVisibility), typeof(Visibility), typeof(EditableItemsControl), new PropertyMetadata(default(Visibility)));
+    public static readonly DependencyProperty AddButtonVisibilityProperty = DependencyProperty.Register(nameof(AddButtonVisibility),
+                                                                                                        typeof(Visibility),
+                                                                                                        typeof(SubSettingItemsControl),
+                                                                                                        new PropertyMetadata(default(Visibility)));
+
+    public static readonly DependencyProperty HeaderTextProperty = DependencyProperty.Register(nameof(HeaderText), typeof(string),
+                                                                                               typeof(SubSettingItemsControl),
+                                                                                               new PropertyMetadata(default(string)));
+
+    public string HeaderText
+    {
+        get => (string)GetValue(HeaderTextProperty);
+        set => SetValue(HeaderTextProperty, value);
+    }
 
     public ICommand AddCommand
     {
@@ -56,10 +68,20 @@ internal class EditableItemsControl : ItemsControl
         get => (DataTemplate)GetValue(EmptyContentTemplateProperty);
         set => SetValue(EmptyContentTemplateProperty, value);
     }
-    
+
     public Visibility AddButtonVisibility
     {
         get => (Visibility)GetValue(AddButtonVisibilityProperty);
         set => SetValue(AddButtonVisibilityProperty, value);
+    }
+
+    protected override DependencyObject GetContainerForItemOverride()
+    {
+        return new ContentControl();
+    }
+
+    protected override bool IsItemItsOwnContainerOverride(object item)
+    {
+        return item is ContentControl;
     }
 }
