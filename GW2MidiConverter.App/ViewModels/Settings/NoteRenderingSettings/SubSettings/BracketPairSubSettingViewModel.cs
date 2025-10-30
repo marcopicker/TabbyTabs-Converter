@@ -21,6 +21,15 @@ internal class BracketPairSubSettingViewModel : DictionarySubSettingViewModel<Oc
             }
         }
 
+        foreach (BracketPairItemViewModel item in Items)
+        {
+            bool bracketsAreDuplicates = Items.Where(i => i != item)
+                                              .Any(i => i.GetBracketPair() == item.GetBracketPair());
+            if (!bracketsAreDuplicates) continue;
+            item.SetInvalid("Brackets must be unique.");
+            isSettingValid = false;
+        }
+
         return isSettingValid;
     }
 
@@ -53,5 +62,10 @@ internal class BracketPairSubSettingViewModel : DictionarySubSettingViewModel<Oc
     protected override KeyValuePair<Octave, BracketPair> CreateDictionaryEntryForItem(BracketPairItemViewModel item)
     {
         return new KeyValuePair<Octave, BracketPair>(item.GetOctave(), item.GetBracketPair());
+    }
+
+    protected override BracketPairItemViewModel CreateDefaultNewItemViewModel()
+    {
+        return new BracketPairItemViewModel(new Octave(0), new BracketPair('(', ')'));
     }
 }

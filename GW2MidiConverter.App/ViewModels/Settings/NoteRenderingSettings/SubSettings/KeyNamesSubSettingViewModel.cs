@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GW2MidiConverter.GuildWars;
 
@@ -25,5 +26,10 @@ internal class KeyNamesSubSettingViewModel : DictionarySubSettingViewModel<Guild
     protected override KeyValuePair<GuildWarsNoteKey, string> CreateDictionaryEntryForItem(KeyNameItemViewModel item)
     {
         return new KeyValuePair<GuildWarsNoteKey, string>(item.Key, item.Token);
+    }
+
+    protected override KeyNameItemViewModel CreateDefaultNewItemViewModel()
+    {
+        throw new InvalidOperationException("This ViewModel does not support creating new items.");
     }
 }

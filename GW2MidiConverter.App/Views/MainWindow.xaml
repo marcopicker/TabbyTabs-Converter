@@ -7,6 +7,7 @@
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
                  xmlns:styles="clr-namespace:GW2MidiConverter.App.Views.Styles"
+                 xmlns:noteRenderingSettings="clr-namespace:GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
@@ -17,8 +18,9 @@
                  WindowCornerPreference="Default"
                  WindowStartupLocation="CenterScreen">
     <ui:FluentWindow.Resources>
-        <!-- <DataTemplate DataType="{x:Type pages:MyPageViewModel}"> -->
-        <!-- </DataTemplate> -->
+        <DataTemplate DataType="{x:Type noteRenderingSettings:NoteRendererSettingsViewModel}">
+            <styles:NoteRenderingSettingsControl />
+        </DataTemplate>
     </ui:FluentWindow.Resources>
     <Grid>
         <!-- <ContentControl Content="{Binding CurrentViewModel}" /> -->
@@ -73,473 +75,490 @@
             <Border Grid.Column="0" BorderThickness="0, 0, 1, 0">
                 <Grid Margin="0,40,0,0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <ScrollViewer Grid.Row="0"
-                                  HorizontalScrollBarVisibility="Disabled"
+                    <ComboBox Margin="8,8"
+                              ItemsSource="{Binding Settings}"
+                              SelectedItem="{Binding CurrentViewModel}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type ComboBoxItem}">
+                                <ui:TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Rectangle Grid.Row="1" Height="1"
+                               HorizontalAlignment="Stretch"
+                               Fill="{ui:ThemeResource ControlFillColorDefaultBrush}"
+                               Margin="8,0,8,8" />
+                    <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto"
-                                  Padding="0,0,10,0">
-                        <StackPanel Orientation="Vertical"
-                                    Margin="10, 0, 10, 10"
-                                    Grid.IsSharedSizeScope="True">
-                            <styles:NoteRenderingSettingsControl DataContext="{Binding NoteRenderingSettingsViewModel}"/>
-                            <!-- <Border CornerRadius="4" -->
-                            <!--         Background="Transparent" -->
-                            <!--         Margin="0,0,0,8" -->
-                            <!--         Padding="8"> -->
-                            <!--     <Grid> -->
-                            <!--         <Grid.ColumnDefinitions> -->
-                            <!--             <ColumnDefinition Width="*" /> -->
-                            <!--             <ColumnDefinition Width="8" /> -->
-                            <!--             <ColumnDefinition Width="Auto" SharedSizeGroup="ValueColumn" /> -->
-                            <!--         </Grid.ColumnDefinitions> -->
-                            <!--         <StackPanel Grid.Column="0"> -->
-                            <!--             <ui:TextBlock FontTypography="BodyStrong" -->
-                            <!--                           Text="Measure Spacing" -->
-                            <!--                           TextWrapping="WrapWithOverflow" /> -->
-                            <!--             <ui:TextBlock FontTypography="Caption" -->
-                            <!--                           Text="The number of spaces between measures." -->
-                            <!--                           TextWrapping="WrapWithOverflow" /> -->
-                            <!--         </StackPanel> -->
-                            <!--         <ui:NumberBox Grid.Column="2" -->
-                            <!--                       Value="1337" -->
-                            <!--                       Minimum="0" -->
-                            <!--                       MaxDecimalPlaces="0" -->
-                            <!--                       PlaceholderText="AAAA" /> -->
-                            <!--     </Grid> -->
-                            <!-- </Border> -->
-                            <!-- <Border CornerRadius="4" -->
-                            <!--         Background="#31000000" -->
-                            <!--         Margin="0,0,0,8" -->
-                            <!--         Padding="8"> -->
-                            <!--     <Grid> -->
-                            <!--         <Grid.ColumnDefinitions> -->
-                            <!--             <ColumnDefinition Width="*" /> -->
-                            <!--             <ColumnDefinition Width="8" /> -->
-                            <!--             <ColumnDefinition Width="Auto" SharedSizeGroup="ValueColumn" /> -->
-                            <!--         </Grid.ColumnDefinitions> -->
-                            <!--         <StackPanel Grid.Column="0"> -->
-                            <!--             <ui:TextBlock FontTypography="BodyStrong" -->
-                            <!--                           Text="Measure Spacing" -->
-                            <!--                           TextWrapping="WrapWithOverflow" /> -->
-                            <!--             <ui:TextBlock FontTypography="Caption" -->
-                            <!--                           Text="The number of spaces between measures." -->
-                            <!--                           TextWrapping="WrapWithOverflow" /> -->
-                            <!--         </StackPanel> -->
-                            <!--         <ui:ToggleSwitch Grid.Column="2" -->
-                            <!--                          OnContent="On" -->
-                            <!--                          OffContent="Off" /> -->
-                            <!--     </Grid> -->
-                            <!-- </Border> -->
-                            <!-- <Border CornerRadius="4" -->
-                            <!--         Background="#00000000" -->
-                            <!--         Margin="0,0,0,8" -->
-                            <!--         Padding="8"> -->
-                            <!--     <Grid> -->
-                            <!--         <Grid.ColumnDefinitions> -->
-                            <!--             <ColumnDefinition Width="*" /> -->
-                            <!--             <ColumnDefinition Width="8" /> -->
-                            <!--             <ColumnDefinition Width="Auto" SharedSizeGroup="ValueColumn" /> -->
-                            <!--         </Grid.ColumnDefinitions> -->
-                            <!--         <StackPanel Grid.Column="0"> -->
-                            <!--             <ui:TextBlock FontTypography="BodyStrong" -->
-                            <!--                           Text="Measure Spacing" -->
-                            <!--                           TextWrapping="WrapWithOverflow" /> -->
-                            <!--             <ui:TextBlock FontTypography="Caption" -->
-                            <!--                           Text="The number of spaces between measures." -->
-                            <!--                           TextWrapping="WrapWithOverflow" /> -->
-                            <!--         </StackPanel> -->
-                            <!--         <ui:ToggleSwitch Grid.Column="2" -->
-                            <!--                          OnContent="On" -->
-                            <!--                          OffContent="Off" /> -->
-                            <!--     </Grid> -->
-                            <!-- </Border> -->
-
-                            <ui:TextBlock Appearance="Primary"
-                                          FontTypography="Subtitle"
-                                          Text="Measure Styles"
-                                          Margin="2,0,0,8" />
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Beat Spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between beats."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox
-                                    Value="{Binding MeasureSpaces, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Minimum="0"
-                                    MaxDecimalPlaces="0"/>
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Show Measure Numbers"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="Shows the measure numbers in front of each measure."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:ToggleSwitch OnContent="Show"
-                                                 OffContent="Hide"
-                                                 IsChecked="{Binding ShowMeasureNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox Value="1337"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
-                            </ui:CardControl>
-
-                            <ui:TextBlock Appearance="Primary"
-                                          FontTypography="Subtitle"
-                                          Text="Measure Styles"
-                                          Margin="2,8,0,8" />
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox Value="1337"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:ToggleSwitch OnContent="On"
-                                                 OffContent="Off" />
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox Value="1337"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
-                            </ui:CardControl>
-
-                            <ui:TextBlock Appearance="Primary"
-                                          FontTypography="Subtitle"
-                                          Text="Measure Styles"
-                                          Margin="2,8,0,8" />
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox Value="1337"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:ToggleSwitch OnContent="On"
-                                                 OffContent="Off" />
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox Value="1337"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
-                            </ui:CardControl>
-
-                            <ui:TextBlock Appearance="Primary"
-                                          FontTypography="Subtitle"
-                                          Text="Measure Styles"
-                                          Margin="2,0,0,8" />
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox Value="1337"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:ToggleSwitch OnContent="On"
-                                                 OffContent="Off" />
-                            </ui:CardControl>
-                            <ui:CardControl Margin="0, 0, 0, 8">
-                                <ui:CardControl.Header>
-                                    <StackPanel>
-                                        <ui:TextBlock
-                                            Margin="0"
-                                            FontTypography="BodyStrong"
-                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                            Text="Measure spacing"
-                                            TextWrapping="WrapWithOverflow" />
-                                        <ui:TextBlock
-                                            Appearance="Secondary"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="The number of spaces between measures."
-                                            TextWrapping="WrapWithOverflow" />
-                                    </StackPanel>
-                                </ui:CardControl.Header>
-                                <ui:NumberBox Value="1337"
-                                              Minimum="0"
-                                              MaxDecimalPlaces="0"
-                                              PlaceholderText="AAAA" />
-                            </ui:CardControl>
-
-                            <!-- <ui:CardControl Margin="0, 0, 0, 8"> -->
-                            <!--     <ui:CardControl.Header> -->
-                            <!--         <StackPanel> -->
-                            <!--             <ui:TextBlock -->
-                            <!--                 Margin="0" -->
-                            <!--                 FontTypography="BodyStrong" -->
-                            <!--                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" -->
-                            <!--                 Text="Measure spacing" -->
-                            <!--                 TextWrapping="WrapWithOverflow" /> -->
-                            <!--             <ui:TextBlock -->
-                            <!--                 Appearance="Secondary" -->
-                            <!--                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" -->
-                            <!--                 Text="The number of spaces between measures." -->
-                            <!--                 TextWrapping="WrapWithOverflow" /> -->
-                            <!--         </StackPanel> -->
-                            <!--     </ui:CardControl.Header> -->
-                            <!--     <ui:NumberBox Value="1337" -->
-                            <!--                   Minimum="0" -->
-                            <!--                   MaxDecimalPlaces="0" -->
-                            <!--                   PlaceholderText="AAAA" /> -->
-                            <!-- </ui:CardControl> -->
-                            <!-- -->
-                            <!-- <ui:CardControl Margin="0, 0, 0, 8"> -->
-                            <!--     <ui:CardControl.Header> -->
-                            <!--         <StackPanel> -->
-                            <!--             <ui:TextBlock -->
-                            <!--                 Margin="0" -->
-                            <!--                 FontTypography="BodyStrong" -->
-                            <!--                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" -->
-                            <!--                 Text="Measure spacing" -->
-                            <!--                 TextWrapping="WrapWithOverflow" /> -->
-                            <!--             <ui:TextBlock -->
-                            <!--                 Appearance="Secondary" -->
-                            <!--                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" -->
-                            <!--                 Text="The number of spaces between measures." -->
-                            <!--                 TextWrapping="WrapWithOverflow" /> -->
-                            <!--         </StackPanel> -->
-                            <!--     </ui:CardControl.Header> -->
-                            <!--     <ui:ToggleSwitch OnContent="On" -->
-                            <!--                      OffContent="Off"/> -->
-                            <!-- </ui:CardControl> -->
-                            <!-- -->
-                            <!-- <ui:CardControl Margin="0, 0, 0, 8"> -->
-                            <!--     <ui:CardControl.Header> -->
-                            <!--         <StackPanel> -->
-                            <!--             <ui:TextBlock -->
-                            <!--                 Margin="0" -->
-                            <!--                 FontTypography="BodyStrong" -->
-                            <!--                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" -->
-                            <!--                 Text="Measure spacing" -->
-                            <!--                 TextWrapping="WrapWithOverflow" /> -->
-                            <!--             <ui:TextBlock -->
-                            <!--                 Appearance="Secondary" -->
-                            <!--                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" -->
-                            <!--                 Text="The number of spaces between measures." -->
-                            <!--                 TextWrapping="WrapWithOverflow" /> -->
-                            <!--         </StackPanel> -->
-                            <!--     </ui:CardControl.Header> -->
-                            <!--     <ui:NumberBox Value="1337" -->
-                            <!--                   Minimum="0" -->
-                            <!--                   MaxDecimalPlaces="0" -->
-                            <!--                   PlaceholderText="AAAA" /> -->
-                            <!-- </ui:CardControl> -->
-                            <!-- -->
-                            <!-- <ui:TextBlock Text="Measure spacing:" -->
-                            <!--               FontTypography="BodyStrong" -->
-                            <!--               Margin="0,20,0,0" /> -->
-                            <!-- <ui:TextBlock Text="The number of spaces between measures." -->
-                            <!--               FontTypography="Caption" -->
-                            <!--               Margin="0,0,0,5" /> -->
-                            <!-- <ui:NumberBox Value="1337" -->
-                            <!--               Minimum="0" -->
-                            <!--               MaxDecimalPlaces="0" -->
-                            <!--               PlaceholderText="AAAA" /> -->
-                            <!-- -->
-                            <!-- <ui:TextBlock Text="Measure spacing:" -->
-                            <!--               FontTypography="BodyStrong" -->
-                            <!--               Margin="0,20,0,0" /> -->
-                            <!-- <ui:TextBlock Text="The number of spaces between measures." -->
-                            <!--               FontTypography="Caption" -->
-                            <!--               Margin="0,0,0,5" /> -->
-                            <!-- <ui:ToggleSwitch OnContent="On" -->
-                            <!--                  OffContent="Off"/> -->
-                            <!-- -->
-                            <!-- <ui:TextBlock Text="Measure spacing:" -->
-                            <!--               FontTypography="BodyStrong" -->
-                            <!--               Margin="0,20,0,0" /> -->
-                            <!-- <ui:TextBlock Text="The number of spaces between measures." -->
-                            <!--               FontTypography="Caption" -->
-                            <!--               Margin="0,0,0,5" /> -->
-                            <!-- <ui:NumberBox Value="1337" -->
-                            <!--               Minimum="0" -->
-                            <!--               MaxDecimalPlaces="0" -->
-                            <!--               PlaceholderText="AAAA" /> -->
-                            <!-- -->
-                            <!-- <ui:TextBlock Text="Measure spacing:" -->
-                            <!--               FontTypography="BodyStrong" -->
-                            <!--               Margin="0,20,0,0" /> -->
-                            <!-- <ui:TextBlock Text="The number of spaces between measures." -->
-                            <!--               FontTypography="Caption" -->
-                            <!--               Margin="0,0,0,5" /> -->
-                            <!-- <ui:NumberBox Value="1337" -->
-                            <!--               Minimum="0" -->
-                            <!--               MaxDecimalPlaces="0" -->
-                            <!--               PlaceholderText="AAAA" /> -->
-                            <!-- -->
-                            <!-- <ui:TextBlock Text="Measure spacing:" -->
-                            <!--               FontTypography="BodyStrong" -->
-                            <!--               Margin="0,20,0,0" /> -->
-                            <!-- <ui:TextBlock Text="The number of spaces between measures." -->
-                            <!--               FontTypography="Caption" -->
-                            <!--               Margin="0,0,0,5" /> -->
-                            <!-- <ui:NumberBox Value="1337" -->
-                            <!--               Minimum="0" -->
-                            <!--               MaxDecimalPlaces="0" -->
-                            <!--               PlaceholderText="AAAA" /> -->
-                        </StackPanel>
+                                  Padding="0,0,00,0">
+                        <ContentControl Content="{Binding CurrentViewModel}"
+                                        Margin="10,0" />
+                        <!-- <StackPanel Orientation="Vertical" -->
+                        <!--             Visibility="Collapsed" -->
+                        <!--             Margin="10, 0, 10, 10" -->
+                        <!--             Grid.IsSharedSizeScope="True"> -->
+                        <!--     <styles:NoteRenderingSettingsControl DataContext="{Binding NoteRenderingSettingsViewModel}" /> -->
+                        <!--     ~1~ <Border CornerRadius="4" @1@ -->
+                        <!--     ~1~         Background="Transparent" @1@ -->
+                        <!--     ~1~         Margin="0,0,0,8" @1@ -->
+                        <!--     ~1~         Padding="8"> @1@ -->
+                        <!--     ~1~     <Grid> @1@ -->
+                        <!--     ~1~         <Grid.ColumnDefinitions> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="*" /> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="8" /> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="Auto" SharedSizeGroup="ValueColumn" /> @1@ -->
+                        <!--     ~1~         </Grid.ColumnDefinitions> @1@ -->
+                        <!--     ~1~         <StackPanel Grid.Column="0"> @1@ -->
+                        <!--     ~1~             <ui:TextBlock FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                           Text="Measure Spacing" @1@ -->
+                        <!--     ~1~                           TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock FontTypography="Caption" @1@ -->
+                        <!--     ~1~                           Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                           TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~         <ui:NumberBox Grid.Column="2" @1@ -->
+                        <!--     ~1~                       Value="1337" @1@ -->
+                        <!--     ~1~                       Minimum="0" @1@ -->
+                        <!--     ~1~                       MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                       PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~     </Grid> @1@ -->
+                        <!--     ~1~ </Border> @1@ -->
+                        <!--     ~1~ <Border CornerRadius="4" @1@ -->
+                        <!--     ~1~         Background="#31000000" @1@ -->
+                        <!--     ~1~         Margin="0,0,0,8" @1@ -->
+                        <!--     ~1~         Padding="8"> @1@ -->
+                        <!--     ~1~     <Grid> @1@ -->
+                        <!--     ~1~         <Grid.ColumnDefinitions> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="*" /> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="8" /> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="Auto" SharedSizeGroup="ValueColumn" /> @1@ -->
+                        <!--     ~1~         </Grid.ColumnDefinitions> @1@ -->
+                        <!--     ~1~         <StackPanel Grid.Column="0"> @1@ -->
+                        <!--     ~1~             <ui:TextBlock FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                           Text="Measure Spacing" @1@ -->
+                        <!--     ~1~                           TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock FontTypography="Caption" @1@ -->
+                        <!--     ~1~                           Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                           TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~         <ui:ToggleSwitch Grid.Column="2" @1@ -->
+                        <!--     ~1~                          OnContent="On" @1@ -->
+                        <!--     ~1~                          OffContent="Off" /> @1@ -->
+                        <!--     ~1~     </Grid> @1@ -->
+                        <!--     ~1~ </Border> @1@ -->
+                        <!--     ~1~ <Border CornerRadius="4" @1@ -->
+                        <!--     ~1~         Background="#00000000" @1@ -->
+                        <!--     ~1~         Margin="0,0,0,8" @1@ -->
+                        <!--     ~1~         Padding="8"> @1@ -->
+                        <!--     ~1~     <Grid> @1@ -->
+                        <!--     ~1~         <Grid.ColumnDefinitions> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="*" /> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="8" /> @1@ -->
+                        <!--     ~1~             <ColumnDefinition Width="Auto" SharedSizeGroup="ValueColumn" /> @1@ -->
+                        <!--     ~1~         </Grid.ColumnDefinitions> @1@ -->
+                        <!--     ~1~         <StackPanel Grid.Column="0"> @1@ -->
+                        <!--     ~1~             <ui:TextBlock FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                           Text="Measure Spacing" @1@ -->
+                        <!--     ~1~                           TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock FontTypography="Caption" @1@ -->
+                        <!--     ~1~                           Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                           TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~         <ui:ToggleSwitch Grid.Column="2" @1@ -->
+                        <!--     ~1~                          OnContent="On" @1@ -->
+                        <!--     ~1~                          OffContent="Off" /> @1@ -->
+                        <!--     ~1~     </Grid> @1@ -->
+                        <!--     ~1~ </Border> @1@ -->
+                        <!-- -->
+                        <!--     ~1~ <ui:TextBlock Appearance="Primary" @1@ -->
+                        <!--     ~1~               FontTypography="Subtitle" @1@ -->
+                        <!--     ~1~               Text="Measure Styles" @1@ -->
+                        <!--     ~1~               Margin="2,0,0,8" /> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Beat Spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between beats." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox @1@ -->
+                        <!--     ~1~         Value="{Binding MeasureSpaces, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" @1@ -->
+                        <!--     ~1~         Minimum="0" @1@ -->
+                        <!--     ~1~         MaxDecimalPlaces="0" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Show Measure Numbers" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Shows the measure numbers in front of each measure." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:ToggleSwitch OnContent="Show" @1@ -->
+                        <!--     ~1~                      OffContent="Hide" @1@ -->
+                        <!--     ~1~                      IsChecked="{Binding ShowMeasureNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Appearance="Primary" @1@ -->
+                        <!--     ~1~               FontTypography="Subtitle" @1@ -->
+                        <!--     ~1~               Text="Measure Styles" @1@ -->
+                        <!--     ~1~               Margin="2,8,0,8" /> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:ToggleSwitch OnContent="On" @1@ -->
+                        <!--     ~1~                      OffContent="Off" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Appearance="Primary" @1@ -->
+                        <!--     ~1~               FontTypography="Subtitle" @1@ -->
+                        <!--     ~1~               Text="Measure Styles" @1@ -->
+                        <!--     ~1~               Margin="2,8,0,8" /> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:ToggleSwitch OnContent="On" @1@ -->
+                        <!--     ~1~                      OffContent="Off" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Appearance="Primary" @1@ -->
+                        <!--     ~1~               FontTypography="Subtitle" @1@ -->
+                        <!--     ~1~               Text="Measure Styles" @1@ -->
+                        <!--     ~1~               Margin="2,0,0,8" /> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:ToggleSwitch OnContent="On" @1@ -->
+                        <!--     ~1~                      OffContent="Off" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!-- -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:ToggleSwitch OnContent="On" @1@ -->
+                        <!--     ~1~                      OffContent="Off"/> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:CardControl Margin="0, 0, 0, 8"> @1@ -->
+                        <!--     ~1~     <ui:CardControl.Header> @1@ -->
+                        <!--     ~1~         <StackPanel> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Margin="0" @1@ -->
+                        <!--     ~1~                 FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorPrimaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="Measure spacing" @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~             <ui:TextBlock @1@ -->
+                        <!--     ~1~                 Appearance="Secondary" @1@ -->
+                        <!--     ~1~                 Foreground="{DynamicResource TextFillColorSecondaryBrush}" @1@ -->
+                        <!--     ~1~                 Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~                 TextWrapping="WrapWithOverflow" /> @1@ -->
+                        <!--     ~1~         </StackPanel> @1@ -->
+                        <!--     ~1~     </ui:CardControl.Header> @1@ -->
+                        <!--     ~1~     <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~                   Minimum="0" @1@ -->
+                        <!--     ~1~                   MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~                   PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ </ui:CardControl> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="Measure spacing:" @1@ -->
+                        <!--     ~1~               FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~               Margin="0,20,0,0" /> @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~               FontTypography="Caption" @1@ -->
+                        <!--     ~1~               Margin="0,0,0,5" /> @1@ -->
+                        <!--     ~1~ <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~               Minimum="0" @1@ -->
+                        <!--     ~1~               MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~               PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="Measure spacing:" @1@ -->
+                        <!--     ~1~               FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~               Margin="0,20,0,0" /> @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~               FontTypography="Caption" @1@ -->
+                        <!--     ~1~               Margin="0,0,0,5" /> @1@ -->
+                        <!--     ~1~ <ui:ToggleSwitch OnContent="On" @1@ -->
+                        <!--     ~1~                  OffContent="Off"/> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="Measure spacing:" @1@ -->
+                        <!--     ~1~               FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~               Margin="0,20,0,0" /> @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~               FontTypography="Caption" @1@ -->
+                        <!--     ~1~               Margin="0,0,0,5" /> @1@ -->
+                        <!--     ~1~ <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~               Minimum="0" @1@ -->
+                        <!--     ~1~               MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~               PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="Measure spacing:" @1@ -->
+                        <!--     ~1~               FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~               Margin="0,20,0,0" /> @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~               FontTypography="Caption" @1@ -->
+                        <!--     ~1~               Margin="0,0,0,5" /> @1@ -->
+                        <!--     ~1~ <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~               Minimum="0" @1@ -->
+                        <!--     ~1~               MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~               PlaceholderText="AAAA" /> @1@ -->
+                        <!--     ~1~ @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="Measure spacing:" @1@ -->
+                        <!--     ~1~               FontTypography="BodyStrong" @1@ -->
+                        <!--     ~1~               Margin="0,20,0,0" /> @1@ -->
+                        <!--     ~1~ <ui:TextBlock Text="The number of spaces between measures." @1@ -->
+                        <!--     ~1~               FontTypography="Caption" @1@ -->
+                        <!--     ~1~               Margin="0,0,0,5" /> @1@ -->
+                        <!--     ~1~ <ui:NumberBox Value="1337" @1@ -->
+                        <!--     ~1~               Minimum="0" @1@ -->
+                        <!--     ~1~               MaxDecimalPlaces="0" @1@ -->
+                        <!--     ~1~               PlaceholderText="AAAA" /> @1@ -->
+                        <!-- </StackPanel> -->
                     </ScrollViewer>
-                    <Border Grid.Row="1"
+                    <Border Grid.Row="3"
                             Margin="0,10,0,0"
                             Padding="5">
                         <ui:Button Content="Export" />

@@ -33,7 +33,7 @@ internal class NoteRendererSettingsViewModel : SettingsViewModel
         private init => SetProperty(ref _trailingSpacesPerBeatSubSetting, value);
     }
     
-    public NoteRendererSettingsViewModel(Rendering.Settings.NoteRenderingSettings settings)
+    public NoteRendererSettingsViewModel(Rendering.Settings.NoteRenderingSettings settings) : base("Notes")
     {
         KeyNamesSubSetting = new KeyNamesSubSettingViewModel();
         KeyNamesSubSetting.ApplySubSettingObject(settings.KeyNames);

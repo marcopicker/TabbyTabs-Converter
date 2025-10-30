@@ -45,4 +45,9 @@ internal class RestSymbolsPerBeatSubSettingViewModel : DictionarySubSettingViewM
     {
         return new KeyValuePair<TabElementLength, char>(new TabElementLength(item.Length), item.Symbol);
     }
+
+    protected override RestSymbolsPerBeatItemViewModel CreateDefaultNewItemViewModel()
+    {
+        return new RestSymbolsPerBeatItemViewModel(new TabElementLength(0.5m), '-');
+    }
 }

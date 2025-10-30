@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
@@ -15,6 +16,11 @@ internal class TrailingSpacesPerBeatSubSettingViewModel : DictionarySubSettingVi
         return new KeyValuePair<TabElementLength, int>(new TabElementLength(item.Length), item.SpaceCount);
     }
 
+    protected override TrailingSpacesPerBeatItemViewModel CreateDefaultNewItemViewModel()
+    {
+        return new TrailingSpacesPerBeatItemViewModel(new TabElementLength(0.5m), 0);
+    }
+
     protected override bool VerifyItem(TrailingSpacesPerBeatItemViewModel item, out string errorMessage)
     {
         if (item.Length < 0)
@@ -25,5 +31,21 @@ internal class TrailingSpacesPerBeatSubSettingViewModel : DictionarySubSettingVi
 
         errorMessage = string.Empty;
         return true;
+    }
+
+    protected override bool VerifySubSettingInContext()
+    {
+        bool areAllSettingsValid = true;
+        List<IGrouping<decimal, TrailingSpacesPerBeatItemViewModel>> lengthGroups = Items.GroupBy(i => i.Length).ToList();
+        foreach (List<TrailingSpacesPerBeatItemViewModel> list in lengthGroups.Select(group => group.ToList()))
+        {
+            if(list.Count == 1) continue;
+            foreach (TrailingSpacesPerBeatItemViewModel item in list)
+            {
+                item.SetInvalid("Lengths must be unique.");
+                areAllSettingsValid = false;
+            }
+        }
+        return areAllSettingsValid;
     }
 }

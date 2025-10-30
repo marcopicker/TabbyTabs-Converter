@@ -6,6 +6,7 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
              xmlns:noteRenderingSettings="clr-namespace:GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings"
+             xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance noteRenderingSettings:NoteRendererSettingsViewModel}">
@@ -13,55 +14,76 @@
         <converters:GuildWarsKeyToStringConverter x:Key="KeyToStringConverter" />
         <converters:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"
                                                  True="Hidden"
-                                                 False="Visible"/>
+                                                 False="Visible" />
     </UserControl.Resources>
-    <StackPanel>
+    <StackPanel Margin="0,0,8,0">
         <ui:TextBlock Text="Note Names"
                       FontTypography="BodyStrong"
                       Margin="0,0,0,8" />
-        <ItemsControl ItemsSource="{Binding KeyNamesSubSetting.Items}"
-                      Grid.IsSharedSizeScope="True"
-                      HorizontalAlignment="Stretch"
-                      Margin="0,0,0,8">
+        <controls:EditableItemsControl ItemsSource="{Binding KeyNamesSubSetting.Items}"
+                                       AlternationCount="{Binding RelativeSource={RelativeSource Self}, Path=Items.Count}"
+                                       Grid.IsSharedSizeScope="True"
+                                       HorizontalAlignment="Stretch"
+                                       AddButtonVisibility="Collapsed"
+                                       Margin="0,0,0,8">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="0,0,0,8"
-                          HorizontalAlignment="Stretch">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="90" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <ui:TextBlock Grid.Column="0"
-                                      Text="{Binding Key, Converter={StaticResource KeyToStringConverter}, StringFormat={}{0} symbol:}"
-                                      VerticalAlignment="Center"
-                                      HorizontalAlignment="Left" />
-                        <ui:TextBox Grid.Column="2"
-                                    Text="{Binding Token, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Stretch"
-                                    MaxLength="4" />
-                        <ui:SymbolIcon Grid.Column="3"
-                                       Symbol="ErrorCircle12"
-                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ui:SymbolIcon.Foreground>
-                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
-                            </ui:SymbolIcon.Foreground>
-                        </ui:SymbolIcon>
-                    </Grid>
+                    <StackPanel Orientation="Vertical">
+                        <Rectangle x:Name="Separator"
+                                   HorizontalAlignment="Stretch"
+                                   Margin="-16,8"
+                                   Height="1"
+                                   Fill="{ui:ThemeResource CardStrokeColorDefaultBrush}" />
+                        <Grid Margin="0,0,0,8"
+                              HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="90" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBlock Grid.Column="0"
+                                          Text="{Binding Key, Converter={StaticResource KeyToStringConverter}, StringFormat={}{0} symbol:}"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left" />
+                            <ui:TextBox Grid.Column="2"
+                                        Text="{Binding Token, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
+                                        MaxLength="4" />
+                            <ui:SymbolIcon Grid.Column="3"
+                                           Symbol="ErrorCircle12"
+                                           Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
+                                           ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ui:SymbolIcon.Foreground>
+                                    <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
+                                </ui:SymbolIcon.Foreground>
+                            </ui:SymbolIcon>
+                        </Grid>
+                    </StackPanel>
+                    <DataTemplate.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                            <Setter TargetName="Separator" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </DataTemplate.Triggers>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        </controls:EditableItemsControl>
 
         <ui:TextBlock Text="Bracket Pairs"
                       FontTypography="BodyStrong"
-                      Margin="0,0,0,8" />
-        <ItemsControl ItemsSource="{Binding BracketPairSubSetting.Items}"
-                      Grid.IsSharedSizeScope="True"
-                      HorizontalAlignment="Stretch"
-                      Margin="0,0,0,8">
+                      Margin="0,0,0,16" />
+        <controls:EditableItemsControl ItemsSource="{Binding BracketPairSubSetting.Items}"
+                                       AddCommand="{Binding BracketPairSubSetting.AddCommand}"
+                                       Grid.IsSharedSizeScope="True"
+                                       HorizontalAlignment="Stretch"
+                                       Margin="0,0,0,8">
+            <controls:EditableItemsControl.EmptyContentTemplate>
+                <DataTemplate>
+                    <ui:TextBlock FontTypography="Caption"
+                                  Text="Add stuff, nya :3" />
+                </DataTemplate>
+            </controls:EditableItemsControl.EmptyContentTemplate>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -70,6 +92,7 @@
                             <ColumnDefinition Width="1.5*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
@@ -88,7 +111,10 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
-                        <ui:SymbolIcon Grid.Column="3"
+                        <ui:Button Grid.Column="3" Content="X"
+                                   Command="{Binding Path=DataContext.BracketPairSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:EditableItemsControl}}}"
+                                   CommandParameter="{Binding}" />
+                        <ui:SymbolIcon Grid.Column="4"
                                        Symbol="ErrorCircle12"
                                        Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                                        ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
@@ -99,15 +125,16 @@
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        </controls:EditableItemsControl>
 
         <ui:TextBlock Text="Rest Symbols Per Beat"
                       FontTypography="BodyStrong"
                       Margin="0,0,0,8" />
-        <ItemsControl ItemsSource="{Binding RestSymbolsPerBeatSubSetting.Items}"
-                      Grid.IsSharedSizeScope="True"
-                      HorizontalAlignment="Stretch"
-                      Margin="0,0,0,8">
+        <controls:EditableItemsControl ItemsSource="{Binding RestSymbolsPerBeatSubSetting.Items}"
+                                       AddCommand="{Binding RestSymbolsPerBeatSubSetting.AddCommand}"
+                                       Grid.IsSharedSizeScope="True"
+                                       HorizontalAlignment="Stretch"
+                                       Margin="0,0,0,8">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -115,6 +142,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
@@ -127,26 +155,30 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
-                        <ui:SymbolIcon Grid.Column="2"
+                        <ui:Button Grid.Column="2" Content="X"
+                                   Command="{Binding Path=DataContext.RestSymbolsPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:EditableItemsControl}}}"
+                                   CommandParameter="{Binding}" />
+                        <ui:SymbolIcon Grid.Column="3"
                                        Symbol="ErrorCircle12"
                                        Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                                        ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                             <ui:SymbolIcon.Foreground>
                                 <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
                             </ui:SymbolIcon.Foreground>
-                        </ui:SymbolIcon>                        
+                        </ui:SymbolIcon>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        </controls:EditableItemsControl>
 
         <ui:TextBlock Text="Trailing Spaces Pet Beat"
                       FontTypography="BodyStrong"
                       Margin="0,0,0,8" />
-        <ItemsControl ItemsSource="{Binding TrailingSpacesPerBeatSubSetting.Items}"
-                      Grid.IsSharedSizeScope="True"
-                      HorizontalAlignment="Stretch"
-                      Margin="0,0,0,8">
+        <controls:EditableItemsControl ItemsSource="{Binding TrailingSpacesPerBeatSubSetting.Items}"
+                                       AddCommand="{Binding TrailingSpacesPerBeatSubSetting.AddCommand}"
+                                       Grid.IsSharedSizeScope="True"
+                                       HorizontalAlignment="Stretch"
+                                       Margin="0,0,0,8">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -154,6 +186,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
@@ -167,7 +200,10 @@
                                       HorizontalAlignment="Stretch"
                                       MaxDecimalPlaces="0"
                                       Minimum="0" />
-                        <ui:SymbolIcon Grid.Column="2"
+                        <ui:Button Grid.Column="2" Content="X"
+                                   Command="{Binding Path=DataContext.TrailingSpacesPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:EditableItemsControl}}}"
+                                   CommandParameter="{Binding}" />
+                        <ui:SymbolIcon Grid.Column="3"
                                        Symbol="ErrorCircle12"
                                        Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                                        ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
@@ -178,6 +214,6 @@
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        </controls:EditableItemsControl>
     </StackPanel>
 </UserControl>

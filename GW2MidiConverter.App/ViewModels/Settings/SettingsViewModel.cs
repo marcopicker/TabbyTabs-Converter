@@ -13,11 +13,19 @@ internal abstract class SettingsViewModel : ObservableObject, ISetting
 
     private bool _isVerifyingSubSettings;
     private readonly ObservableCollection<ISubSetting> _subSettings = [];
+    private string _name;
+
+    public string Name
+    {
+        get => _name;
+        set => SetProperty(ref _name, value);
+    }
 
     protected IReadOnlyCollection<ISubSetting> SubSettings => _subSettings;
-
-    protected SettingsViewModel()
+    
+    protected SettingsViewModel(string name)
     {
+        Name = name;
         _subSettings.CollectionChanged += SubSettingsOnCollectionChanged;
     }
 

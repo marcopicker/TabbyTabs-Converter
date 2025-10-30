@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using GW2MidiConverter.App.Models;
 
 namespace GW2MidiConverter.App.ViewModels.Settings;
@@ -10,7 +13,8 @@ internal abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> 
                                                                                                                                          where TKey : notnull
 {
     private FullyObservableCollection<TViewModel> _items = [];
-    private bool _isVerifyingSetting;
+    private ICommand? _addCommand;
+    private ICommand? _removeCommand;
 
     public FullyObservableCollection<TViewModel> Items
     {
@@ -19,13 +23,48 @@ internal abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> 
         {
             if (!SetProperty(ref _items, value)) return;
             _items.ItemPropertyChanged += ItemsOnItemPropertyChanged;
+            _items.CollectionChanged += ItemsOnCollectionChanged;
             NotifySettingChanged();
         }
+    }
+
+    public ICommand? AddCommand
+    {
+        get => _addCommand;
+        set => SetProperty(ref _addCommand, value);
+    }
+
+    public ICommand? RemoveCommand
+    {
+        get => _removeCommand;
+        set => SetProperty(ref _removeCommand, value);
+    }
+
+    public DictionarySubSettingViewModel()
+    {
+        AddCommand = new RelayCommand(AddNewItem);
+        RemoveCommand = new RelayCommand<TViewModel?>(RemoveItem);
     }
 
     protected abstract TViewModel CreateItemViewModel(TKey key, TValue value);
 
     protected abstract KeyValuePair<TKey, TValue> CreateDictionaryEntryForItem(TViewModel item);
+
+    protected abstract TViewModel CreateDefaultNewItemViewModel();
+
+    protected virtual void AddNewItem()
+    {
+        TViewModel newItem = CreateDefaultNewItemViewModel();
+        Items.Add(newItem);
+        NotifySettingChanged();
+    }
+
+    protected virtual void RemoveItem(TViewModel? item)
+    {
+        Console.WriteLine($"Removing item {item}");
+        if (item == null) return;
+        Items.Remove(item);
+    }
 
     public override void ApplySubSettingObject(IReadOnlyDictionary<TKey, TValue> setting)
     {
@@ -75,10 +114,15 @@ internal abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> 
     {
         return true;
     }
-    
+
     protected abstract bool VerifyItem(TViewModel item, out string errorMessage);
 
     private void ItemsOnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        NotifySettingChanged();
+    }
+
+    private void ItemsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         NotifySettingChanged();
     }

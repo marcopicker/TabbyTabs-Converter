@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using GW2MidiConverter.App.ViewModels.Settings;
@@ -19,7 +20,7 @@ internal class MainWindowViewModel : ObservableObject
     private readonly ISnackbarService _snackbarService;
     private readonly TabDocument _tabDocument;
 
-    private object _currentViewModel;
+    private SettingsViewModel _currentViewModel;
     private string _tabText;
     private int _measureSpaces;
     private bool _showMeasureNumbers;
@@ -27,7 +28,9 @@ internal class MainWindowViewModel : ObservableObject
 
     public object ApplicationTitle => "GW2 Tab Converter";
 
-    public object CurrentViewModel
+    public List<SettingsViewModel> Settings { get; } = [];
+
+    public SettingsViewModel CurrentViewModel
     {
         get => _currentViewModel;
         set => SetProperty(ref _currentViewModel, value);
@@ -78,7 +81,12 @@ internal class MainWindowViewModel : ObservableObject
 
         NoteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings());
         NoteRenderingSettingsViewModel.SubSettingChanged += (_, _) => RebuildTab();
-
+        
+        Settings.Add(NoteRenderingSettingsViewModel);
+        Settings.Add(NoteRenderingSettingsViewModel);
+        Settings.Add(NoteRenderingSettingsViewModel);
+        CurrentViewModel = Settings[0];
+        
         RebuildTab();
     }
 
