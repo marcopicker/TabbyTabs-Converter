@@ -39,6 +39,28 @@ internal class SubSettingItemsControl : ItemsControl
                                                                                                typeof(SubSettingItemsControl),
                                                                                                new PropertyMetadata(default(string)));
 
+    public static readonly DependencyProperty InternalHeaderContentProperty = DependencyProperty.Register(nameof(InternalHeaderContent),
+                                                                                                          typeof(object),
+                                                                                                          typeof(SubSettingItemsControl),
+                                                                                                          new PropertyMetadata(default(object)));
+
+    public static readonly DependencyProperty InternalHeaderTemplateProperty = DependencyProperty.Register(nameof(InternalHeaderTemplate),
+                                                                                                           typeof(DataTemplate),
+                                                                                                           typeof(SubSettingItemsControl),
+                                                                                                           new PropertyMetadata(default(DataTemplate)));
+
+    public DataTemplate InternalHeaderTemplate
+    {
+        get => (DataTemplate)GetValue(InternalHeaderTemplateProperty);
+        set => SetValue(InternalHeaderTemplateProperty, value);
+    }
+
+    public object InternalHeaderContent
+    {
+        get => GetValue(InternalHeaderContentProperty);
+        set => SetValue(InternalHeaderContentProperty, value);
+    }
+
     public string HeaderText
     {
         get => (string)GetValue(HeaderTextProperty);

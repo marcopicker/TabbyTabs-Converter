@@ -3,7 +3,7 @@
                     xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <Style TargetType="{x:Type controls:SubSettingItemsControl}">
-        <Setter Property="AlternationCount" Value="{Binding Path=Items.Count, RelativeSource={RelativeSource Self}}"/>
+        <Setter Property="AlternationCount" Value="{Binding Path=Items.Count, RelativeSource={RelativeSource Self}}" />
         <Setter Property="Focusable" Value="False"></Setter>
         <Setter Property="Template">
             <Setter.Value>
@@ -34,6 +34,20 @@
                                 Focusable="False">
                             <StackPanel Orientation="Vertical"
                                         Focusable="False">
+                                <ContentPresenter Content="{TemplateBinding InternalHeaderContent}"
+                                                  ContentTemplate="{TemplateBinding InternalHeaderTemplate}">
+                                    <!-- <ContentPresenter.Style> -->
+                                    <!--     <Style TargetType="ContentPresenter"> -->
+                                    <!--         <Style.Triggers> -->
+                                    <!--             <Trigger Property="Content" Value="{x:Null}"> -->
+                                    <!--                 <Trigger.Setters> -->
+                                    <!--                     <Setter Property="Visibility" Value="Collapsed" /> -->
+                                    <!--                 </Trigger.Setters> -->
+                                    <!--             </Trigger> -->
+                                    <!--         </Style.Triggers> -->
+                                    <!--     </Style> -->
+                                    <!-- </ContentPresenter.Style> -->
+                                </ContentPresenter>
                                 <ItemsPresenter Focusable="False" />
                                 <ContentPresenter Content="{TemplateBinding EmptyContent}"
                                                   ContentTemplate="{TemplateBinding EmptyContentTemplate}"
@@ -52,7 +66,15 @@
                                         </Style>
                                     </ContentPresenter.Style>
                                 </ContentPresenter>
+                                <Rectangle x:Name="Separator"
+                                           Visibility="{TemplateBinding AddButtonVisibility}"
+                                           HorizontalAlignment="Stretch"
+                                           Margin="-16, 8"
+                                           Height="1"
+                                           Fill="{DynamicResource WindowBackground}"
+                                           Focusable="False" />
                                 <ui:Button Content="Add"
+                                           HorizontalAlignment="Right"
                                            Command="{TemplateBinding AddCommand}"
                                            Visibility="{TemplateBinding AddButtonVisibility}" />
                             </StackPanel>
@@ -64,7 +86,7 @@
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="ContentControl">
-                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="Focusable" Value="False" />
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ContentControl">
@@ -73,8 +95,8 @@
                                                HorizontalAlignment="Stretch"
                                                Margin="-16, 8"
                                                Height="1"
-                                               Fill="{DynamicResource WindowBackground}" 
-                                               Focusable="False"/>
+                                               Fill="{DynamicResource WindowBackground}"
+                                               Focusable="False" />
                                     <ContentPresenter />
                                 </StackPanel>
                                 <ControlTemplate.Triggers>
