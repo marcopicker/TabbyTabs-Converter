@@ -42,6 +42,7 @@
                                           Focusable="False" />
                             <ui:TextBox Grid.Column="2"
                                         Text="{Binding Token, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        ClearButtonEnabled="False"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Stretch"
                                         MaxLength="4">
@@ -115,23 +116,27 @@
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
                                       Value="{Binding Octave, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ClearButtonEnabled="False"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Stretch"
                                       MaxLength="2"
                                       MaxDecimalPlaces="0" />
                         <ui:TextBox Grid.Column="1"
                                     Text="{Binding OpeningBracket, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    ClearButtonEnabled="False"
                                     Margin="8,0,0,0"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
                         <ui:TextBox Grid.Column="2"
                                     Text="{Binding ClosingBracket, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    ClearButtonEnabled="False"
                                     Margin="8,0,0,0"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
-                        <ui:Button Grid.Column="3" Content="X"
+                        <ui:Button Grid.Column="3" 
+                                   Content="X"
                                    Margin="8,0,0,0"
                                    Command="{Binding Path=DataContext.BracketPairSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
@@ -163,6 +168,34 @@
                                          HeaderText="Rest Symbols"
                                          HorizontalAlignment="Stretch"
                                          Margin="0,0,0,16">
+            <controls:SubSettingItemsControl.InternalHeaderTemplate>
+                <DataTemplate>
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="D" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="E" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBlock Grid.Column="0"
+                                          Text="Beats"
+                                          HorizontalAlignment="Stretch"
+                                          TextAlignment="Center" />
+                            <ui:TextBlock Grid.Column="1"
+                                          Text="Symbol"
+                                          HorizontalAlignment="Stretch"
+                                          TextAlignment="Center" />
+                        </Grid>
+                        <Rectangle x:Name="Separator"
+                                   HorizontalAlignment="Stretch"
+                                   Margin="-16, 0,-16,8"
+                                   Height="1"
+                                   Fill="{DynamicResource WindowBackground}"
+                                   Focusable="False" />
+                    </StackPanel>
+                </DataTemplate>
+            </controls:SubSettingItemsControl.InternalHeaderTemplate>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -170,24 +203,36 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="D" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="E" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
                                       Value="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ClearButtonEnabled="False"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Stretch"
-                                      MaxDecimalPlaces="3" />
+                                      MaxDecimalPlaces="3"
+                                      Minimum="0"
+                                      Maximum="1"
+                                      SmallChange="0.25"
+                                      LargeChange="0.5" />
                         <ui:TextBox Grid.Column="1"
                                     Text="{Binding Symbol, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    ClearButtonEnabled="False"
+                                    Margin="8,0,0,0"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
-                        <ui:Button Grid.Column="2" Content="X"
+                        <ui:Button Grid.Column="2"
+                                   Margin="8,0,0,0"
+                                   Content="X"
                                    Command="{Binding Path=DataContext.RestSymbolsPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
                         <ui:SymbolIcon Grid.Column="3"
                                        Symbol="ErrorCircle12"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Margin="8,0,0,0"
                                        Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                                        ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                             <ui:SymbolIcon.Foreground>
@@ -205,6 +250,34 @@
                                          HeaderText="Trailing Spaces"
                                          HorizontalAlignment="Stretch"
                                          Margin="0,0,0,16">
+            <controls:SubSettingItemsControl.InternalHeaderTemplate>
+                <DataTemplate>
+                    <StackPanel HorizontalAlignment="Stretch">
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="D" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="E" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBlock Grid.Column="0"
+                                          Text="Beats"
+                                          HorizontalAlignment="Stretch"
+                                          TextAlignment="Center" />
+                            <ui:TextBlock Grid.Column="1"
+                                          Text="Spaces"
+                                          HorizontalAlignment="Stretch"
+                                          TextAlignment="Center" />
+                        </Grid>
+                        <Rectangle x:Name="Separator"
+                                   HorizontalAlignment="Stretch"
+                                   Margin="-16, 0,-16,8"
+                                   Height="1"
+                                   Fill="{DynamicResource WindowBackground}"
+                                   Focusable="False" />
+                    </StackPanel>
+                </DataTemplate>
+            </controls:SubSettingItemsControl.InternalHeaderTemplate>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,0,0,8"
@@ -212,26 +285,37 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="D" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="E" />
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
                                       Value="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ClearButtonEnabled="False"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Stretch"
-                                      MaxDecimalPlaces="3" />
+                                      MaxDecimalPlaces="3"
+                                      Minimum="0"
+                                      Maximum="1"
+                                      SmallChange="0.25"
+                                      LargeChange="0.5"/>
                         <ui:NumberBox Grid.Column="1"
                                       Value="{Binding SpaceCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ClearButtonEnabled="False"
+                                      Margin="8,0,0,0"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Stretch"
                                       MaxDecimalPlaces="0"
                                       Minimum="0" />
                         <ui:Button Grid.Column="2"
+                                   Margin="8,0,0,0"
                                    Content="X"
                                    Command="{Binding Path=DataContext.TrailingSpacesPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
                         <ui:SymbolIcon Grid.Column="3"
                                        Symbol="ErrorCircle12"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Margin="8,0,0,0"
                                        Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                                        ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                             <ui:SymbolIcon.Foreground>
