@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using GW2MidiConverter.GuildWars;
 
-namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
+namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
 
 internal class KeyNamesSubSettingViewModel : DictionarySubSettingViewModel<GuildWarsNoteKey, string, KeyNameItemViewModel>
 {

@@ -6,8 +6,8 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
-                 xmlns:noteRenderingSettings="clr-namespace:GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings"
-                 xmlns:settings="clr-namespace:GW2MidiConverter.App.Views.Settings"
+                 xmlns:settingsControls="clr-namespace:GW2MidiConverter.App.Views.Settings"
+                 xmlns:settingsViewModels="clr-namespace:GW2MidiConverter.App.ViewModels.Settings"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
@@ -18,8 +18,14 @@
                  WindowCornerPreference="Default"
                  WindowStartupLocation="CenterScreen">
     <ui:FluentWindow.Resources>
-        <DataTemplate DataType="{x:Type noteRenderingSettings:NoteRendererSettingsViewModel}">
-            <settings:NoteRenderingSettingsControl />
+        <DataTemplate DataType="{x:Type settingsViewModels:NoteRendererSettingsViewModel}">
+            <settingsControls:NoteRenderingSettingsControl />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type settingsViewModels:MeasureRenderingSettingsViewModel}">
+            <settingsControls:MeasureRenderingSettingsControl />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type settingsViewModels:TrackRenderingSettingsViewModel}">
+            <settingsControls:TrackRenderingSettingsControl />
         </DataTemplate>
     </ui:FluentWindow.Resources>
     <Grid>

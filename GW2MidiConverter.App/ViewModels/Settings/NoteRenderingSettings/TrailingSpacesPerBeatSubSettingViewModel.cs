@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Tab;
 
-namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
+namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
 
 internal class TrailingSpacesPerBeatSubSettingViewModel : DictionarySubSettingViewModel<TabElementLength, int, TrailingSpacesPerBeatItemViewModel>
 {

@@ -32,6 +32,16 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+        <Page Update="Controls\SubSettingContentControl.generic.xaml">
+          <Generator>MSBuild:Compile</Generator>
+          <XamlRuntime>Wpf</XamlRuntime>
+          <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Views\Settings\TrackRenderingSettingsControl.xaml">
+          <Generator>MSBuild:Compile</Generator>
+          <XamlRuntime>Wpf</XamlRuntime>
+          <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
 
     <ItemGroup>

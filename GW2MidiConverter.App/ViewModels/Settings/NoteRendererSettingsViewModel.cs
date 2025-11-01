@@ -1,6 +1,6 @@
-using GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings.SubSettings;
+using GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
 
-namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
+namespace GW2MidiConverter.App.ViewModels.Settings;
 
 internal class NoteRendererSettingsViewModel : SettingsViewModel
 {

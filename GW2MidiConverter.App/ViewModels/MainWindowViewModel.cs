@@ -5,7 +5,6 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GW2MidiConverter.App.ViewModels.Settings;
-using GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Rendering;
@@ -22,10 +21,12 @@ internal class MainWindowViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbarService;
     private TabDocument? _tabDocument;
-
-    private SettingsViewModel? _selectedSettingsViewModel;
-    private readonly NoteRendererSettingsViewModel _noteRenderingSettingsViewModel;
     private string _tabText = "";
+    private SettingsViewModel? _selectedSettingsViewModel;
+    
+    private readonly NoteRendererSettingsViewModel _noteRenderingSettingsViewModel;
+    private readonly MeasureRenderingSettingsViewModel _measureRenderingSettingsViewModel;
+    private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
 
     public object ApplicationTitle => "GW2 Tab Converter";
 
@@ -63,6 +64,12 @@ internal class MainWindowViewModel : ObservableObject
         _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings());
         RegisterSettingsViewModel(_noteRenderingSettingsViewModel);
         
+        _measureRenderingSettingsViewModel = new MeasureRenderingSettingsViewModel(new MeasureRenderingSettings());
+        RegisterSettingsViewModel(_measureRenderingSettingsViewModel);
+        
+        _trackRenderingSettingsViewModel = new TrackRenderingSettingsViewModel(new TrackRenderingSettings());
+        RegisterSettingsViewModel(_trackRenderingSettingsViewModel);
+        
         SelectedSettingsViewModel = Settings[0];
         
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile("H:\\Private\\Coding\\GW2 Midi Converter\\GW2MidiConverter.Tests\\Resources\\Coraline - Exploration (GW2) Merged parts.mid");
@@ -94,7 +101,9 @@ internal class MainWindowViewModel : ObservableObject
     {
         return new TabRenderingSettings
         {
-            NoteRenderingSettings = _noteRenderingSettingsViewModel.CreateSettings()
+            NoteRenderingSettings = _noteRenderingSettingsViewModel.CreateSettings(),
+            MeasureRenderingSettings = _measureRenderingSettingsViewModel.CreateSettings(),
+            TrackRenderingSettings = _trackRenderingSettingsViewModel.CreateSettings()
         };
     }
 

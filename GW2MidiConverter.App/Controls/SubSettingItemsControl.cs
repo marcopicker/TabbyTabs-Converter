@@ -49,6 +49,11 @@ internal class SubSettingItemsControl : ItemsControl
                                                                                                            typeof(SubSettingItemsControl),
                                                                                                            new PropertyMetadata(default(DataTemplate)));
 
+    public static readonly DependencyProperty DescriptionTextProperty = DependencyProperty.Register(nameof(DescriptionText),
+                                                                                                    typeof(string),
+                                                                                                    typeof(SubSettingItemsControl),
+                                                                                                    new PropertyMetadata(default(string)));
+
     public DataTemplate InternalHeaderTemplate
     {
         get => (DataTemplate)GetValue(InternalHeaderTemplateProperty);
@@ -61,10 +66,16 @@ internal class SubSettingItemsControl : ItemsControl
         set => SetValue(InternalHeaderContentProperty, value);
     }
 
-    public string HeaderText
+    public string? HeaderText
     {
         get => (string)GetValue(HeaderTextProperty);
         set => SetValue(HeaderTextProperty, value);
+    }
+
+    public string? DescriptionText
+    {
+        get => (string)GetValue(DescriptionTextProperty);
+        set => SetValue(DescriptionTextProperty, value);
     }
 
     public ICommand AddCommand
@@ -104,6 +115,6 @@ internal class SubSettingItemsControl : ItemsControl
 
     protected override bool IsItemItsOwnContainerOverride(object item)
     {
-        return item is ContentControl;
+        return item is not SubSettingContentControl && item is ContentControl;
     }
 }

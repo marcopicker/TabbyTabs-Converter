@@ -10,22 +10,11 @@
                 <ControlTemplate TargetType="{x:Type controls:SubSettingItemsControl}">
                     <StackPanel Orientation="Vertical"
                                 Focusable="False">
-                        <ui:TextBlock Text="{TemplateBinding HeaderText}"
+                        <ui:TextBlock x:Name="HeaderTextBlock"
+                                      Text="{TemplateBinding HeaderText}"
                                       FontTypography="BodyStrong"
                                       Margin="0,0,0,8"
-                                      Focusable="False">
-                            <ui:TextBlock.Style>
-                                <Style TargetType="{x:Type ui:TextBlock}">
-                                    <Style.Triggers>
-                                        <Trigger Property="Text" Value="{x:Null}">
-                                            <Trigger.Setters>
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </Trigger.Setters>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ui:TextBlock.Style>
-                        </ui:TextBlock>
+                                      Focusable="False" />
                         <Border Padding="16,10,16,10"
                                 Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{ui:ThemeResource CardStrokeColorDefaultBrush}"
@@ -80,6 +69,11 @@
                             </StackPanel>
                         </Border>
                     </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HeaderText" Value="{x:Null}">
+                            <Setter TargetName="HeaderTextBlock" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
