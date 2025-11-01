@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GW2MidiConverter.App.ViewModels.Settings;
 using GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
 using GW2MidiConverter.GuildWars.Instruments;
@@ -10,6 +12,7 @@ using GW2MidiConverter.Rendering;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Octaves;
+using Microsoft.Win32;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 
@@ -18,85 +21,63 @@ namespace GW2MidiConverter.App.ViewModels;
 internal class MainWindowViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbarService;
-    private readonly TabDocument _tabDocument;
+    private TabDocument? _tabDocument;
 
-    private SettingsViewModel _currentViewModel;
-    private string _tabText;
-    private int _measureSpaces;
-    private bool _showMeasureNumbers;
-    private NoteRendererSettingsViewModel _noteRenderingSettingsViewModel;
+    private SettingsViewModel? _selectedSettingsViewModel;
+    private readonly NoteRendererSettingsViewModel _noteRenderingSettingsViewModel;
+    private string _tabText = "";
 
     public object ApplicationTitle => "GW2 Tab Converter";
 
     public List<SettingsViewModel> Settings { get; } = [];
 
-    public SettingsViewModel CurrentViewModel
+    public SettingsViewModel? SelectedSettingsViewModel
     {
-        get => _currentViewModel;
-        set => SetProperty(ref _currentViewModel, value);
+        get => _selectedSettingsViewModel;
+        set => SetProperty(ref _selectedSettingsViewModel, value);
+    }
+
+    public TabDocument? TabDocument
+    {
+        get => _tabDocument;
+        set
+        {
+            _tabDocument = value;
+            RebuildTab();
+        }
     }
 
     public string TabText
     {
         get => _tabText;
-        set => SetProperty(ref _tabText, value);
+        private set => SetProperty(ref _tabText, value);
     }
 
-    public int MeasureSpaces
-    {
-        get => _measureSpaces;
-        set
-        {
-            if (!SetProperty(ref _measureSpaces, value)) return;
-            RebuildTab();
-        }
-    }
+    public ICommand ExportCommand { get; }
 
-    public bool ShowMeasureNumbers
-    {
-        get => _showMeasureNumbers;
-        set
-        {
-            if (!SetProperty(ref _showMeasureNumbers, value)) return;
-            RebuildTab();
-        }
-    }
-
-    public NoteRendererSettingsViewModel NoteRenderingSettingsViewModel
-    {
-        get => _noteRenderingSettingsViewModel;
-        set => SetProperty(ref _noteRenderingSettingsViewModel, value);
-    }
-
-    public MainWindowViewModel(IServiceProvider serviceProvider,
-                               ISnackbarService snackbarService)
+    public MainWindowViewModel(ISnackbarService snackbarService)
     {
         _snackbarService = snackbarService;
-        MeasureSpaces = 4;
-
+        ExportCommand = new RelayCommand(ExportTab);
+        
+        _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings());
+        RegisterSettingsViewModel(_noteRenderingSettingsViewModel);
+        
+        SelectedSettingsViewModel = Settings[0];
+        
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile("H:\\Private\\Coding\\GW2 Midi Converter\\GW2MidiConverter.Tests\\Resources\\Coraline - Exploration (GW2) Merged parts.mid");
-        _tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
-        // _tabRenderer = new TabRenderer(_tabDocument);
-        _tabDocument.EnableTrack(0, Instrument.Piano);
-
-        NoteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings());
-        NoteRenderingSettingsViewModel.SubSettingChanged += (_, _) => RebuildTab();
-        
-        Settings.Add(NoteRenderingSettingsViewModel);
-        Settings.Add(NoteRenderingSettingsViewModel);
-        Settings.Add(NoteRenderingSettingsViewModel);
-        CurrentViewModel = Settings[0];
-        
-        RebuildTab();
+        TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
+        tabDocument.EnableTrack(0, Instrument.Piano);
+        TabDocument = tabDocument;
     }
 
     private void RebuildTab()
     {
         if (_tabDocument == null!) return;
-        TabRenderingSettings settings = BuildSettings();
-
+        
         try
         {
+            TabRenderingSettings settings = BuildRenderingSettings();
             TabRenderer renderer = new TabRenderer(_tabDocument, settings);
             TabText = renderer.Render();
         }
@@ -109,18 +90,63 @@ internal class MainWindowViewModel : ObservableObject
         }
     }
 
-    private TabRenderingSettings BuildSettings()
+    private TabRenderingSettings BuildRenderingSettings()
     {
-        MeasureRenderingSettings measureRenderingSettings = new MeasureRenderingSettings()
+        return new TabRenderingSettings
         {
-            SpacesBetweenBeats = MeasureSpaces,
-            ShowMeasureNumbers = ShowMeasureNumbers
+            NoteRenderingSettings = _noteRenderingSettingsViewModel.CreateSettings()
         };
+    }
+
+    private void RegisterSettingsViewModel(SettingsViewModel settings)
+    {
+        Settings.Add(settings);
+        settings.SubSettingChanged += (_, _) => RebuildTab();
+    }
+    
+    private void ExportTab()
+    {
+        if (TabDocument == null)
+        {
+            _snackbarService.Show("No Tab", "Please load a MIDI file first.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(4));
+            return;
+        }
         
-        return new TabRenderingSettings()
+        if (!CheckSettingValidity())
         {
-            MeasureRenderingSettings = measureRenderingSettings,
-            NoteRenderingSettings = NoteRenderingSettingsViewModel.CreateSettings()
+            _snackbarService.Show("Invalid Settings", "Please check your settings and try again.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(4));
+            return;
+        }
+        
+        SaveFileDialog saveFileDialog = new SaveFileDialog
+        {
+            Filter = "Text File (*.txt)|*.txt",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
         };
+
+        string fileName = PrepareFileName();
+        saveFileDialog.FileName = fileName;
+
+
+        try
+        {
+            if (saveFileDialog.ShowDialog() != true) return;
+            File.WriteAllText(saveFileDialog.FileName, TabText);
+        }
+        catch (Exception e)
+        {
+            _snackbarService.Show("Export Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
+            throw;
+        }
+    }
+
+    private bool CheckSettingValidity()
+    {
+        return true;
+    }
+
+    private string PrepareFileName()
+    {
+        return "Tab.txt";
     }
 }
