@@ -6,8 +6,8 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
-                 xmlns:styles="clr-namespace:GW2MidiConverter.App.Views.Styles"
                  xmlns:noteRenderingSettings="clr-namespace:GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings"
+                 xmlns:settings="clr-namespace:GW2MidiConverter.App.Views.Settings"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
@@ -19,7 +19,7 @@
                  WindowStartupLocation="CenterScreen">
     <ui:FluentWindow.Resources>
         <DataTemplate DataType="{x:Type noteRenderingSettings:NoteRendererSettingsViewModel}">
-            <styles:NoteRenderingSettingsControl />
+            <settings:NoteRenderingSettingsControl />
         </DataTemplate>
     </ui:FluentWindow.Resources>
     <Grid>
