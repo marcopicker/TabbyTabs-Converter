@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Tab;
@@ -13,7 +14,8 @@ internal class TrailingSpacesPerBeatSubSettingViewModel : DictionarySubSettingVi
 
     protected override KeyValuePair<TabElementLength, int> CreateDictionaryEntryForItem(TrailingSpacesPerBeatItemViewModel item)
     {
-        return new KeyValuePair<TabElementLength, int>(new TabElementLength(item.Length), item.SpaceCount);
+        TabElementLength length = new TabElementLength(Math.Max(0, item.Length));
+        return new KeyValuePair<TabElementLength, int>(length, item.SpaceCount);
     }
 
     protected override TrailingSpacesPerBeatItemViewModel CreateDefaultNewItemViewModel()
@@ -39,13 +41,14 @@ internal class TrailingSpacesPerBeatSubSettingViewModel : DictionarySubSettingVi
         List<IGrouping<decimal, TrailingSpacesPerBeatItemViewModel>> lengthGroups = Items.GroupBy(i => i.Length).ToList();
         foreach (List<TrailingSpacesPerBeatItemViewModel> list in lengthGroups.Select(group => group.ToList()))
         {
-            if(list.Count == 1) continue;
+            if (list.Count == 1) continue;
             foreach (TrailingSpacesPerBeatItemViewModel item in list)
             {
                 item.SetInvalid("Lengths must be unique.");
                 areAllSettingsValid = false;
             }
         }
+
         return areAllSettingsValid;
     }
 }

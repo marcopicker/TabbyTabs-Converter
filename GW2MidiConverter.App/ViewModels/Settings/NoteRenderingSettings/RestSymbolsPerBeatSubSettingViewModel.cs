@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Tab;
@@ -43,7 +44,8 @@ internal class RestSymbolsPerBeatSubSettingViewModel : DictionarySubSettingViewM
 
     protected override KeyValuePair<TabElementLength, char> CreateDictionaryEntryForItem(RestSymbolsPerBeatItemViewModel item)
     {
-        return new KeyValuePair<TabElementLength, char>(new TabElementLength(item.Length), item.Symbol);
+        TabElementLength length = new TabElementLength(Math.Max(0, item.Length));
+        return new KeyValuePair<TabElementLength, char>(length, item.Symbol);
     }
 
     protected override RestSymbolsPerBeatItemViewModel CreateDefaultNewItemViewModel()
