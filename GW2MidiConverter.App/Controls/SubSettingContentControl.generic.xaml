@@ -20,12 +20,13 @@
                                 <ui:TextBlock x:Name="HeaderText"
                                               Text="{TemplateBinding HeaderText}"
                                               FontTypography="BodyStrong"
-                                              VerticalAlignment="Center" />
+                                              VerticalAlignment="Center"
+                                              TextWrapping="Wrap" />
                                 <ui:TextBlock x:Name="DescriptionText"
                                               Text="{TemplateBinding DescriptionText}"
                                               FontTypography="Caption"
                                               VerticalAlignment="Center"
-                                              TextWrapping="Wrap"/>
+                                              TextWrapping="Wrap" />
                             </StackPanel>
                             <StackPanel Grid.Column="1"
                                         VerticalAlignment="Stretch"

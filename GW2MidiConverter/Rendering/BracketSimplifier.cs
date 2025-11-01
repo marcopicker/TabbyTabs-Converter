@@ -12,14 +12,13 @@ internal class BracketSimplifier
     public BracketSimplifier(IReadOnlyCollection<BracketPair> bracketPairs)
     {
         ArgumentNullException.ThrowIfNull(bracketPairs);
-        if (bracketPairs.Count == 0) throw new ArgumentException("Bracket pairs must not be empty.", nameof(bracketPairs));
-
         _bracketPairs = bracketPairs;
     }
 
     public string Simplify(string input)
     {
         if (string.IsNullOrWhiteSpace(input)) return input;
+        if (_bracketPairs.Count == 0) return input;
 
         StringBuilder builder = new StringBuilder();
         BracketPair? currentBracketScope = null;

@@ -41,6 +41,7 @@ internal class TrackRenderingSettingsViewModel : SettingsViewModel
     {
         return new TrackRenderingSettings
         {
+            ShowTrackName = ShowTrackName.Value,
             LineBreaksAfterTrackName = Math.Max(0, LineBreaksAfterTrackName.Value),
             LineBreaksBetweenTracks = Math.Max(0, LineBreaksBetweenTracks.Value),
             MaxMeasureCountBeforeLineBreak = Math.Max(1, MaxMeasureCountBeforeLineBreak.Value),

@@ -27,8 +27,7 @@ internal class TabTrackRenderer(TrackRenderingSettings trackRenderingSettings,
         if (track.Measures.Count == 0) return string.Empty;
         _stringBuilder.Clear();
 
-        _stringBuilder.AppendLine($"{track.TrackInfo.InstrumentName}:");
-        _stringBuilder.Append(new string('\n', trackRenderingSettings.LineBreaksAfterTrackName));
+        RenderTrackHeader(track);
         
         TimeSignature previousTimeSignature = new TimeSignature(0, 0);
         int measureInRowsCounter = 0;
@@ -61,6 +60,13 @@ internal class TabTrackRenderer(TrackRenderingSettings trackRenderingSettings,
         }
 
         return _stringBuilder.ToString().Trim().TrimStart('\n');
+    }
+
+    private void RenderTrackHeader(TabTrack track)
+    {
+        if (!trackRenderingSettings.ShowTrackName) return;
+        _stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"{track.TrackInfo.InstrumentName}:");
+        _stringBuilder.Append(new string('\n', trackRenderingSettings.LineBreaksAfterTrackName));
     }
 
     private void RenderMeasureNumber(int measureMeasureNumber)

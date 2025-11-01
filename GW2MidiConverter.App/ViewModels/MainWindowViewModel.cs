@@ -27,6 +27,7 @@ internal class MainWindowViewModel : ObservableObject
     private readonly NoteRendererSettingsViewModel _noteRenderingSettingsViewModel;
     private readonly MeasureRenderingSettingsViewModel _measureRenderingSettingsViewModel;
     private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
+    private readonly TimeSignatureRenderingSettingsViewModel _timeSignatureRenderingSettingsViewModel;
 
     public object ApplicationTitle => "GW2 Tab Converter";
 
@@ -70,6 +71,9 @@ internal class MainWindowViewModel : ObservableObject
         _trackRenderingSettingsViewModel = new TrackRenderingSettingsViewModel(new TrackRenderingSettings());
         RegisterSettingsViewModel(_trackRenderingSettingsViewModel);
         
+        _timeSignatureRenderingSettingsViewModel = new TimeSignatureRenderingSettingsViewModel(new TimeSignatureRenderingSettings());
+        RegisterSettingsViewModel(_timeSignatureRenderingSettingsViewModel);
+        
         SelectedSettingsViewModel = Settings[0];
         
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile("H:\\Private\\Coding\\GW2 Midi Converter\\GW2MidiConverter.Tests\\Resources\\Coraline - Exploration (GW2) Merged parts.mid");
@@ -103,7 +107,8 @@ internal class MainWindowViewModel : ObservableObject
         {
             NoteRenderingSettings = _noteRenderingSettingsViewModel.CreateSettings(),
             MeasureRenderingSettings = _measureRenderingSettingsViewModel.CreateSettings(),
-            TrackRenderingSettings = _trackRenderingSettingsViewModel.CreateSettings()
+            TrackRenderingSettings = _trackRenderingSettingsViewModel.CreateSettings(),
+            TimeSignatureRenderingSettings = _timeSignatureRenderingSettingsViewModel.CreateSettings()
         };
     }
 

@@ -23,6 +23,7 @@
                                          HorizontalAlignment="Stretch"
                                          AddButtonVisibility="Collapsed"
                                          HeaderText="Note Names"
+                                         DescriptionText="What to display for each playable note in the tab."
                                          Margin="0,0,0,16">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -69,6 +70,7 @@
                                          AddCommand="{Binding BracketPairSubSetting.AddCommand}"
                                          Grid.IsSharedSizeScope="True"
                                          HeaderText="Octaves Brackets"
+                                         DescriptionText="Which brackets to use for which octave."
                                          HorizontalAlignment="Stretch"
                                          Margin="0,0,0,16">
             <controls:SubSettingItemsControl.InternalHeaderTemplate>
@@ -135,8 +137,8 @@
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Stretch"
                                     MaxLength="1" />
-                        <ui:Button Grid.Column="3" 
-                                   Content="X"
+                        <ui:Button Grid.Column="3"
+                                   Icon="{ui:SymbolIcon Delete24}"
                                    Margin="8,0,0,0"
                                    Command="{Binding Path=DataContext.BracketPairSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
@@ -154,18 +156,13 @@
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-            <controls:SubSettingItemsControl.EmptyContentTemplate>
-                <DataTemplate>
-                    <ui:TextBlock FontTypography="Caption"
-                                  Text="Add stuff, nya :3" />
-                </DataTemplate>
-            </controls:SubSettingItemsControl.EmptyContentTemplate>
         </controls:SubSettingItemsControl>
 
         <controls:SubSettingItemsControl ItemsSource="{Binding RestSymbolsPerBeatSubSetting.Items}"
                                          AddCommand="{Binding RestSymbolsPerBeatSubSetting.AddCommand}"
                                          Grid.IsSharedSizeScope="True"
                                          HeaderText="Rest Symbols"
+                                         DescriptionText="Which symbol to display for rests, measured in beats."
                                          HorizontalAlignment="Stretch"
                                          Margin="0,0,0,16">
             <controls:SubSettingItemsControl.InternalHeaderTemplate>
@@ -224,7 +221,7 @@
                                     MaxLength="1" />
                         <ui:Button Grid.Column="2"
                                    Margin="8,0,0,0"
-                                   Content="X"
+                                   Icon="{ui:SymbolIcon Delete24}"
                                    Command="{Binding Path=DataContext.RestSymbolsPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
                         <ui:SymbolIcon Grid.Column="3"
@@ -247,6 +244,7 @@
                                          AddCommand="{Binding TrailingSpacesPerBeatSubSetting.AddCommand}"
                                          Grid.IsSharedSizeScope="True"
                                          HeaderText="Trailing Spaces"
+                                         DescriptionText="How many spaces to display after notes and rests, depending on their length in beats."
                                          HorizontalAlignment="Stretch"
                                          Margin="0,0,0,16">
             <controls:SubSettingItemsControl.InternalHeaderTemplate>
@@ -289,13 +287,14 @@
                         </Grid.ColumnDefinitions>
                         <ui:NumberBox Grid.Column="0"
                                       Value="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      x:Name="MeowBox"
                                       ClearButtonEnabled="False"
                                       VerticalAlignment="Center"
                                       HorizontalAlignment="Stretch"
                                       MaxDecimalPlaces="3"
                                       Minimum="0"
                                       SmallChange="0.25"
-                                      LargeChange="0.5"/>
+                                      LargeChange="0.5" />
                         <ui:NumberBox Grid.Column="1"
                                       Value="{Binding SpaceCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       ClearButtonEnabled="False"
@@ -306,7 +305,7 @@
                                       Minimum="0" />
                         <ui:Button Grid.Column="2"
                                    Margin="8,0,0,0"
-                                   Content="X"
+                                   Icon="{ui:SymbolIcon Delete24}"
                                    Command="{Binding Path=DataContext.TrailingSpacesPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
                         <ui:SymbolIcon Grid.Column="3"

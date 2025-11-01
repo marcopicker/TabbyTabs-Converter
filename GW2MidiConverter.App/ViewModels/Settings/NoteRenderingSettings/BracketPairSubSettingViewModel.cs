@@ -24,7 +24,8 @@ internal class BracketPairSubSettingViewModel : DictionarySubSettingViewModel<Oc
         foreach (BracketPairItemViewModel item in Items)
         {
             bool bracketsAreDuplicates = Items.Where(i => i != item)
-                                              .Any(i => i.GetBracketPair() == item.GetBracketPair());
+                                              .Any(i => i.GetBracketPair().GetBracketCharacters().Contains(item.OpeningBracket) ||
+                                                        i.GetBracketPair().GetBracketCharacters().Contains(item.ClosingBracket));
             if (!bracketsAreDuplicates) continue;
             item.SetInvalid("Brackets must be unique.");
             isSettingValid = false;

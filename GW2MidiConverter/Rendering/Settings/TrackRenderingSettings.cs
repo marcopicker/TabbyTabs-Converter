@@ -24,4 +24,6 @@ public class TrackRenderingSettings
             _measuresPerLine = value;
         }
     }
+
+    public bool ShowTrackName { get; set; } = true;
 }

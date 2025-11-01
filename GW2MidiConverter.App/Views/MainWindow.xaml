@@ -27,6 +27,9 @@
         <DataTemplate DataType="{x:Type settingsViewModels:TrackRenderingSettingsViewModel}">
             <settingsControls:TrackRenderingSettingsControl />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type settingsViewModels:TimeSignatureRenderingSettingsViewModel}">
+            <settingsControls:TimeSignatureRenderingSettingsControl />
+        </DataTemplate>
     </ui:FluentWindow.Resources>
     <Grid>
         <!-- <ContentControl Content="{Binding CurrentViewModel}" /> -->

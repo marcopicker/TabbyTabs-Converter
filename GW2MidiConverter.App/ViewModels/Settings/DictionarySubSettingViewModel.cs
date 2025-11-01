@@ -61,7 +61,6 @@ internal abstract class DictionarySubSettingViewModel<TKey, TValue, TViewModel> 
 
     protected virtual void RemoveItem(TViewModel? item)
     {
-        Console.WriteLine($"Removing item {item}");
         if (item == null) return;
         Items.Remove(item);
     }

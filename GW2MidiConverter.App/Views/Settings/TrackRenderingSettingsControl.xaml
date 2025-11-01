@@ -13,12 +13,12 @@
         <controls:SubSettingItemsControl AddButtonVisibility="Collapsed"
                                          Margin="0,0,0,16">
             <controls:SubSettingItemsControl.Items>
-                <controls:SubSettingContentControl HeaderText="ShowTrackName"
+                <controls:SubSettingContentControl HeaderText="Show Track Name"
                                                    ShowBorder="False">
                     <ui:ToggleSwitch IsChecked="{Binding ShowTrackName.Value}" />
                 </controls:SubSettingContentControl>
                 
-                <controls:SubSettingContentControl HeaderText="LineBreaksAfterTrackName"
+                <controls:SubSettingContentControl HeaderText="Line Breaks After Track Name"
                                                    ShowBorder="False"
                                                    IsEnabled="{Binding ShowTrackName.Value}">
                     <ui:NumberBox Value="{Binding LineBreaksAfterTrackName.Value, UpdateSourceTrigger=PropertyChanged}"
@@ -28,14 +28,15 @@
             </controls:SubSettingItemsControl.Items>
         </controls:SubSettingItemsControl>
 
-        <controls:SubSettingContentControl HeaderText="LineBreaksBetweenTracks"
+        <controls:SubSettingContentControl HeaderText="Line Breaks Between Tracks"
                                            Margin="0,0,0,16">
             <ui:NumberBox Value="{Binding LineBreaksBetweenTracks.Value, UpdateSourceTrigger=PropertyChanged}"
                           Minimum="0"
                           ClearButtonEnabled="False"/>
         </controls:SubSettingContentControl>
         
-        <controls:SubSettingContentControl HeaderText="MaxMeasureCountBeforeLineBreak"
+        <controls:SubSettingContentControl HeaderText="Lines Until Line Break"
+                                           DescriptionText="How many lines can be rendered until a line break."
                                            Margin="0,0,0,16">
             <ui:NumberBox Value="{Binding MaxMeasureCountBeforeLineBreak.Value, UpdateSourceTrigger=PropertyChanged}"
                           Minimum="1"
@@ -45,14 +46,14 @@
         <controls:SubSettingItemsControl AddButtonVisibility="Collapsed"
                                          Margin="0,0,0,16">
             <controls:SubSettingItemsControl.Items>
-                <controls:SubSettingContentControl HeaderText="LinesBeforeTimeSignature"
+                <controls:SubSettingContentControl HeaderText="Lines Before Time Signatures"
                                                    ShowBorder="False">
                     <ui:NumberBox Value="{Binding LinesBeforeTimeSignature.Value, UpdateSourceTrigger=PropertyChanged}"
                                   Minimum="0"
                                   ClearButtonEnabled="False"/>
                 </controls:SubSettingContentControl>
                 
-                <controls:SubSettingContentControl HeaderText="LinesAfterTimeSignature"
+                <controls:SubSettingContentControl HeaderText="Lines After Time Signatures"
                                                    ShowBorder="False">
                     <ui:NumberBox Value="{Binding LinesAfterTimeSignature.Value, UpdateSourceTrigger=PropertyChanged}"
                                   Minimum="0"
@@ -61,7 +62,7 @@
             </controls:SubSettingItemsControl.Items>
         </controls:SubSettingItemsControl>
         
-        <controls:SubSettingContentControl HeaderText="MeasuresPerLine">
+        <controls:SubSettingContentControl HeaderText="Measures Per Line">
             <ui:NumberBox Value="{Binding MeasuresPerLine.Value, UpdateSourceTrigger=PropertyChanged}"
                           Minimum="1"
                           ClearButtonEnabled="False"/>
