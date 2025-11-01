@@ -213,7 +213,6 @@
                                       HorizontalAlignment="Stretch"
                                       MaxDecimalPlaces="3"
                                       Minimum="0"
-                                      Maximum="1"
                                       SmallChange="0.25"
                                       LargeChange="0.5" />
                         <ui:TextBox Grid.Column="1"
@@ -295,7 +294,6 @@
                                       HorizontalAlignment="Stretch"
                                       MaxDecimalPlaces="3"
                                       Minimum="0"
-                                      Maximum="1"
                                       SmallChange="0.25"
                                       LargeChange="0.5"/>
                         <ui:NumberBox Grid.Column="1"
