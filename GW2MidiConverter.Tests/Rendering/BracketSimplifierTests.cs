@@ -14,9 +14,9 @@ public class BracketSimplifierTests
     }
 
     [Test]
-    public void Constructor_NoBracketPairsSpecified_Throws()
+    public void Constructor_NoBracketPairsSpecified_DoesNotThrow()
     {
-        Assert.That(() => _ = new BracketSimplifier([]), Throws.ArgumentException);
+        Assert.That(() => _ = new BracketSimplifier([]), Throws.Nothing);
     }
 
     [TestCase("", "")]
