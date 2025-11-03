@@ -1,0 +1,150 @@
+<UserControl x:Class="GW2MidiConverter.App.Views.FileLoaderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal"
+             d:DataContext="{d:DesignInstance viewModels:FileLoaderViewModel}"
+             Background="Transparent"
+             AllowDrop="True">
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="DragEnter">
+            <b:InvokeCommandAction Command="{Binding OnDragEnterCommand}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="Drop">
+            <b:InvokeCommandAction Command="{Binding OnDropFilesCommand}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+    <Grid HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ui:Card Grid.Row="0"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Margin="0,0,0,16">
+            <StackPanel Orientation="Vertical"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                <ui:SymbolIcon Symbol="MailInboxArrowDown20"
+                               FontSize="32"
+                               Foreground="{ui:ThemeResource AccentTextFillColorPrimaryBrush}"
+                               Margin="0,0,0,5" />
+                <ui:TextBlock Appearance="Primary" FontTypography="BodyStrong" Text="Drag your MIDI or MuseScore file here to start converting."
+                              TextAlignment="Center"
+                              Margin="0,0,0,10" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Column="0"
+                               HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}"
+                               Margin="0, 5"
+                               Height="1" />
+                    <ui:TextBlock Grid.Column="1"
+                                  Margin="8,0"
+                                  Appearance="Primary"
+                                  FontTypography="Caption"
+                                  Text="OR"
+                                  HorizontalAlignment="Center"
+                                  TextAlignment="Center" />
+                    <Rectangle Grid.Column="2"
+                               HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}"
+                               Margin="0, 5"
+                               Height="1" />
+                </Grid>
+                <ui:Button HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="0,10,0,0"
+                           Content="Select file..."
+                           Command="{Binding BrowseFilesCommand}" />
+            </StackPanel>
+        </ui:Card>
+        <controls:SubSettingItemsControl Grid.Row="1"
+                                         x:Name="TrackConfigurationItemsControl"
+                                         ItemsSource="{Binding TrackConfigItems}"
+                                         Grid.IsSharedSizeScope="True"
+                                         AddButtonVisibility="Collapsed"
+                                         Margin="0,0,0,16">
+            <controls:SubSettingItemsControl.Style>
+                <Style TargetType="controls:SubSettingItemsControl">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding TrackConfigItems.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </controls:SubSettingItemsControl.Style>
+            <controls:SubSettingItemsControl.InternalHeaderTemplate>
+                <DataTemplate>
+                    <StackPanel HorizontalAlignment="Stretch"
+                                Orientation="Vertical">
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="A" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="B" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBlock Grid.Column="0"
+                                          Text="Enabled"
+                                          HorizontalAlignment="Left"
+                                          TextAlignment="Left"
+                                          Margin="0,0,16,0" />
+                            <ui:TextBlock Grid.Column="1"
+                                          Text="Track Name"
+                                          HorizontalAlignment="Stretch"
+                                          TextAlignment="Left" />
+                            <ui:TextBlock Grid.Column="2"
+                                          Text="Instrument"
+                                          HorizontalAlignment="Stretch"
+                                          TextAlignment="Right"
+                                          Margin="8,0,0,0" />
+                        </Grid>
+                        <Rectangle x:Name="Separator"
+                                   HorizontalAlignment="Stretch"
+                                   Margin="-16, 0,-16,8"
+                                   Height="1"
+                                   Fill="{DynamicResource WindowBackground}"
+                                   Focusable="False" />
+                    </StackPanel>
+                </DataTemplate>
+            </controls:SubSettingItemsControl.InternalHeaderTemplate>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type viewModels:TrackConfigItemViewModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="A" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="B" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding IsChecked}"
+                                  Margin="0,0,16,0" />
+                        <ui:TextBlock Grid.Column="1"
+                                      Text="{Binding TrackName}"
+                                      VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="2"
+                                  ItemsSource="{Binding Path=DataContext.PossibleInstruments, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                  SelectedItem="{Binding SelectedInstrument}"
+                                  Margin="8,0,0,0"
+                                  HorizontalAlignment="Right" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </controls:SubSettingItemsControl>
+        <ui:Button Grid.Row="2"
+                   Command="{Binding ConvertTabCommand}"
+                   Content="Convert Tab"
+                   Icon="{ui:SymbolIcon ArrowRight16}" />
+    </Grid>
+</UserControl>

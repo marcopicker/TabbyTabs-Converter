@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
@@ -36,12 +37,29 @@ public class TabDocument
         RebuildTracks();
     }
 
+    public void DisableAllTracks()
+    {
+        _instrumentsByTrackIds.Clear();
+        RebuildTracks();
+    }
+
     public void EnableTrack(int trackIndex, Instrument instrument)
     {
         // No need to rebuild when nothing changes.
-        if(_instrumentsByTrackIds.TryGetValue(trackIndex, out Instrument? value) && value == instrument) return;
-        
+        if (_instrumentsByTrackIds.TryGetValue(trackIndex, out Instrument? value) && value == instrument) return;
+
         _instrumentsByTrackIds[trackIndex] = instrument;
+        RebuildTracks();
+    }
+
+    public void EnableTracks(IReadOnlyCollection<TabDocumentTrackConfig> configs)
+    {
+        ArgumentNullException.ThrowIfNull(configs);
+        foreach (TabDocumentTrackConfig config in configs)
+        {
+            if (config.Instrument == null) continue;
+            _instrumentsByTrackIds[config.TrackIndex] = config.Instrument;
+        }
         RebuildTracks();
     }
 
@@ -52,7 +70,7 @@ public class TabDocument
         {
             Instrument instrument = _instrumentsByTrackIds[trackIndex];
             TrackConverter trackConverter = _trackConvertersByTrackIds[trackIndex];
-            
+
             TabTrack track = trackConverter.Convert(instrument, _octaveCalculator);
             _tracks.Add(track);
         }

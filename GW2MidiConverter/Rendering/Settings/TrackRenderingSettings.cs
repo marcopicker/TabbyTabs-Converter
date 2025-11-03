@@ -6,8 +6,8 @@ public class TrackRenderingSettings
 {
     private readonly int _measuresPerLine = 1;
     
-    public int LineBreaksAfterTrackName { get; init; } = 2;
-    public int LineBreaksBetweenTracks { get; init; } = 2;
+    public int LineBreaksAfterTrackName { get; init; }
+    public int LineBreaksBetweenTracks { get; init; } = 4;
     
     public int MaxMeasureCountBeforeLineBreak { get; init; } = 4;
     

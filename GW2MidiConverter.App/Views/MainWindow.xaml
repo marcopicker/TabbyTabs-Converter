@@ -5,9 +5,8 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:controls="clr-namespace:GW2MidiConverter.App.Views"
                  xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
-                 xmlns:settingsControls="clr-namespace:GW2MidiConverter.App.Views.Settings"
-                 xmlns:settingsViewModels="clr-namespace:GW2MidiConverter.App.ViewModels.Settings"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
@@ -18,175 +17,16 @@
                  WindowCornerPreference="Default"
                  WindowStartupLocation="CenterScreen">
     <ui:FluentWindow.Resources>
-        <DataTemplate DataType="{x:Type settingsViewModels:NoteRendererSettingsViewModel}">
-            <settingsControls:NoteRenderingSettingsControl />
+        <DataTemplate DataType="{x:Type viewModels:FileLoaderViewModel}">
+            <controls:FileLoaderControl />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type settingsViewModels:MeasureRenderingSettingsViewModel}">
-            <settingsControls:MeasureRenderingSettingsControl />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type settingsViewModels:TrackRenderingSettingsViewModel}">
-            <settingsControls:TrackRenderingSettingsControl />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type settingsViewModels:TimeSignatureRenderingSettingsViewModel}">
-            <settingsControls:TimeSignatureRenderingSettingsControl />
+        <DataTemplate DataType="{x:Type viewModels:TabRendererViewModel}">
+            <controls:TabRenderingControl />
         </DataTemplate>
     </ui:FluentWindow.Resources>
     <Grid>
-        <!-- <ContentControl Content="{Binding CurrentViewModel}" /> -->
-        <!-- <ui:Card HorizontalAlignment="Center" -->
-        <!--          VerticalAlignment="Center" -->
-        <!--          Margin="0,0,0,10"> -->
-        <!--     <StackPanel Orientation="Vertical" -->
-        <!--                 VerticalAlignment="Center" -->
-        <!--                 HorizontalAlignment="Center"> -->
-        <!--         <ui:SymbolIcon Symbol="MailInboxArrowDown20" -->
-        <!--                        FontSize="32" -->
-        <!--                        Foreground="{ui:ThemeResource AccentTextFillColorPrimaryBrush}" -->
-        <!--                        Margin="0,0,0,5"/> -->
-        <!--         <ui:TextBlock Appearance="Primary" FontTypography="BodyStrong" Text="Drag your MIDI or MuseScore file here to start converting." -->
-        <!--                       TextAlignment="Center" -->
-        <!--                       Margin="0,0,0,10"/> -->
-        <!--         <Grid> -->
-        <!--             <Grid.ColumnDefinitions> -->
-        <!--                 <ColumnDefinition Width="*"/> -->
-        <!--                 <ColumnDefinition Width="Auto"/> -->
-        <!--                 <ColumnDefinition Width="*"/> -->
-        <!--             </Grid.ColumnDefinitions> -->
-        <!--             <Rectangle Grid.Column="0"  -->
-        <!--                        HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}" -->
-        <!--                        Margin="0, 5" -->
-        <!--                        Height="1" /> -->
-        <!--             <ui:TextBlock Grid.Column="1" -->
-        <!--                           Margin="8,0" -->
-        <!--                           Appearance="Primary" -->
-        <!--                           FontTypography="Caption" -->
-        <!--                           Text="OR" -->
-        <!--                           HorizontalAlignment="Center" -->
-        <!--                           TextAlignment="Center" /> -->
-        <!--             <Rectangle Grid.Column="2"  -->
-        <!--                        HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}" -->
-        <!--                        Margin="0, 5" -->
-        <!--                        Height="1" />                     -->
-        <!--         </Grid> -->
-        <!--         <ui:Button HorizontalAlignment="Center" -->
-        <!--                    VerticalAlignment="Center" -->
-        <!--                    Margin="0,10,0,0" -->
-        <!--                    Content="Select file..." /> -->
-        <!--     </StackPanel> -->
-        <!-- </ui:Card> -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MinWidth="350" MaxWidth="500" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="999*" MinWidth="500" />
-            </Grid.ColumnDefinitions>
-            <!-- Left column -->
-            <Border Grid.Column="0" BorderThickness="0, 0, 1, 0">
-                <Grid Margin="0,40,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <ComboBox Margin="8,8"
-                              ItemsSource="{Binding Settings}"
-                              SelectedItem="{Binding SelectedSettingsViewModel}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type ComboBoxItem}">
-                                <ui:TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <Rectangle Grid.Row="1" Height="1"
-                               HorizontalAlignment="Stretch"
-                               Fill="{ui:ThemeResource ControlFillColorDefaultBrush}"
-                               Margin="8,0,8,8" />
-                    <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled"
-                                  VerticalScrollBarVisibility="Auto">
-                        <ContentControl Content="{Binding SelectedSettingsViewModel}"
-                                        Margin="10,0"
-                                        Focusable="False" />
-                    </ScrollViewer>
-                    <Rectangle Grid.Row="3" Height="1"
-                               HorizontalAlignment="Stretch"
-                               Fill="{ui:ThemeResource ControlFillColorDefaultBrush}"
-                               Margin="8,8,8,8" />
-                    <Border Grid.Row="4"
-                            Padding="5">
-                        <ui:Button Content="Export"
-                                   Command="{Binding ExportCommand}"/>
-                    </Border>
-                </Grid>
-            </Border>
-            <GridSplitter Grid.Column="1"
-                          Width="5"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          Background="#84000000"
-                          ShowsPreview="False"
-                          Cursor="SizeWE"
-                          ResizeBehavior="PreviousAndNext"
-                          ResizeDirection="Columns"
-                          IsTabStop="False" />
-            <Border Grid.Column="2" Background="#84000000"
-                    HorizontalAlignment="Stretch">
-                <ScrollViewer
-                    HorizontalScrollBarVisibility="Auto"
-                    VerticalScrollBarVisibility="Auto"
-                    Margin="0,0,0,0"
-                    Padding="20,0,10,0"
-                    Loaded="TabScrollViewer_OnLoaded"
-                    ScrollChanged="TabScrollViewer_OnScrollChanged">
-                    <ScrollViewer.Template>
-                        <ControlTemplate TargetType="ScrollViewer">
-                            <Grid x:Name="Grid" Background="{TemplateBinding Background}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
-                                                        CanContentScroll="{TemplateBinding CanContentScroll}"
-                                                        CanHorizontallyScroll="False" CanVerticallyScroll="False"
-                                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                        Content="{TemplateBinding Content}" Grid.Column="0"
-                                                        Margin="{TemplateBinding Padding}" Grid.Row="0">
-                                    <!-- <ScrollContentPresenter.OpacityMask> -->
-                                    <!--     <LinearGradientBrush StartPoint="0,50" EndPoint="0,0" MappingMode="Absolute"> -->
-                                    <!--         <GradientStop Color="#FF000000" Offset="0" /> -->
-                                    <!--         <GradientStop Color="#7F000000" Offset="0.25" /> -->
-                                    <!--         <GradientStop Color="#00000000" Offset="1" /> -->
-                                    <!--     </LinearGradientBrush> -->
-                                    <!-- </ScrollContentPresenter.OpacityMask> -->
-                                </ScrollContentPresenter>
-                                <ScrollBar x:Name="PART_VerticalScrollBar"
-                                           AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow"
-                                           Margin="0,40,0,0"
-                                           Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0"
-                                           Grid.Row="0"
-                                           Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                                           Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                           ViewportSize="{TemplateBinding ViewportHeight}" />
-                                <ScrollBar x:Name="PART_HorizontalScrollBar"
-                                           AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow"
-                                           Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0"
-                                           Orientation="Horizontal" Grid.Row="1"
-                                           Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
-                                           Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                           ViewportSize="{TemplateBinding ViewportWidth}" />
-                            </Grid>
-                        </ControlTemplate>
-                    </ScrollViewer.Template>
-                    <TextBlock FontFamily="Lucida Console" xml:space="preserve" Text="{Binding TabText}"
-                               Padding="0,20,0,0" />
-                </ScrollViewer>
-            </Border>
-        </Grid>
+        <ContentControl Content="{Binding CurrentViewModel}"
+                        Focusable="False" />
         <ContentPresenter x:Name="RootContentDialog" />
         <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
         <ui:TitleBar x:Name="TitleBar"

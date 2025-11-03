@@ -75,7 +75,7 @@
                         </Trigger>
                         <Trigger Property="HasItems" Value="True">
                             <Setter TargetName="EmptyContentPresenter" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="InternalHeaderContent" Property="Visibility" Value="Collapsed" />
+                            <!-- <Setter TargetName="InternalHeaderContent" Property="Visibility" Value="Collapsed" /> -->
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
