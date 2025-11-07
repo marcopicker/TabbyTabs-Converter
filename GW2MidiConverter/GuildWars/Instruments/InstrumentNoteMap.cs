@@ -30,11 +30,4 @@ public class InstrumentNoteMap
                                      .ToArray();
         return notes;
     }
-
-    [Obsolete("This is not implemented yet.", false)]
-    public static InstrumentNoteMap FromFile(string path)
-    {
-        if (!File.Exists(path)) throw new FileNotFoundException("The given file does not exist.", path);
-        throw new NotImplementedException();
-    }
 }
