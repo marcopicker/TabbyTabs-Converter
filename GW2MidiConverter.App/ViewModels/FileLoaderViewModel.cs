@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -23,8 +24,8 @@ internal class FileLoaderViewModel : ObservableObject
     private readonly ISnackbarService _snackbar;
     private FullyObservableCollection<TrackConfigItemViewModel> _trackConfigItems = [];
 
-    private MidiDocument? _loadedMidiDocument = null;
-    
+    private MidiDocument? _loadedMidiDocument;
+
     public ICommand OnDragEnterCommand { get; }
 
     public ICommand OnDropFilesCommand { get; }
@@ -48,10 +49,8 @@ internal class FileLoaderViewModel : ObservableObject
 
     public RelayCommand ConvertTabCommand { get; }
 
-    public TabDocument? TabDocument { get; private set; }
-    
     public event EventHandler<TabDocument>? TabDocumentLoaded;
-    
+
     public FileLoaderViewModel(ISnackbarService snackbar)
     {
         _snackbar = snackbar;
@@ -70,6 +69,8 @@ internal class FileLoaderViewModel : ObservableObject
         };
     }
 
+    [SuppressMessage("ReSharper", "RedundantJumpStatement")]
+    [SuppressMessage("ReSharper", "UnusedVariable")]
     private void HandleDragEnter(DragEventArgs? e)
     {
         if (e?.Data == null) return;
@@ -116,18 +117,16 @@ internal class FileLoaderViewModel : ObservableObject
         TryLoadFiles(fileNames);
     }
 
-    private bool TryLoadFiles(string[] files)
+    private void TryLoadFiles(string[] files)
     {
-        if (files.Length == 0)
+        switch (files.Length)
         {
-            _snackbar.Show("No Files", "Please select a MIDI file first.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
-            return false;
-        }
-
-        if (files.Length > 1)
-        {
-            _snackbar.Show("Multiple Files", "Please select only one MIDI file.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
-            return false;
+            case 0:
+                _snackbar.Show("No Files", "Please select a MIDI file first.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
+                return;
+            case > 1:
+                _snackbar.Show("Multiple Files", "Please select only one MIDI file.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
+                return;
         }
 
         string fileName = files[0];
@@ -140,18 +139,17 @@ internal class FileLoaderViewModel : ObservableObject
         catch (Exception e)
         {
             _snackbar.Show("File Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
-            return false;
+            return;
         }
 
         if (midiDocument.InstrumentTrackIndexes.Count == 0)
         {
             _snackbar.Show("No Tracks", "The selected MIDI file does not contain any tracks.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(3));
-            return false;
+            return;
         }
 
         _loadedMidiDocument = midiDocument;
         PrepareMidiDocument();
-        return true;
     }
 
     private void PrepareMidiDocument()

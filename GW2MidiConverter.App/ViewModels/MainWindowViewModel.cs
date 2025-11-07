@@ -6,15 +6,14 @@ namespace GW2MidiConverter.App.ViewModels;
 
 internal class MainWindowViewModel : ObservableObject
 {
-    private readonly ISnackbarService _snackbar;
-    private object _currentViewModel;
+    private object? _currentViewModel;
     
     private readonly FileLoaderViewModel _fileLoaderViewModel;
     private readonly TabRendererViewModel _tabRendererViewModel;
     
     public object ApplicationTitle => "GW2 Tab Converter";
 
-    public object CurrentViewModel
+    public object? CurrentViewModel
     {
         get => _currentViewModel;
         private set => SetProperty(ref _currentViewModel, value);
@@ -22,8 +21,6 @@ internal class MainWindowViewModel : ObservableObject
 
     public MainWindowViewModel(ISnackbarService snackbar)
     {
-        _snackbar = snackbar;
-        
         _fileLoaderViewModel = new FileLoaderViewModel(snackbar);
         _fileLoaderViewModel.TabDocumentLoaded += HandleTabDocumentLoaded;
         
