@@ -1,3 +1,4 @@
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using GW2MidiConverter.Tab;
 using Wpf.Ui;
@@ -11,7 +12,7 @@ internal class MainWindowViewModel : ObservableObject
     private readonly FileLoaderViewModel _fileLoaderViewModel;
     private readonly TabRendererViewModel _tabRendererViewModel;
     
-    public object ApplicationTitle => "GW2 Tab Converter";
+    public string ApplicationTitle => $"GW2 Tab Converter ({Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)})";
 
     public object? CurrentViewModel
     {

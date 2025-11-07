@@ -4,6 +4,7 @@
     <PropertyGroup>
         <NoWarn>$(NoWarn);WPF0001</NoWarn>
         <AssemblyName>GW2MidiConverter.App</AssemblyName>
+        <AssemblyVersion>0.1.0</AssemblyVersion>
     </PropertyGroup>
 
     <PropertyGroup>
