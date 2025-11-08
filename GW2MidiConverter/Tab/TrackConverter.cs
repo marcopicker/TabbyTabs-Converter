@@ -36,7 +36,7 @@ internal class TrackConverter
         return _track.Measures
                      .SelectMany(m => m.NoteGroups)
                      .SelectMany(n => n.Notes)
-                     .All(n => instrument.NoteMap.IsNoteMapped(n));
+                     .All(instrument.CanPlayNote);
     }
 
     public TabTrack Convert(Instrument instrument, IOctaveCalculator octaveCalculator)
@@ -50,7 +50,7 @@ internal class TrackConverter
         _octaves = octaveCalculator.CalculateOctaves(potentialOctaves);
 
         _currentNoteIndex = 0;
-        List<TabMeasure> measures = _track.Measures.Select(m => ConvertMeasure(m, instrument.NoteMap)).ToList();
+        List<TabMeasure> measures = _track.Measures.Select(m => ConvertMeasure(m, instrument)).ToList();
         TrackInfo trackInfo = _track.Info;
         return new TabTrack(trackInfo, measures);
     }
@@ -67,13 +67,13 @@ internal class TrackConverter
     private void GetAllPotentialNotes(Instrument instrument)
     {
         List<MidiNoteNumber> allNoteNumbers = GetNoteNumbersInTrack();
-        List<GuildWarsNote[]> potentialNotes = allNoteNumbers.Where(n => instrument.NoteMap.IsNoteMapped(n))
-                                                             .Select(n => instrument.NoteMap.MapMidiToNotes(n))
+        List<GuildWarsNote[]> potentialNotes = allNoteNumbers.Where(instrument.CanPlayNote)
+                                                             .Select(instrument.MapMidiToNotes)
                                                              .ToList();
         _potentialNotes = potentialNotes;
     }
 
-    private TabMeasure ConvertMeasure(MidiMeasure midiMeasure, InstrumentNoteMap noteMap)
+    private TabMeasure ConvertMeasure(MidiMeasure midiMeasure, Instrument instrument)
     {
         TimeSignature timeSignature = midiMeasure.MeasureInfo.TimeSignature;
 
@@ -101,7 +101,7 @@ internal class TrackConverter
             MidiNoteGroup group = midiMeasure.NoteGroups[i];
             MidiNoteGroup nextGroup = midiMeasure.NoteGroups[i + 1];
 
-            NoteGroupToken noteGroup = ConvertNoteGroup(group, noteMap, timeSignature, midiMeasure);
+            NoteGroupToken noteGroup = ConvertNoteGroup(group, instrument, timeSignature, midiMeasure);
             tokens.Add(noteGroup);
 
             if (TryConvertRest(group.TimeSpan.EndTick, nextGroup.TimeSpan.StartTick, timeSignature, out RestToken? rest))
@@ -113,7 +113,7 @@ internal class TrackConverter
 
         // Check for a rest at the end of this measure.
         MidiNoteGroup lastGroup = midiMeasure.NoteGroups[^1];
-        tokens.Add(ConvertNoteGroup(lastGroup, noteMap, timeSignature, midiMeasure));
+        tokens.Add(ConvertNoteGroup(lastGroup, instrument, timeSignature, midiMeasure));
         bool doesLastNoteCarryOverIntoNextMeasure = lastGroup.TimeSpan.EndTick > midiMeasure.MeasureInfo.EndTick;
         if (!doesLastNoteCarryOverIntoNextMeasure && TryConvertRest(lastGroup.TimeSpan.EndTick, midiMeasure.MeasureInfo.EndTick, timeSignature, out RestToken? lastRest))
         {
@@ -125,17 +125,17 @@ internal class TrackConverter
         return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, tokens);
     }
 
-    private NoteGroupToken ConvertNoteGroup(MidiNoteGroup group, InstrumentNoteMap noteMap, TimeSignature timeSignature, MidiMeasure measure)
+    private NoteGroupToken ConvertNoteGroup(MidiNoteGroup group, Instrument instrument, TimeSignature timeSignature, MidiMeasure measure)
     {
         List<GuildWarsNote> notes = [];
         foreach (MidiNoteNumber midiNoteNumber in group.Notes)
         {
-            if (!noteMap.IsNoteMapped(midiNoteNumber))
+            if (!instrument.CanPlayNote(midiNoteNumber))
             {
                 continue;
             }
 
-            GuildWarsNote[] mappedNotes = noteMap.MapMidiToNotes(midiNoteNumber);
+            GuildWarsNote[] mappedNotes = instrument.MapMidiToNotes(midiNoteNumber);
             Octave octave = _octaves[_currentNoteIndex];
             GuildWarsNote noteToAdd = mappedNotes.First(note => note.Octave == octave);
             notes.Add(noteToAdd);

@@ -1,6 +1,6 @@
 namespace GW2MidiConverter.GuildWars;
 
-public readonly record struct GuildWarsNote(GuildWarsNoteKey Key, Octave Octave)
+public record GuildWarsNote(GuildWarsNoteKey Key, Octave Octave)
 {
     public override string ToString()
     {

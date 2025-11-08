@@ -61,11 +61,11 @@ internal class FileLoaderViewModel : ObservableObject
 
         PossibleInstruments = new List<Instrument>()
         {
-            Instrument.Piano,
-            Instrument.Minstrel,
-            Instrument.Harp,
-            Instrument.Lute,
-            Instrument.Bass
+            // Instrument.Piano,
+            // Instrument.Minstrel,
+            // Instrument.Harp,
+            // Instrument.Lute,
+            // Instrument.Bass
         };
     }
 
