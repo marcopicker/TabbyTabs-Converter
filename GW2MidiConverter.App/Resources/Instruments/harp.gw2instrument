@@ -1,0 +1,32 @@
+{
+    "Name" : "Harp",
+    "Notes" : 
+    [ 
+        { "MidiNote" : 48, "Key" : "Note1", "Octave" : -1 },
+        { "MidiNote" : 50, "Key" : "Note2", "Octave" : -1 },
+        { "MidiNote" : 52, "Key" : "Note3", "Octave" : -1 },
+        { "MidiNote" : 53, "Key" : "Note4", "Octave" : -1 },
+        { "MidiNote" : 55, "Key" : "Note5", "Octave" : -1 },
+        { "MidiNote" : 57, "Key" : "Note6", "Octave" : -1 },
+        { "MidiNote" : 59, "Key" : "Note7", "Octave" : -1 },
+        { "MidiNote" : 60, "Key" : "Note8", "Octave" : -1 },
+        
+        { "MidiNote" : 60, "Key" : "Note1", "Octave" : 0 },
+        { "MidiNote" : 62, "Key" : "Note2", "Octave" : 0 },
+        { "MidiNote" : 64, "Key" : "Note3", "Octave" : 0 },
+        { "MidiNote" : 65, "Key" : "Note4", "Octave" : 0 },
+        { "MidiNote" : 67, "Key" : "Note5", "Octave" : 0 },
+        { "MidiNote" : 69, "Key" : "Note6", "Octave" : 0 },
+        { "MidiNote" : 71, "Key" : "Note7", "Octave" : 0 },
+        { "MidiNote" : 72, "Key" : "Note8", "Octave" : 0 },
+        
+        { "MidiNote" : 72, "Key" : "Note1", "Octave" : 1 },
+        { "MidiNote" : 74, "Key" : "Note2", "Octave" : 1 },
+        { "MidiNote" : 76, "Key" : "Note3", "Octave" : 1 },
+        { "MidiNote" : 77, "Key" : "Note4", "Octave" : 1 },
+        { "MidiNote" : 79, "Key" : "Note5", "Octave" : 1 },
+        { "MidiNote" : 81, "Key" : "Note6", "Octave" : 1 },
+        { "MidiNote" : 83, "Key" : "Note7", "Octave" : 1 },
+        { "MidiNote" : 84, "Key" : "Note8", "Octave" : 1 }
+    ]
+}

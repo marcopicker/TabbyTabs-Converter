@@ -51,7 +51,8 @@ internal class FileLoaderViewModel : ObservableObject
 
     public event EventHandler<TabDocument>? TabDocumentLoaded;
 
-    public FileLoaderViewModel(ISnackbarService snackbar)
+    public FileLoaderViewModel(ISnackbarService snackbar, 
+                               IInstrumentProvider instrumentProvider)
     {
         _snackbar = snackbar;
         OnDragEnterCommand = new RelayCommand<DragEventArgs>(HandleDragEnter);
@@ -59,14 +60,7 @@ internal class FileLoaderViewModel : ObservableObject
         BrowseFilesCommand = new RelayCommand(BrowseFiles);
         ConvertTabCommand = new RelayCommand(ConvertTab, CanConvertTab);
 
-        PossibleInstruments = new List<Instrument>()
-        {
-            // Instrument.Piano,
-            // Instrument.Minstrel,
-            // Instrument.Harp,
-            // Instrument.Lute,
-            // Instrument.Bass
-        };
+        PossibleInstruments = instrumentProvider.GetInstruments().ToList();
     }
 
     [SuppressMessage("ReSharper", "RedundantJumpStatement")]

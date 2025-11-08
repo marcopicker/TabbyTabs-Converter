@@ -75,4 +75,37 @@
       <ProjectReference Include="..\GW2MidiConverter\GW2MidiConverter.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Resources\Instruments\piano.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\minstrel.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\lute.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\harp.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\magnanimous_choir_bell.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\choir_bell.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\bass_guitar.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\flute.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\marriners_horn.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Instruments\verdarach.gw2instrument">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
+using GW2MidiConverter.App.Models;
 using GW2MidiConverter.Tab;
 using Wpf.Ui;
 
@@ -20,9 +21,10 @@ internal class MainWindowViewModel : ObservableObject
         private set => SetProperty(ref _currentViewModel, value);
     }
 
-    public MainWindowViewModel(ISnackbarService snackbar)
+    public MainWindowViewModel(ISnackbarService snackbar,
+                               IInstrumentProvider instrumentProvider)
     {
-        _fileLoaderViewModel = new FileLoaderViewModel(snackbar);
+        _fileLoaderViewModel = new FileLoaderViewModel(snackbar, instrumentProvider);
         _fileLoaderViewModel.TabDocumentLoaded += HandleTabDocumentLoaded;
         
         _tabRendererViewModel = new TabRendererViewModel(snackbar);

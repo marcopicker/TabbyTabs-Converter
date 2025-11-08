@@ -1,0 +1,23 @@
+{
+    "Name" : "Bass Guitar",
+    "Notes" : 
+    [ 
+        { "MidiNote" : 36, "Key" : "Note1", "Octave" : -1 },
+        { "MidiNote" : 38, "Key" : "Note2", "Octave" : -1 },
+        { "MidiNote" : 40, "Key" : "Note3", "Octave" : -1 },
+        { "MidiNote" : 41, "Key" : "Note4", "Octave" : -1 },
+        { "MidiNote" : 43, "Key" : "Note5", "Octave" : -1 },
+        { "MidiNote" : 45, "Key" : "Note6", "Octave" : -1 },
+        { "MidiNote" : 47, "Key" : "Note7", "Octave" : -1 },
+        { "MidiNote" : 48, "Key" : "Note8", "Octave" : -1 },
+        
+        { "MidiNote" : 48, "Key" : "Note1", "Octave" : 0 },
+        { "MidiNote" : 50, "Key" : "Note2", "Octave" : 0 },
+        { "MidiNote" : 52, "Key" : "Note3", "Octave" : 0 },
+        { "MidiNote" : 53, "Key" : "Note4", "Octave" : 0 },
+        { "MidiNote" : 55, "Key" : "Note5", "Octave" : 0 },
+        { "MidiNote" : 57, "Key" : "Note6", "Octave" : 0 },
+        { "MidiNote" : 59, "Key" : "Note7", "Octave" : 0 },
+        { "MidiNote" : 60, "Key" : "Note8", "Octave" : 0 }
+    ]
+}

@@ -32,6 +32,14 @@ public class InstrumentTests
         Assert.That(instrument.PlayableNotes, Is.Not.Null);
         Assert.That(instrument.PlayableNotes, Is.Not.Empty);
     }
+    
+    [Test]
+    public void FromFile_ValidFile_NameIsCorrect()
+    {
+        Instrument instrument = Instrument.FromFile(InstrumentFiles.ValidInstrumentFile);
+
+        Assert.That(instrument.Name, Is.EqualTo("Test Instrument"));
+    }
 
     [Test]
     public void IsNoteMapped()

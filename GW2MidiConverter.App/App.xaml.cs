@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using GW2MidiConverter.App.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using GW2MidiConverter.App.ViewModels;
@@ -31,6 +32,9 @@ public partial class App : Application
         // Windows
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainWindowViewModel>();
+        
+        // Services
+        services.AddSingleton<IInstrumentProvider, InstrumentFilesLoader>();
     }
 
     public static T GetRequiredService<T>() where T : class
