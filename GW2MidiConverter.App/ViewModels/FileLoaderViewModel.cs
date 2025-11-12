@@ -22,6 +22,7 @@ namespace GW2MidiConverter.App.ViewModels;
 internal class FileLoaderViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbar;
+    private readonly IEditDistanceCalculator _editDistanceCalculator;
     private FullyObservableCollection<TrackConfigItemViewModel> _trackConfigItems = [];
 
     private MidiDocument? _loadedMidiDocument;
@@ -51,10 +52,13 @@ internal class FileLoaderViewModel : ObservableObject
 
     public event EventHandler<TabDocument>? TabDocumentLoaded;
 
-    public FileLoaderViewModel(ISnackbarService snackbar, 
-                               IInstrumentProvider instrumentProvider)
+    public FileLoaderViewModel(ISnackbarService snackbar,
+                               IInstrumentProvider instrumentProvider,
+                               IEditDistanceCalculator editDistanceCalculator)
     {
         _snackbar = snackbar;
+        _editDistanceCalculator = editDistanceCalculator;
+
         OnDragEnterCommand = new RelayCommand<DragEventArgs>(HandleDragEnter);
         OnDropFilesCommand = new RelayCommand<DragEventArgs>(HandleDropFiles);
         BrowseFilesCommand = new RelayCommand(BrowseFiles);
@@ -154,11 +158,16 @@ internal class FileLoaderViewModel : ObservableObject
         foreach (int index in _loadedMidiDocument.InstrumentTrackIndexes)
         {
             TrackInfo trackInfo = _loadedMidiDocument.GetTrackInfo(index);
+
             TrackConfigItemViewModel item = new TrackConfigItemViewModel(trackInfo);
+            item.SelectedInstrument = FindFittingInstrumentForTrack(trackInfo);
+            item.IsChecked = item.SelectedInstrument != null;
+
             items.Add(item);
         }
 
         TrackConfigItems = new FullyObservableCollection<TrackConfigItemViewModel>(items);
+        ConvertTabCommand.NotifyCanExecuteChanged();
     }
 
     private void ConvertTab()
@@ -198,5 +207,13 @@ internal class FileLoaderViewModel : ObservableObject
     private void OnTabDocumentLoaded(TabDocument e)
     {
         TabDocumentLoaded?.Invoke(this, e);
+    }
+
+    private Instrument? FindFittingInstrumentForTrack(TrackInfo track)
+    {
+        IReadOnlyList<Instrument> fittingInstruments = PossibleInstruments.Where(i => i.Name.Contains(track.InstrumentName, StringComparison.InvariantCultureIgnoreCase))
+                                                                          .ToList();
+        if (fittingInstruments.Count == 0) fittingInstruments = PossibleInstruments;
+        return fittingInstruments.MinBy(i => _editDistanceCalculator.CalculateDistance(i.Name, track.InstrumentName));
     }
 }

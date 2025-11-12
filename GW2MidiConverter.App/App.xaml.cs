@@ -35,6 +35,7 @@ public partial class App : Application
         
         // Services
         services.AddSingleton<IInstrumentProvider, InstrumentFilesLoader>();
+        services.AddSingleton<IEditDistanceCalculator, LevenshteinDistanceCalculator>();
     }
 
     public static T GetRequiredService<T>() where T : class
