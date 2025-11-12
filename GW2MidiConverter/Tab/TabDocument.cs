@@ -63,6 +63,12 @@ public class TabDocument
         RebuildTracks();
     }
 
+    public bool CanInstrumentPlayTrack(int trackIndex, Instrument instrument)
+    {
+        ArgumentNullException.ThrowIfNull(instrument);
+        return _trackConvertersByTrackIds[trackIndex].CanConvert(instrument);
+    }
+
     private void RebuildTracks()
     {
         _tracks.Clear();

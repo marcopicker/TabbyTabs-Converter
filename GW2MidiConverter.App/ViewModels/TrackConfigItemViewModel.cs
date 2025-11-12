@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using GW2MidiConverter.App.Controls;
 using GW2MidiConverter.General;
 using GW2MidiConverter.GuildWars.Instruments;
 
@@ -8,6 +9,8 @@ internal class TrackConfigItemViewModel(TrackInfo trackInfo) : ObservableObject
 {
     private Instrument? _selectedInstrument;
     private bool _isChecked = true;
+    private ValidityType _validity;
+    private string? _invalidMessage = string.Empty;
 
     public bool IsChecked
     {
@@ -23,5 +26,17 @@ internal class TrackConfigItemViewModel(TrackInfo trackInfo) : ObservableObject
     {
         get => _selectedInstrument;
         set => SetProperty(ref _selectedInstrument, value);
+    }
+
+    public ValidityType Validity
+    {
+        get => _validity;
+        set => SetProperty(ref _validity, value);
+    }
+
+    public string? InvalidMessage
+    {
+        get => _invalidMessage;
+        set => SetProperty(ref _invalidMessage, value);
     }
 }

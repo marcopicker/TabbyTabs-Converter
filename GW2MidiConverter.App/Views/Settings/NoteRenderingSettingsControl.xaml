@@ -48,18 +48,9 @@
                                         HorizontalAlignment="Stretch"
                                         MaxLength="4">
                             </ui:TextBox>
-                            <ui:SymbolIcon Grid.Column="3"
-                                           Symbol="ErrorCircle12"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"
-                                           Margin="8,0,0,0"
-                                           Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                           ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                           Focusable="False">
-                                <ui:SymbolIcon.Foreground>
-                                    <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
-                                </ui:SymbolIcon.Foreground>
-                            </ui:SymbolIcon>
+                            <controls:ValidityIcon Grid.Column="3"
+                                                   ValidityType="{Binding Validity}"
+                                                   ValidityMessage="{Binding InvalidMessage}" />
                         </Grid>
                     </StackPanel>
                 </DataTemplate>
@@ -142,17 +133,9 @@
                                    Margin="8,0,0,0"
                                    Command="{Binding Path=DataContext.BracketPairSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
-                        <ui:SymbolIcon Grid.Column="4"
-                                       Symbol="ErrorCircle12"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       Margin="8,0,0,0"
-                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ui:SymbolIcon.Foreground>
-                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
-                            </ui:SymbolIcon.Foreground>
-                        </ui:SymbolIcon>
+                        <controls:ValidityIcon Grid.Column="4"
+                                               ValidityType="{Binding Validity}"
+                                               ValidityMessage="{Binding InvalidMessage}" />
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -224,17 +207,9 @@
                                    Icon="{ui:SymbolIcon Delete24}"
                                    Command="{Binding Path=DataContext.RestSymbolsPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
-                        <ui:SymbolIcon Grid.Column="3"
-                                       Symbol="ErrorCircle12"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       Margin="8,0,0,0"
-                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ui:SymbolIcon.Foreground>
-                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
-                            </ui:SymbolIcon.Foreground>
-                        </ui:SymbolIcon>
+                        <controls:ValidityIcon Grid.Column="3"
+                                               ValidityType="{Binding Validity}"
+                                               ValidityMessage="{Binding InvalidMessage}" />
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -308,17 +283,9 @@
                                    Icon="{ui:SymbolIcon Delete24}"
                                    Command="{Binding Path=DataContext.TrailingSpacesPerBeatSubSetting.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type controls:SubSettingItemsControl}}}"
                                    CommandParameter="{Binding}" />
-                        <ui:SymbolIcon Grid.Column="3"
-                                       Symbol="ErrorCircle12"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       Margin="8,0,0,0"
-                                       Visibility="{Binding IsValid, Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
-                                       ToolTip="{Binding InvalidMessage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ui:SymbolIcon.Foreground>
-                                <SolidColorBrush Color="{DynamicResource PaletteRedColor}" />
-                            </ui:SymbolIcon.Foreground>
-                        </ui:SymbolIcon>
+                        <controls:ValidityIcon Grid.Column="3"
+                                               ValidityType="{Binding Validity}"
+                                               ValidityMessage="{Binding InvalidMessage}" />
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

@@ -7,6 +7,7 @@
              xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
+             xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal"
              d:DataContext="{d:DesignInstance viewModels:FileLoaderViewModel}"
@@ -20,6 +21,11 @@
             <b:InvokeCommandAction Command="{Binding OnDropFilesCommand}" PassEventArgsToCommand="True" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"
+                                                 True="Collapsed"
+                                                 False="Visible" />
+    </UserControl.Resources>
     <Grid HorizontalAlignment="Center"
           VerticalAlignment="Center">
         <Grid.RowDefinitions>
@@ -94,6 +100,7 @@
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="A" />
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="B" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="C" />
                             </Grid.ColumnDefinitions>
                             <ui:TextBlock Grid.Column="0"
                                           Text="Enabled"
@@ -126,6 +133,7 @@
                             <ColumnDefinition Width="Auto" SharedSizeGroup="A" />
                             <ColumnDefinition Width="Auto" SharedSizeGroup="B" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="C" />
                         </Grid.ColumnDefinitions>
                         <CheckBox Grid.Column="0"
                                   IsChecked="{Binding IsChecked}"
@@ -138,6 +146,9 @@
                                   SelectedItem="{Binding SelectedInstrument}"
                                   Margin="8,0,0,0"
                                   HorizontalAlignment="Right" />
+                        <controls:ValidityIcon Grid.Column="3"
+                                               ValidityMessage="{Binding InvalidMessage}"
+                                               ValidityType="{Binding Validity}"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

@@ -3,5 +3,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../Controls/SubSettingItemsControl.generic.xaml"/>
         <ResourceDictionary Source="../Controls/SubSettingContentControl.generic.xaml"/>
+        <ResourceDictionary Source="../Controls/ValidityIcon.generic.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

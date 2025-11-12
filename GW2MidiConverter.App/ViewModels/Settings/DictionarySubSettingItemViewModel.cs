@@ -1,29 +1,34 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using GW2MidiConverter.App.Controls;
 
 namespace GW2MidiConverter.App.ViewModels.Settings;
 
 internal abstract class DictionarySubSettingItemViewModel : ObservableObject
 {
-    private bool _isValid = true;
-    private string _invalidMessage = string.Empty;
+    private ValidityType _validity = ValidityType.Valid;
+    private string? _invalidMessage = string.Empty;
 
-    public bool IsValid
+    public ValidityType Validity
     {
-        get => _isValid;
-        private set => SetProperty(ref _isValid, value);
+        get => _validity;
+        private set => SetProperty(ref _validity, value);
     }
 
-    public string InvalidMessage
+    public string? InvalidMessage
     {
         get => _invalidMessage;
         private set => SetProperty(ref _invalidMessage, value);
     }
 
-    public void SetValid() => IsValid = true;
-
-    public void SetInvalid(string message)
+    public void SetValid()
     {
-        IsValid = false;
+        Validity = ValidityType.Valid;
+        InvalidMessage = null;
+    }
+
+    public void SetInvalid(string? message)
+    {
+        Validity = ValidityType.Invalid;
         InvalidMessage = message;
     }
 }

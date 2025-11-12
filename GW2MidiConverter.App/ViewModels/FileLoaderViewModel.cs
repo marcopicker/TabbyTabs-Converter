@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GW2MidiConverter.App.Controls;
 using GW2MidiConverter.App.Models;
 using GW2MidiConverter.General;
 using GW2MidiConverter.GuildWars.Instruments;
@@ -26,6 +27,7 @@ internal class FileLoaderViewModel : ObservableObject
     private FullyObservableCollection<TrackConfigItemViewModel> _trackConfigItems = [];
 
     private MidiDocument? _loadedMidiDocument;
+    private TabDocument? _loadedTabDocument;
 
     public ICommand OnDragEnterCommand { get; }
 
@@ -154,6 +156,8 @@ internal class FileLoaderViewModel : ObservableObject
     {
         if (_loadedMidiDocument == null) return;
 
+        _loadedTabDocument = TabDocument.FromMidiDocument(_loadedMidiDocument, new LookAheadOctaveCalculator());
+
         List<TrackConfigItemViewModel> items = [];
         foreach (int index in _loadedMidiDocument.InstrumentTrackIndexes)
         {
@@ -172,16 +176,15 @@ internal class FileLoaderViewModel : ObservableObject
 
     private void ConvertTab()
     {
-        if (_loadedMidiDocument == null) return;
+        if (_loadedTabDocument == null) return;
         try
         {
-            TabDocument tabDocument = TabDocument.FromMidiDocument(_loadedMidiDocument, new LookAheadOctaveCalculator());
             List<TabDocumentTrackConfig> config = TrackConfigItems.Select(i => new TabDocumentTrackConfig(i.TrackInfo.TrackIndex, i.SelectedInstrument))
                                                                   .ToList();
-            tabDocument.DisableAllTracks();
-            tabDocument.EnableTracks(config);
+            _loadedTabDocument.DisableAllTracks();
+            _loadedTabDocument.EnableTracks(config);
 
-            OnTabDocumentLoaded(tabDocument);
+            OnTabDocumentLoaded(_loadedTabDocument);
         }
         catch (Exception e)
         {
@@ -192,15 +195,18 @@ internal class FileLoaderViewModel : ObservableObject
     private bool CanConvertTab()
     {
         if (_loadedMidiDocument == null) return false;
+        if (_loadedTabDocument == null) return false;
         if (TrackConfigItems.Count == 0) return false;
         if (TrackConfigItems.All(t => !t.IsChecked)) return false;
-        if (TrackConfigItems.Where(t => t.IsChecked).Any(t => t.SelectedInstrument == null)) return false;
-
-        return true;
+        return TrackConfigItems.All(t => t.Validity != ValidityType.Invalid );
     }
 
     private void TrackConfigItemsOnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (sender is not TrackConfigItemViewModel item) return;
+        if (e.PropertyName is nameof(TrackConfigItemViewModel.Validity) or nameof(TrackConfigItemViewModel.InvalidMessage)) return;
+
+        VerifyTrackConfigItem(item);
         ConvertTabCommand.NotifyCanExecuteChanged();
     }
 
@@ -215,5 +221,29 @@ internal class FileLoaderViewModel : ObservableObject
                                                                           .ToList();
         if (fittingInstruments.Count == 0) fittingInstruments = PossibleInstruments;
         return fittingInstruments.MinBy(i => _editDistanceCalculator.CalculateDistance(i.Name, track.InstrumentName));
+    }
+
+    private void VerifyTrackConfigItem(TrackConfigItemViewModel item)
+    {
+        if (_loadedTabDocument == null) return;
+
+        if (item is { IsChecked: true, SelectedInstrument: null })
+        {
+            item.Validity = ValidityType.Invalid;
+            item.InvalidMessage = "No instrument selected!";
+            return;
+        }
+
+        bool canPlayTrack = _loadedTabDocument.CanInstrumentPlayTrack(item.TrackInfo.TrackIndex, item.SelectedInstrument!);
+        if (canPlayTrack)
+        {
+            item.Validity = ValidityType.Valid;
+            item.InvalidMessage = string.Empty;
+        }
+        else
+        {
+            item.Validity = ValidityType.Warning;
+            item.InvalidMessage = "At least one note of this track is outside of the selected instrument's range!";
+        }
     }
 }
