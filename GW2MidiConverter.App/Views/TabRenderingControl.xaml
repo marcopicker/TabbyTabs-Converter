@@ -64,9 +64,21 @@
                            Fill="{ui:ThemeResource ControlFillColorDefaultBrush}"
                            Margin="8,8,8,8" />
                 <Border Grid.Row="4"
-                        Padding="5">
-                    <ui:Button Content="Export"
-                               Command="{Binding ExportCommand}" />
+                        Margin="8,8,8,16">
+                    <DockPanel LastChildFill="False">
+                        <ui:Button DockPanel.Dock="Right"
+                                   Content="Export"
+                                   Command="{Binding ExportCommand}"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:SymbolIcon Save16}"
+                                   Appearance="Primary" />
+                        <ui:Button DockPanel.Dock="Left"
+                                   Content="Back"
+                                   Command="{Binding ReturnCommand}"
+                                   VerticalAlignment="Center"
+                                   Icon="{ui:SymbolIcon ArrowLeft12}"
+                                   Appearance="Secondary" />
+                    </DockPanel>
                 </Border>
             </Grid>
         </Border>

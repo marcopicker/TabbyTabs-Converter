@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using GW2MidiConverter.App.Models;
@@ -29,6 +30,7 @@ internal class MainWindowViewModel : ObservableObject
         _fileLoaderViewModel.TabDocumentLoaded += HandleTabDocumentLoaded;
         
         _tabRendererViewModel = new TabRendererViewModel(snackbar);
+        _tabRendererViewModel.ReturnRequested += HandleReturnRequested;
         
         CurrentViewModel = _fileLoaderViewModel;
     }
@@ -37,5 +39,10 @@ internal class MainWindowViewModel : ObservableObject
     {
         CurrentViewModel = _tabRendererViewModel;
         _tabRendererViewModel.TabDocument = document;
+    }
+    
+    private void HandleReturnRequested(object? sender, EventArgs e)
+    {
+        CurrentViewModel = _fileLoaderViewModel;
     }
 }

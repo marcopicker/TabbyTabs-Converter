@@ -22,9 +22,9 @@
         </b:EventTrigger>
     </b:Interaction.Triggers>
     <UserControl.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter"
-                                                 True="Collapsed"
-                                                 False="Visible" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
+                                                 True="Visible"
+                                                 False="Collapsed" />
     </UserControl.Resources>
     <Grid HorizontalAlignment="Center"
           VerticalAlignment="Center">
@@ -148,14 +148,16 @@
                                   HorizontalAlignment="Right" />
                         <controls:ValidityIcon Grid.Column="3"
                                                ValidityMessage="{Binding InvalidMessage}"
-                                               ValidityType="{Binding Validity}"/>
+                                               ValidityType="{Binding Validity}" />
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </controls:SubSettingItemsControl>
         <ui:Button Grid.Row="2"
+                   HorizontalAlignment="Right"
                    Command="{Binding ConvertTabCommand}"
                    Content="Convert Tab"
-                   Icon="{ui:SymbolIcon ArrowRight16}" />
+                   Icon="{ui:SymbolIcon ArrowRight16}"
+                   Visibility="{Binding ElementName=TrackConfigurationItemsControl, Path=Visibility }" />
     </Grid>
 </UserControl>

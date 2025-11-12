@@ -29,9 +29,7 @@
                         Focusable="False" />
         <ContentPresenter x:Name="RootContentDialog" />
         <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
-        <ui:TitleBar x:Name="TitleBar"
-                     Title="{Binding ApplicationTitle}"
-                     CloseWindowByDoubleClickOnIcon="True"
-                     Icon="{ui:SymbolIcon AnimalCat16}" />
+        <ui:TitleBar Title="{Binding ApplicationTitle}"
+                     Icon="{ui:SymbolIcon MusicNote120}" />
     </Grid>
 </ui:FluentWindow>

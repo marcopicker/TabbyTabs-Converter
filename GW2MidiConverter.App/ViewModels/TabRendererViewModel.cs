@@ -29,6 +29,8 @@ internal class TabRendererViewModel : ObservableObject
     private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
     private readonly TimeSignatureRenderingSettingsViewModel _timeSignatureRenderingSettingsViewModel;
 
+    public event EventHandler? ReturnRequested;
+    
     public List<SettingsViewModel> Settings { get; } = [];
 
     public SettingsViewModel? SelectedSettingsViewModel
@@ -55,11 +57,14 @@ internal class TabRendererViewModel : ObservableObject
 
     public ICommand ExportCommand { get; }
 
+    public ICommand ReturnCommand { get; }
+
 
     public TabRendererViewModel(ISnackbarService snackbarService)
     {
         _snackbarService = snackbarService;
         ExportCommand = new RelayCommand(ExportTab);
+        ReturnCommand = new RelayCommand(RequestReturn);
 
         _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings());
         RegisterSettingsViewModel(_noteRenderingSettingsViewModel);
@@ -110,6 +115,11 @@ internal class TabRendererViewModel : ObservableObject
     {
         Settings.Add(settings);
         settings.SubSettingChanged += (_, _) => RebuildTab();
+    }
+
+    private void RequestReturn()
+    {
+        ReturnRequested?.Invoke(this, EventArgs.Empty);
     }
 
     private void ExportTab()
