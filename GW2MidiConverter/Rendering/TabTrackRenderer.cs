@@ -35,7 +35,6 @@ internal class TabTrackRenderer(
         int consecutiveMeasures = 0;
         for (int i = 0; i < track.Measures.Count; i++)
         {
-            // Loop data.
             TabMeasure currentMeasure = track.Measures[i];
             TabMeasure? nextMeasure = i + 1 < track.Measures.Count ? track.Measures[i + 1] : null;
 
