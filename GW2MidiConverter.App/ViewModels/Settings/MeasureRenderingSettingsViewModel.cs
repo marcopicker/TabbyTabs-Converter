@@ -1,3 +1,5 @@
+using System;
+
 namespace GW2MidiConverter.App.ViewModels.Settings;
 
 internal class MeasureRenderingSettingsViewModel : SettingsViewModel
@@ -5,19 +7,23 @@ internal class MeasureRenderingSettingsViewModel : SettingsViewModel
     public AtomicSubSettingViewModel<bool> ShowMeasureNumbers { get; }
     public AtomicSubSettingViewModel<bool> DrawMeasureDelimiters { get; }
     public AtomicSubSettingViewModel<char> MeasureDelimiter { get; }
+    public AtomicSubSettingViewModel<int> MeasureDelimiterPadding { get; }
     public AtomicSubSettingViewModel<int> SpacesBetweenBeats { get; }
-    
+
     public MeasureRenderingSettingsViewModel(Rendering.Settings.MeasureRenderingSettings settings) : base("Measures")
     {
         ShowMeasureNumbers = new AtomicSubSettingViewModel<bool>(settings.ShowMeasureNumbers);
         RegisterSubSetting(ShowMeasureNumbers);
-        
+
         DrawMeasureDelimiters = new AtomicSubSettingViewModel<bool>(settings.DrawMeasureDelimiters);
         RegisterSubSetting(DrawMeasureDelimiters);
-        
+
         MeasureDelimiter = new AtomicSubSettingViewModel<char>(settings.MeasureDelimiter);
         RegisterSubSetting(MeasureDelimiter);
-        
+
+        MeasureDelimiterPadding = new AtomicSubSettingViewModel<int>(settings.MeasureDelimiterPadding);
+        RegisterSubSetting(MeasureDelimiterPadding);
+
         SpacesBetweenBeats = new AtomicSubSettingViewModel<int>(settings.SpacesBetweenBeats);
         SpacesBetweenBeats.VerifySettingFunc = () =>
         {
@@ -27,7 +33,7 @@ internal class MeasureRenderingSettingsViewModel : SettingsViewModel
         };
         RegisterSubSetting(SpacesBetweenBeats);
     }
-    
+
     public Rendering.Settings.MeasureRenderingSettings CreateSettings()
     {
         return new Rendering.Settings.MeasureRenderingSettings
@@ -35,7 +41,8 @@ internal class MeasureRenderingSettingsViewModel : SettingsViewModel
             ShowMeasureNumbers = ShowMeasureNumbers.Value,
             DrawMeasureDelimiters = DrawMeasureDelimiters.Value,
             MeasureDelimiter = MeasureDelimiter.Value,
-            SpacesBetweenBeats = SpacesBetweenBeats.Value
+            MeasureDelimiterPadding = Math.Max(0, MeasureDelimiterPadding.Value),
+            SpacesBetweenBeats = Math.Max(1, SpacesBetweenBeats.Value)
         };
     }
 }

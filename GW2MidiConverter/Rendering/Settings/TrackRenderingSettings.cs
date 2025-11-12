@@ -9,7 +9,8 @@ public class TrackRenderingSettings
     public int LineBreaksAfterTrackName { get; init; }
     public int LineBreaksBetweenTracks { get; init; } = 4;
     
-    public int MaxMeasureCountBeforeLineBreak { get; init; } = 4;
+    // TODO MP: Rename row to line
+    public int MaxConsecutiveRowCount { get; init; } = 4;
     
     public int LinesBeforeTimeSignature { get; init; } = 1;
     public int LinesAfterTimeSignature { get; init; }

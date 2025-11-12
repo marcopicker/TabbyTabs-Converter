@@ -24,7 +24,7 @@ internal class TrackRenderingSettingsViewModel : SettingsViewModel
         LineBreaksBetweenTracks = new AtomicSubSettingViewModel<int>(settings.LineBreaksBetweenTracks);
         RegisterSubSetting(LineBreaksBetweenTracks);
 
-        MaxMeasureCountBeforeLineBreak = new AtomicSubSettingViewModel<int>(settings.MaxMeasureCountBeforeLineBreak);
+        MaxMeasureCountBeforeLineBreak = new AtomicSubSettingViewModel<int>(settings.MaxConsecutiveRowCount);
         RegisterSubSetting(MaxMeasureCountBeforeLineBreak);
 
         LinesBeforeTimeSignature = new AtomicSubSettingViewModel<int>(settings.LinesBeforeTimeSignature);
@@ -44,7 +44,7 @@ internal class TrackRenderingSettingsViewModel : SettingsViewModel
             ShowTrackName = ShowTrackName.Value,
             LineBreaksAfterTrackName = Math.Max(0, LineBreaksAfterTrackName.Value),
             LineBreaksBetweenTracks = Math.Max(0, LineBreaksBetweenTracks.Value),
-            MaxMeasureCountBeforeLineBreak = Math.Max(1, MaxMeasureCountBeforeLineBreak.Value),
+            MaxConsecutiveRowCount = Math.Max(1, MaxMeasureCountBeforeLineBreak.Value),
             LinesBeforeTimeSignature = Math.Max(0, LinesBeforeTimeSignature.Value),
             LinesAfterTimeSignature = Math.Max(0, LinesAfterTimeSignature.Value),
             MeasuresPerLine = Math.Max(1, MeasuresPerLine.Value)

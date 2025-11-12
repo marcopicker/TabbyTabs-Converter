@@ -32,14 +32,22 @@
                                 TextAlignment="Center"
                                 ClearButtonEnabled="False" />
                 </controls:SubSettingContentControl>
+
+                <controls:SubSettingContentControl HeaderText="Padding"
+                                                   IsEnabled="{Binding DrawMeasureDelimiters.Value}"
+                                                   ShowBorder="False">
+                    <ui:NumberBox Value="{Binding MeasureDelimiterPadding.Value, UpdateSourceTrigger=PropertyChanged}"
+                                  Minimum="0"
+                                  ClearButtonEnabled="False" />
+                </controls:SubSettingContentControl>
             </controls:SubSettingItemsControl.Items>
         </controls:SubSettingItemsControl>
 
         <controls:SubSettingContentControl HeaderText="Beat Spacing"
                                            DescriptionText="The number of spaces that are placed between each beat of a measure.">
             <ui:NumberBox Value="{Binding SpacesBetweenBeats.Value, UpdateSourceTrigger=PropertyChanged}"
-                          Minimum="0"
-                          ClearButtonEnabled="False"/>
+                          Minimum="1"
+                          ClearButtonEnabled="False" />
         </controls:SubSettingContentControl>
     </StackPanel>
 </UserControl>
