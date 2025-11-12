@@ -45,6 +45,8 @@ internal class TabTrackRenderer(
 
             if (isTimeSignatureRendered)
             {
+                bool isFirstMeasure = i == 0;
+                if (isFirstMeasure) timeSignatureString = timeSignatureString.TrimStart();
                 _trackStringBuilder.Append(timeSignatureString);
                 consecutiveLines = 0;
             }
@@ -146,7 +148,7 @@ internal class TabTrackRenderer(
                 break;
             case TimeSignaturePositioning.InFrontOfMeasure:
                 stringBuilder.Append(new string('\n', trackRenderingSettings.LinesBeforeTimeSignature));
-                stringBuilder.AppendLine(timeSignatureString);
+                stringBuilder.Append(timeSignatureString);
                 break;
         }
 

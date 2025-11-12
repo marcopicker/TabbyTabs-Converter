@@ -5,8 +5,8 @@ namespace GW2MidiConverter.Rendering.Settings;
 public class TrackRenderingSettings
 {
     private readonly int _measuresPerLine = 1;
-    
-    public int LineBreaksAfterTrackName { get; init; }
+
+    public int LineBreaksAfterTrackName { get; init; } = 1;
     public int LineBreaksBetweenTracks { get; init; } = 4;
     
     // TODO MP: Rename row to line
