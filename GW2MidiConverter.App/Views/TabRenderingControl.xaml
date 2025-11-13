@@ -89,7 +89,7 @@
                         Margin="8,8,8,16">
                     <DockPanel LastChildFill="False">
                         <ui:Button DockPanel.Dock="Right"
-                                   Content="Export"
+                                   Content="Export Tab"
                                    Command="{Binding ExportCommand}"
                                    VerticalAlignment="Center"
                                    Icon="{ui:SymbolIcon Save16}"
