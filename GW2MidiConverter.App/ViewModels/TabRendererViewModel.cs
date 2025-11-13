@@ -28,7 +28,6 @@ internal class TabRendererViewModel : ObservableObject
     private readonly MeasureRenderingSettingsViewModel _measureRenderingSettingsViewModel;
     private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
     private readonly TimeSignatureRenderingSettingsViewModel _timeSignatureRenderingSettingsViewModel;
-    private bool _isStyleFlyoutOpen;
 
     public event EventHandler? ReturnRequested;
 
@@ -59,15 +58,8 @@ internal class TabRendererViewModel : ObservableObject
     public ICommand ExportCommand { get; }
 
     public ICommand ReturnCommand { get; }
-
-    public ICommand OpenStyleFlyoutCommand { get; }
-
-    public bool IsStyleFlyoutOpen
-    {
-        get => _isStyleFlyoutOpen;
-        set => SetProperty(ref _isStyleFlyoutOpen, value);
-    }
-
+    public ICommand LoadStyleCommand { get; }
+    public ICommand SaveStyleCommand { get; }
     public ICommand ResetStyleCommand { get; }
 
 
@@ -79,13 +71,9 @@ internal class TabRendererViewModel : ObservableObject
 
         ExportCommand = new RelayCommand(ExportTab);
         ReturnCommand = new RelayCommand(RequestReturn);
+        LoadStyleCommand = new RelayCommand(ExecuteLoadStyleCommand);
+        SaveStyleCommand = new RelayCommand(ExecuteSaveStyleCommand);
         ResetStyleCommand = new AsyncRelayCommand(ExecuteResetSettingsCommand);
-
-        OpenStyleFlyoutCommand = new RelayCommand(() =>
-        {
-            if (!IsStyleFlyoutOpen) IsStyleFlyoutOpen = true;
-        });
-
 
         _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings(), "Notes");
         _measureRenderingSettingsViewModel = new MeasureRenderingSettingsViewModel(new MeasureRenderingSettings(), "Measures");
@@ -100,7 +88,7 @@ internal class TabRendererViewModel : ObservableObject
         SelectedSettingsViewModel = Settings[0];
     }
 
-    public void ApplySettings(TabRenderingSettings settings)
+    private void ApplySettings(TabRenderingSettings settings)
     {
         _noteRenderingSettingsViewModel.ApplySettings(settings.NoteRenderingSettings);
         _measureRenderingSettingsViewModel.ApplySettings(settings.MeasureRenderingSettings);
@@ -182,6 +170,56 @@ internal class TabRendererViewModel : ObservableObject
         {
             _snackbarService.Show("Export Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
             throw;
+        }
+    }
+
+    private void ExecuteLoadStyleCommand()
+    {
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Filter = "GW2TabStyle File (*.gw2tabstyle)|*.gw2tabstyle",
+            Multiselect = false,
+            AddToRecent = true
+        };
+
+        try
+        {
+            bool? dialogResult = openFileDialog.ShowDialog();
+            if (dialogResult != true) return;
+
+            TabRenderingSettings renderingSettings = TabRenderingSettings.FromFile(openFileDialog.FileName);
+            ApplySettings(renderingSettings);
+
+            _snackbarService.Show("Style Loaded", $"The style '{Path.GetFileName(openFileDialog.FileName)}' was successfully loaded.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), TimeSpan.FromSeconds(3));
+        }
+        catch (Exception e)
+        {
+            _snackbarService.Show("Load Error", e.Message, ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle16), TimeSpan.FromSeconds(10));
+        }
+    }
+
+    private void ExecuteSaveStyleCommand()
+    {
+        SaveFileDialog saveFileDialog = new SaveFileDialog
+        {
+            Filter = "GW2TabStyle File (*.gw2tabstyle)|*.gw2tabstyle",
+            CreatePrompt = true,
+            AddToRecent = true
+        };
+
+        try
+        {
+            bool? dialogResult = saveFileDialog.ShowDialog();
+            if (dialogResult != true) return;
+
+            TabRenderingSettings renderingSettings = BuildRenderingSettings();
+            renderingSettings.SaveToFile(saveFileDialog.FileName);
+
+            _snackbarService.Show("Style Saved", "The style was saved successfully.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), TimeSpan.FromSeconds(3));
+        }
+        catch (Exception e)
+        {
+            _snackbarService.Show("Load Error", e.Message, ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle16), TimeSpan.FromSeconds(10));
         }
     }
 

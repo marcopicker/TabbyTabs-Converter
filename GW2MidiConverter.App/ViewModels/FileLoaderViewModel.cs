@@ -98,7 +98,7 @@ internal class FileLoaderViewModel : ObservableObject
         {
             Filter = "MIDI Files (*.mid, *.midi)|*.mid;*.midi",
             Multiselect = false,
-            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            AddToRecent = true,
         };
 
         string[] fileNames;

@@ -40,33 +40,15 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0">
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Margin="8">
-                        <ui:Button HorizontalAlignment="Stretch"
-                                   Icon="{ui:SymbolIcon Save16}"
-                                   ToolTip="Export Style"
-                                   ToolTipService.InitialShowDelay="0"
-                                   ToolTipService.BetweenShowDelay="0"
-                                   ToolTipService.Placement="Bottom" />
-                        <ui:Button Margin="8,0,0,0"
-                                   HorizontalAlignment="Stretch"
-                                   Icon="{ui:SymbolIcon Open16}"
-                                   ToolTip="Import Style"
-                                   ToolTipService.InitialShowDelay="0"
-                                   ToolTipService.BetweenShowDelay="0"
-                                   ToolTipService.Placement="Bottom" />
-                        <ui:Button Margin="8,0,0,0"
-                                   HorizontalAlignment="Stretch"
-                                   Icon="{ui:SymbolIcon ArrowCounterclockwise16}"
-                                   Command="{Binding ResetStyleCommand}"
-                                   ToolTip="Reset Style"
-                                   ToolTipService.InitialShowDelay="0"
-                                   ToolTipService.BetweenShowDelay="0"
-                                   ToolTipService.Placement="Bottom" />
-                    </StackPanel>
-                    <ComboBox Margin="8,0,8,8"
+                <Grid Grid.Row="0"
+                      Margin="8,8,0,8"
+                      HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0"
+                              x:Name="SettingSelectorComboBox"
                               ItemsSource="{Binding Settings}"
                               SelectedItem="{Binding SelectedSettingsViewModel}">
                         <ComboBox.ItemTemplate>
@@ -75,7 +57,20 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                </StackPanel>
+                    <ui:DropDownButton Grid.Column="1"
+                                       Margin="8,0,8,0"
+                                       Icon="{ui:SymbolIcon MoreHorizontal24}"
+                                       Height="{Binding ElementName=SettingSelectorComboBox, Path=ActualHeight, Mode=OneWay}">
+                        <ui:DropDownButton.Flyout>
+                            <ContextMenu>
+                                <MenuItem Icon="{ui:SymbolIcon Open16}" Header="Import Style" Command="{Binding LoadStyleCommand}" />
+                                <MenuItem Icon="{ui:SymbolIcon Save16}" Header="Export Style" Command="{Binding SaveStyleCommand}" />
+                                <Separator />
+                                <MenuItem Icon="{ui:SymbolIcon ArrowCounterclockwise16}" Header="Reset Style" Command="{Binding ResetStyleCommand}" />
+                            </ContextMenu>
+                        </ui:DropDownButton.Flyout>
+                    </ui:DropDownButton>
+                </Grid>
                 <Rectangle Grid.Row="1" Height="1"
                            HorizontalAlignment="Stretch"
                            Fill="{ui:ThemeResource ControlFillColorDefaultBrush}"
