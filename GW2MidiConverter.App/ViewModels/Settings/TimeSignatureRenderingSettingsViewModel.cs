@@ -2,26 +2,29 @@ using GW2MidiConverter.Rendering.Settings;
 
 namespace GW2MidiConverter.App.ViewModels.Settings;
 
-internal class TimeSignatureRenderingSettingsViewModel : SettingsViewModel
+internal class TimeSignatureRenderingSettingsViewModel(TimeSignatureRenderingSettings setting, string name) : SettingsViewModel<TimeSignatureRenderingSettings>(setting, name)
 {
-    public EnumSubSettingViewModel<TimeSignatureVisibility> TimeSignatureVisibility { get; }
-    public EnumSubSettingViewModel<TimeSignaturePositioning> TimeSignaturePositioning { get; }
-    
-    public TimeSignatureRenderingSettingsViewModel(TimeSignatureRenderingSettings settings) : base("Time Signatures")
+    public EnumSubSettingViewModel<TimeSignatureVisibility> TimeSignatureVisibility { get; } = new EnumSubSettingViewModel<TimeSignatureVisibility>();
+    public EnumSubSettingViewModel<TimeSignaturePositioning> TimeSignaturePositioning { get; } = new EnumSubSettingViewModel<TimeSignaturePositioning>();
+
+    public override void ApplySettings(TimeSignatureRenderingSettings setting)
     {
-        TimeSignatureVisibility = new EnumSubSettingViewModel<TimeSignatureVisibility>(settings.TimeSignatureVisibility);
-        RegisterSubSetting(TimeSignatureVisibility);
-        
-        TimeSignaturePositioning = new EnumSubSettingViewModel<TimeSignaturePositioning>(settings.TimeSignaturePositioning);
-        RegisterSubSetting(TimeSignaturePositioning);
+        TimeSignatureVisibility.Value = setting.TimeSignatureVisibility;
+        TimeSignaturePositioning.Value = setting.TimeSignaturePositioning;
     }
 
-    public TimeSignatureRenderingSettings CreateSettings()
+    public override TimeSignatureRenderingSettings GetSettings()
     {
         return new TimeSignatureRenderingSettings
         {
             TimeSignatureVisibility = TimeSignatureVisibility.Value,
             TimeSignaturePositioning = TimeSignaturePositioning.Value
         };
+    }
+
+    protected override void RegisterSubSettings()
+    {
+        RegisterSubSetting(TimeSignatureVisibility);
+        RegisterSubSetting(TimeSignaturePositioning);
     }
 }

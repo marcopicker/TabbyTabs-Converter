@@ -16,7 +16,7 @@ public abstract class SubSettingViewModel<TSetting> : ObservableObject, ISubSett
 
     public abstract bool VerifySetting();
     public abstract void ApplySubSettingObject(TSetting setting);
-    public abstract TSetting GetSubSettingObject();
+    public abstract TSetting? GetSubSettingObject();
 
     protected void NotifySettingChanged()
     {

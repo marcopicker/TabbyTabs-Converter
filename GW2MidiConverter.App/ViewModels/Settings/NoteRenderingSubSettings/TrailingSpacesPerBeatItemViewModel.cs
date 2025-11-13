@@ -1,6 +1,6 @@
 using GW2MidiConverter.Tab;
 
-namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
+namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSubSettings;
 
 internal class TrailingSpacesPerBeatItemViewModel(TabElementLength length, int spaceCount) : DictionarySubSettingItemViewModel
 {

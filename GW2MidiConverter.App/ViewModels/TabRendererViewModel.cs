@@ -5,12 +5,9 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GW2MidiConverter.App.ViewModels.Settings;
-using GW2MidiConverter.GuildWars.Instruments;
-using GW2MidiConverter.Midi;
 using GW2MidiConverter.Rendering;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
-using GW2MidiConverter.Tab.Octaves;
 using Microsoft.Win32;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
@@ -22,18 +19,19 @@ internal class TabRendererViewModel : ObservableObject
     private readonly ISnackbarService _snackbarService;
     private TabDocument? _tabDocument;
     private string _tabText = "";
-    private SettingsViewModel? _selectedSettingsViewModel;
+    private ISettingsViewModel? _selectedSettingsViewModel;
 
     private readonly NoteRendererSettingsViewModel _noteRenderingSettingsViewModel;
     private readonly MeasureRenderingSettingsViewModel _measureRenderingSettingsViewModel;
     private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
     private readonly TimeSignatureRenderingSettingsViewModel _timeSignatureRenderingSettingsViewModel;
+    private bool _isStyleFlyoutOpen;
 
     public event EventHandler? ReturnRequested;
     
-    public List<SettingsViewModel> Settings { get; } = [];
+    public List<ISettingsViewModel> Settings { get; } = [];
 
-    public SettingsViewModel? SelectedSettingsViewModel
+    public ISettingsViewModel? SelectedSettingsViewModel
     {
         get => _selectedSettingsViewModel;
         set => SetProperty(ref _selectedSettingsViewModel, value);
@@ -58,27 +56,54 @@ internal class TabRendererViewModel : ObservableObject
     public ICommand ExportCommand { get; }
 
     public ICommand ReturnCommand { get; }
+    
+    public ICommand OpenStyleFlyoutCommand { get; }
+
+    public bool IsStyleFlyoutOpen
+    {
+        get => _isStyleFlyoutOpen;
+        set => SetProperty(ref _isStyleFlyoutOpen, value);
+    }
+
+    public ICommand ResetStyleCommand { get; }
 
 
     public TabRendererViewModel(ISnackbarService snackbarService)
     {
         _snackbarService = snackbarService;
+        
         ExportCommand = new RelayCommand(ExportTab);
         ReturnCommand = new RelayCommand(RequestReturn);
+        
+        OpenStyleFlyoutCommand = new RelayCommand(() =>
+        {
+            if (!IsStyleFlyoutOpen) IsStyleFlyoutOpen = true;
+        });
+        
+        ResetStyleCommand = new RelayCommand(() =>
+        {
+            ApplySettings(new TabRenderingSettings());
+        });
 
-        _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings());
+        _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings(), "Notes");
+        _measureRenderingSettingsViewModel = new MeasureRenderingSettingsViewModel(new MeasureRenderingSettings(), "Measures");
+        _trackRenderingSettingsViewModel = new TrackRenderingSettingsViewModel(new TrackRenderingSettings(), "Tracks");
+        _timeSignatureRenderingSettingsViewModel = new TimeSignatureRenderingSettingsViewModel(new TimeSignatureRenderingSettings(), "Time Signatures");
+        
         RegisterSettingsViewModel(_noteRenderingSettingsViewModel);
-
-        _measureRenderingSettingsViewModel = new MeasureRenderingSettingsViewModel(new MeasureRenderingSettings());
         RegisterSettingsViewModel(_measureRenderingSettingsViewModel);
-
-        _trackRenderingSettingsViewModel = new TrackRenderingSettingsViewModel(new TrackRenderingSettings());
         RegisterSettingsViewModel(_trackRenderingSettingsViewModel);
-
-        _timeSignatureRenderingSettingsViewModel = new TimeSignatureRenderingSettingsViewModel(new TimeSignatureRenderingSettings());
         RegisterSettingsViewModel(_timeSignatureRenderingSettingsViewModel);
 
         SelectedSettingsViewModel = Settings[0];
+    }
+
+    public void ApplySettings(TabRenderingSettings settings)
+    {
+        _noteRenderingSettingsViewModel.ApplySettings(settings.NoteRenderingSettings);
+        _measureRenderingSettingsViewModel.ApplySettings(settings.MeasureRenderingSettings);
+        _trackRenderingSettingsViewModel.ApplySettings(settings.TrackRenderingSettings);
+        _timeSignatureRenderingSettingsViewModel.ApplySettings(settings.TimeSignatureRenderingSettings);
     }
 
     private void RebuildTab()
@@ -104,17 +129,17 @@ internal class TabRendererViewModel : ObservableObject
     {
         return new TabRenderingSettings
         {
-            NoteRenderingSettings = _noteRenderingSettingsViewModel.CreateSettings(),
-            MeasureRenderingSettings = _measureRenderingSettingsViewModel.CreateSettings(),
-            TrackRenderingSettings = _trackRenderingSettingsViewModel.CreateSettings(),
-            TimeSignatureRenderingSettings = _timeSignatureRenderingSettingsViewModel.CreateSettings()
+            NoteRenderingSettings = _noteRenderingSettingsViewModel.GetSettings(),
+            MeasureRenderingSettings = _measureRenderingSettingsViewModel.GetSettings(),
+            TrackRenderingSettings = _trackRenderingSettingsViewModel.GetSettings(),
+            TimeSignatureRenderingSettings = _timeSignatureRenderingSettingsViewModel.GetSettings()
         };
     }
 
-    private void RegisterSettingsViewModel(SettingsViewModel settings)
+    private void RegisterSettingsViewModel(ISettingsViewModel settingsViewModel)
     {
-        Settings.Add(settings);
-        settings.SubSettingChanged += (_, _) => RebuildTab();
+        Settings.Add(settingsViewModel);
+        settingsViewModel.SubSettingChanged += (_, _) => RebuildTab();
     }
 
     private void RequestReturn()

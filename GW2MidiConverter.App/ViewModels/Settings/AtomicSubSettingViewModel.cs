@@ -5,9 +5,9 @@ namespace GW2MidiConverter.App.ViewModels.Settings;
 internal class AtomicSubSettingViewModel<T> : SubSettingViewModel<T>
 {
     private string? _errorMessage;
-    private T _value;
+    private T? _value;
 
-    public T Value
+    public T? Value
     {
         get => _value;
         set
@@ -25,9 +25,9 @@ internal class AtomicSubSettingViewModel<T> : SubSettingViewModel<T>
         set => SetProperty(ref _errorMessage, value);
     }
 
-    public AtomicSubSettingViewModel(T initialValue)
+    public AtomicSubSettingViewModel()
     {
-        _value = Value = initialValue;
+        _value = Value = default;
     }
 
     public override bool VerifySetting()
@@ -40,7 +40,7 @@ internal class AtomicSubSettingViewModel<T> : SubSettingViewModel<T>
         Value = setting;
     }
 
-    public override T GetSubSettingObject()
+    public override T? GetSubSettingObject()
     {
         return Value;
     }

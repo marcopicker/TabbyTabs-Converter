@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GW2MidiConverter.Tab;
 
-namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
+namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSubSettings;
 
 internal class RestSymbolsPerBeatSubSettingViewModel : DictionarySubSettingViewModel<TabElementLength, char, RestSymbolsPerBeatItemViewModel>
 {

@@ -1,6 +1,6 @@
 using GW2MidiConverter.Tab;
 
-namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
+namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSubSettings;
 
 internal class RestSymbolsPerBeatItemViewModel(TabElementLength length, char symbol) : DictionarySubSettingItemViewModel
 {

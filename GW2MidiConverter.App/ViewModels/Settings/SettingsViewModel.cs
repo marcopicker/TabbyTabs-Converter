@@ -2,18 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace GW2MidiConverter.App.ViewModels.Settings;
 
-internal abstract class SettingsViewModel : ObservableObject, ISetting
+internal abstract class SettingsViewModel<TSettings> : ObservableObject, ISettingsViewModel
 {
     public event EventHandler? SubSettingChanged;
 
     private bool _isVerifyingSubSettings;
     private readonly ObservableCollection<ISubSetting> _subSettings = [];
-    private string _name;
+    private string _name = string.Empty;
 
     public string Name
     {
@@ -23,12 +22,21 @@ internal abstract class SettingsViewModel : ObservableObject, ISetting
 
     protected IReadOnlyCollection<ISubSetting> SubSettings => _subSettings;
     
-    protected SettingsViewModel(string name)
+    public SettingsViewModel(TSettings setting, string name)
     {
         Name = name;
         _subSettings.CollectionChanged += SubSettingsOnCollectionChanged;
+        
+        ApplySettings(setting);
+        RegisterSubSettings();
     }
-
+    
+    public abstract void ApplySettings(TSettings setting); 
+    
+    public abstract TSettings GetSettings();
+    
+    protected abstract void RegisterSubSettings(); 
+    
     protected void RegisterSubSetting(ISubSetting subSetting)
     {
         _subSettings.Add(subSetting);

@@ -1,7 +1,7 @@
 using GW2MidiConverter.GuildWars;
 using GW2MidiConverter.Rendering;
 
-namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSettings;
+namespace GW2MidiConverter.App.ViewModels.Settings.NoteRenderingSubSettings;
 
 internal class BracketPairItemViewModel(Octave octave, BracketPair pair) : DictionarySubSettingItemViewModel
 {

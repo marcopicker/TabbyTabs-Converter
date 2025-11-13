@@ -3,41 +3,28 @@ using GW2MidiConverter.Rendering.Settings;
 
 namespace GW2MidiConverter.App.ViewModels.Settings;
 
-internal class TrackRenderingSettingsViewModel : SettingsViewModel
+internal class TrackRenderingSettingsViewModel(TrackRenderingSettings setting, string name) : SettingsViewModel<TrackRenderingSettings>(setting, name)
 {
-    public AtomicSubSettingViewModel<bool> ShowTrackName { get; }
-    public AtomicSubSettingViewModel<int> LineBreaksAfterTrackName { get; }
-    public AtomicSubSettingViewModel<int> LineBreaksBetweenTracks { get; }
-    public AtomicSubSettingViewModel<int> MaxMeasureCountBeforeLineBreak { get; }
-    public AtomicSubSettingViewModel<int> LinesBeforeTimeSignature { get; }
-    public AtomicSubSettingViewModel<int> LinesAfterTimeSignature { get; }
-    public AtomicSubSettingViewModel<int> MeasuresPerLine { get; }
+    public AtomicSubSettingViewModel<bool> ShowTrackName { get; } = new AtomicSubSettingViewModel<bool>();
+    public AtomicSubSettingViewModel<int> LineBreaksAfterTrackName { get; } = new AtomicSubSettingViewModel<int>();
+    public AtomicSubSettingViewModel<int> LineBreaksBetweenTracks { get; } = new AtomicSubSettingViewModel<int>();
+    public AtomicSubSettingViewModel<int> MaxMeasureCountBeforeLineBreak { get; } = new AtomicSubSettingViewModel<int>();
+    public AtomicSubSettingViewModel<int> LinesBeforeTimeSignature { get; } = new AtomicSubSettingViewModel<int>();
+    public AtomicSubSettingViewModel<int> LinesAfterTimeSignature { get; } = new AtomicSubSettingViewModel<int>();
+    public AtomicSubSettingViewModel<int> MeasuresPerLine { get; } = new AtomicSubSettingViewModel<int>();
 
-    public TrackRenderingSettingsViewModel(TrackRenderingSettings settings) : base("Tracks")
+    public override void ApplySettings(TrackRenderingSettings setting)
     {
-        ShowTrackName = new AtomicSubSettingViewModel<bool>(true);
-        RegisterSubSetting(ShowTrackName);
-
-        LineBreaksAfterTrackName = new AtomicSubSettingViewModel<int>(settings.LineBreaksAfterTrackName);
-        RegisterSubSetting(LineBreaksAfterTrackName);
-
-        LineBreaksBetweenTracks = new AtomicSubSettingViewModel<int>(settings.LineBreaksBetweenTracks);
-        RegisterSubSetting(LineBreaksBetweenTracks);
-
-        MaxMeasureCountBeforeLineBreak = new AtomicSubSettingViewModel<int>(settings.MaxConsecutiveRowCount);
-        RegisterSubSetting(MaxMeasureCountBeforeLineBreak);
-
-        LinesBeforeTimeSignature = new AtomicSubSettingViewModel<int>(settings.LinesBeforeTimeSignature);
-        RegisterSubSetting(LinesBeforeTimeSignature);
-
-        LinesAfterTimeSignature = new AtomicSubSettingViewModel<int>(settings.LinesAfterTimeSignature);
-        RegisterSubSetting(LinesAfterTimeSignature);
-
-        MeasuresPerLine = new AtomicSubSettingViewModel<int>(settings.MeasuresPerLine);
-        RegisterSubSetting(MeasuresPerLine);
+        ShowTrackName.Value = setting.ShowTrackName;
+        LineBreaksAfterTrackName.Value = setting.LineBreaksAfterTrackName;
+        LineBreaksBetweenTracks.Value = setting.LineBreaksBetweenTracks;
+        MaxMeasureCountBeforeLineBreak.Value = setting.MaxConsecutiveRowCount;
+        LinesBeforeTimeSignature.Value = setting.LinesBeforeTimeSignature;
+        LinesAfterTimeSignature.Value = setting.LinesAfterTimeSignature;
+        MeasuresPerLine.Value = setting.MeasuresPerLine;
     }
 
-    public TrackRenderingSettings CreateSettings()
+    public override TrackRenderingSettings GetSettings()
     {
         return new TrackRenderingSettings
         {
@@ -49,5 +36,16 @@ internal class TrackRenderingSettingsViewModel : SettingsViewModel
             LinesAfterTimeSignature = Math.Max(0, LinesAfterTimeSignature.Value),
             MeasuresPerLine = Math.Max(1, MeasuresPerLine.Value)
         };
+    }
+
+    protected override void RegisterSubSettings()
+    {
+        RegisterSubSetting(ShowTrackName);
+        RegisterSubSetting(LineBreaksAfterTrackName);
+        RegisterSubSetting(LineBreaksBetweenTracks);
+        RegisterSubSetting(MaxMeasureCountBeforeLineBreak);
+        RegisterSubSetting(LinesBeforeTimeSignature);
+        RegisterSubSetting(LinesAfterTimeSignature);
+        RegisterSubSetting(MeasuresPerLine);
     }
 }

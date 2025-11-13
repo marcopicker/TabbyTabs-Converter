@@ -2,7 +2,7 @@ using System;
 
 namespace GW2MidiConverter.App.ViewModels.Settings;
 
-internal interface ISetting
+internal interface ISettingsViewModel
 {
     public event EventHandler? SubSettingChanged;
 }
