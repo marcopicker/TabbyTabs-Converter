@@ -140,13 +140,15 @@
                                                     ContentTemplate="{TemplateBinding ContentTemplate}"
                                                     Content="{TemplateBinding Content}" Grid.Column="0"
                                                     Margin="{TemplateBinding Padding}" Grid.Row="0">
-                                <!-- <ScrollContentPresenter.OpacityMask> -->
-                                <!--     <LinearGradientBrush StartPoint="0,50" EndPoint="0,0" MappingMode="Absolute"> -->
-                                <!--         <GradientStop Color="#FF000000" Offset="0" /> -->
-                                <!--         <GradientStop Color="#7F000000" Offset="0.25" /> -->
-                                <!--         <GradientStop Color="#00000000" Offset="1" /> -->
-                                <!--     </LinearGradientBrush> -->
-                                <!-- </ScrollContentPresenter.OpacityMask> -->
+                                <ScrollContentPresenter.OpacityMask>
+                                    <!-- WARNING -->
+                                    <!-- Removing the names here causes a crash! -->
+                                    <LinearGradientBrush x:Name="ScrollOpacityMaskBrush" StartPoint="0,50" EndPoint="0,0" MappingMode="Absolute">
+                                        <GradientStop x:Name="ScrollGradientStop1" Color="#FF000000" Offset="0" />
+                                        <GradientStop x:Name="ScrollGradientStop2" Color="#7F000000" Offset="0.25" />
+                                        <GradientStop x:Name="ScrollGradientStop3" Color="#00000000" Offset="1" />
+                                    </LinearGradientBrush>
+                                </ScrollContentPresenter.OpacityMask>
                             </ScrollContentPresenter>
                             <ScrollBar x:Name="PART_VerticalScrollBar"
                                        AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow"
