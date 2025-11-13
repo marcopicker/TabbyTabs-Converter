@@ -24,12 +24,13 @@ internal class MainWindowViewModel : ObservableObject
 
     public MainWindowViewModel(ISnackbarService snackbar,
                                IInstrumentProvider instrumentProvider,
-                               IEditDistanceCalculator editDistanceCalculator)
+                               IEditDistanceCalculator editDistanceCalculator,
+                               IContentDialogService contentDialogService)
     {
         _fileLoaderViewModel = new FileLoaderViewModel(snackbar, instrumentProvider, editDistanceCalculator);
         _fileLoaderViewModel.TabDocumentLoaded += HandleTabDocumentLoaded;
         
-        _tabRendererViewModel = new TabRendererViewModel(snackbar);
+        _tabRendererViewModel = new TabRendererViewModel(snackbar, contentDialogService);
         _tabRendererViewModel.ReturnRequested += HandleReturnRequested;
         
         CurrentViewModel = _fileLoaderViewModel;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,12 +12,14 @@ using GW2MidiConverter.Tab;
 using Microsoft.Win32;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace GW2MidiConverter.App.ViewModels;
 
 internal class TabRendererViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbarService;
+    private readonly IContentDialogService _contentDialogService;
     private TabDocument? _tabDocument;
     private string _tabText = "";
     private ISettingsViewModel? _selectedSettingsViewModel;
@@ -28,7 +31,7 @@ internal class TabRendererViewModel : ObservableObject
     private bool _isStyleFlyoutOpen;
 
     public event EventHandler? ReturnRequested;
-    
+
     public List<ISettingsViewModel> Settings { get; } = [];
 
     public ISettingsViewModel? SelectedSettingsViewModel
@@ -56,7 +59,7 @@ internal class TabRendererViewModel : ObservableObject
     public ICommand ExportCommand { get; }
 
     public ICommand ReturnCommand { get; }
-    
+
     public ICommand OpenStyleFlyoutCommand { get; }
 
     public bool IsStyleFlyoutOpen
@@ -68,28 +71,27 @@ internal class TabRendererViewModel : ObservableObject
     public ICommand ResetStyleCommand { get; }
 
 
-    public TabRendererViewModel(ISnackbarService snackbarService)
+    public TabRendererViewModel(ISnackbarService snackbarService,
+                                IContentDialogService contentDialogService)
     {
         _snackbarService = snackbarService;
-        
+        _contentDialogService = contentDialogService;
+
         ExportCommand = new RelayCommand(ExportTab);
         ReturnCommand = new RelayCommand(RequestReturn);
-        
+        ResetStyleCommand = new AsyncRelayCommand(ExecuteResetSettingsCommand);
+
         OpenStyleFlyoutCommand = new RelayCommand(() =>
         {
             if (!IsStyleFlyoutOpen) IsStyleFlyoutOpen = true;
         });
-        
-        ResetStyleCommand = new RelayCommand(() =>
-        {
-            ApplySettings(new TabRenderingSettings());
-        });
+
 
         _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings(), "Notes");
         _measureRenderingSettingsViewModel = new MeasureRenderingSettingsViewModel(new MeasureRenderingSettings(), "Measures");
         _trackRenderingSettingsViewModel = new TrackRenderingSettingsViewModel(new TrackRenderingSettings(), "Tracks");
         _timeSignatureRenderingSettingsViewModel = new TimeSignatureRenderingSettingsViewModel(new TimeSignatureRenderingSettings(), "Time Signatures");
-        
+
         RegisterSettingsViewModel(_noteRenderingSettingsViewModel);
         RegisterSettingsViewModel(_measureRenderingSettingsViewModel);
         RegisterSettingsViewModel(_trackRenderingSettingsViewModel);
@@ -180,6 +182,25 @@ internal class TabRendererViewModel : ObservableObject
         {
             _snackbarService.Show("Export Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
             throw;
+        }
+    }
+
+    private async Task ExecuteResetSettingsCommand()
+    {
+        ContentDialogResult result = await _contentDialogService.ShowSimpleDialogAsync(
+            new SimpleContentDialogCreateOptions
+            {
+                Title = "Reset the Tab Styles?",
+                Content = "All of your unsaved changes will be lost. Are you sure you want to reset the tab styles?",
+                PrimaryButtonText = "Reset",
+                SecondaryButtonText = "Don't Reset",
+                CloseButtonText = "Cancel",
+            }
+        );
+
+        if (result == ContentDialogResult.Primary)
+        {
+            ApplySettings(new TabRenderingSettings());
         }
     }
 
