@@ -7,6 +7,7 @@
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:controls="clr-namespace:GW2MidiConverter.App.Views"
                  xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
+                 xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
@@ -16,6 +17,11 @@
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Default"
                  WindowStartupLocation="CenterScreen">
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <ui:FluentWindow.Resources>
         <DataTemplate DataType="{x:Type viewModels:FileLoaderViewModel}">
             <controls:FileLoaderControl />

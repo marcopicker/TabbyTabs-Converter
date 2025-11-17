@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using GW2MidiConverter.App.Models;
+using GW2MidiConverter.App.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using GW2MidiConverter.App.ViewModels;
@@ -36,6 +37,7 @@ public partial class App : Application
         // Services
         services.AddSingleton<IInstrumentProvider, InstrumentFilesLoader>();
         services.AddSingleton<IEditDistanceCalculator, LevenshteinDistanceCalculator>();
+        services.AddSingleton<IApplicationVersionChecker, GitHubHostedApplicationVersionChecker>();
     }
 
     public static T GetRequiredService<T>() where T : class

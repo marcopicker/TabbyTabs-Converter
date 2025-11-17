@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GW2MidiConverter.App.Controls;
 using GW2MidiConverter.App.Models;
+using GW2MidiConverter.App.Services;
 using GW2MidiConverter.General;
 using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
@@ -29,6 +30,7 @@ internal class FileLoaderViewModel : ObservableObject
     private TabDocument? _loadedTabDocument;
     private FileDraggingInfoState _currentDragState;
     private bool _fileLoadingErrorProxy;
+    private VersionCheckInfo? _updateInfo;
 
     public ICommand OnDragEnterCommand { get; }
     public ICommand OnDragLeaveCommand { get; }
@@ -68,6 +70,12 @@ internal class FileLoaderViewModel : ObservableObject
     public IReadOnlyList<Instrument> PossibleInstruments { get; }
 
     public RelayCommand ConvertTabCommand { get; }
+
+    public VersionCheckInfo? UpdateInfo
+    {
+        get => _updateInfo;
+        set => SetProperty(ref _updateInfo, value);
+    }
 
     public event EventHandler<TabDocument>? TabDocumentLoaded;
 
