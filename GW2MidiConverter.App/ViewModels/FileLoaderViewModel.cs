@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -28,12 +27,20 @@ internal class FileLoaderViewModel : ObservableObject
 
     private MidiDocument? _loadedMidiDocument;
     private TabDocument? _loadedTabDocument;
+    private FileDraggingInfoState _currentDragState;
 
     public ICommand OnDragEnterCommand { get; }
+    public ICommand OnDragLeaveCommand { get; }
 
     public ICommand OnDropFilesCommand { get; }
 
     public ICommand BrowseFilesCommand { get; }
+
+    public FileDraggingInfoState CurrentDragState
+    {
+        get => _currentDragState;
+        private set => SetProperty(ref _currentDragState, value);
+    }
 
     public FullyObservableCollection<TrackConfigItemViewModel> TrackConfigItems
     {
@@ -62,6 +69,7 @@ internal class FileLoaderViewModel : ObservableObject
         _editDistanceCalculator = editDistanceCalculator;
 
         OnDragEnterCommand = new RelayCommand<DragEventArgs>(HandleDragEnter);
+        OnDragLeaveCommand = new RelayCommand<DragEventArgs>(HandleDragLeave);
         OnDropFilesCommand = new RelayCommand<DragEventArgs>(HandleDropFiles);
         BrowseFilesCommand = new RelayCommand(BrowseFiles);
         ConvertTabCommand = new RelayCommand(ConvertTab, CanConvertTab);
@@ -69,8 +77,6 @@ internal class FileLoaderViewModel : ObservableObject
         PossibleInstruments = instrumentProvider.GetInstruments().ToList();
     }
 
-    [SuppressMessage("ReSharper", "RedundantJumpStatement")]
-    [SuppressMessage("ReSharper", "UnusedVariable")]
     private void HandleDragEnter(DragEventArgs? e)
     {
         if (e?.Data == null) return;
@@ -78,12 +84,17 @@ internal class FileLoaderViewModel : ObservableObject
         if (!isFileDrop) return;
 
         if (e.Data.GetData(DataFormats.FileDrop) is not string[] files) return;
+        CurrentDragState = files.Length == 1 ? FileDraggingInfoState.Valid : FileDraggingInfoState.Invalid;
+    }
 
-        // TODO MP: Check if file is valid. :3
+    private void HandleDragLeave(DragEventArgs? e)
+    {
+        CurrentDragState = FileDraggingInfoState.None;
     }
 
     private void HandleDropFiles(DragEventArgs? e)
     {
+        CurrentDragState = FileDraggingInfoState.None;
         if (e?.Data == null) return;
         bool isFileDrop = e.Data.GetDataPresent(DataFormats.FileDrop);
         if (!isFileDrop) return;
@@ -198,7 +209,7 @@ internal class FileLoaderViewModel : ObservableObject
         if (_loadedTabDocument == null) return false;
         if (TrackConfigItems.Count == 0) return false;
         if (TrackConfigItems.All(t => !t.IsChecked)) return false;
-        return TrackConfigItems.All(t => t.Validity != ValidityType.Invalid );
+        return TrackConfigItems.All(t => t.Validity != ValidityType.Invalid);
     }
 
     private void TrackConfigItemsOnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)

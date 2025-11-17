@@ -7,25 +7,27 @@
              xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
-             xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal"
              d:DataContext="{d:DesignInstance viewModels:FileLoaderViewModel}"
              Background="Transparent"
              AllowDrop="True">
+    <UserControl.Resources>
+        <Duration x:Key="ColourFadeInAnimationDuration">0:0:0.125</Duration>
+        <Duration x:Key="ColourFadeOutAnimationDuration">0:0:0.2</Duration>
+    </UserControl.Resources>
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="DragEnter">
             <b:InvokeCommandAction Command="{Binding OnDragEnterCommand}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="DragLeave">
+            <b:InvokeCommandAction Command="{Binding OnDragLeaveCommand}" PassEventArgsToCommand="True" />
         </b:EventTrigger>
         <b:EventTrigger EventName="Drop">
             <b:InvokeCommandAction Command="{Binding OnDropFilesCommand}" PassEventArgsToCommand="True" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
-    <UserControl.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
-                                                 True="Visible"
-                                                 False="Collapsed" />
-    </UserControl.Resources>
+
     <Grid HorizontalAlignment="Center"
           VerticalAlignment="Center">
         <Grid.RowDefinitions>
@@ -33,18 +35,63 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ui:Card Grid.Row="0"
-                 HorizontalAlignment="Center"
-                 VerticalAlignment="Center"
-                 Margin="0,0,0,16">
+        <Border Grid.Row="0"
+                x:Name="MainBorder"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                CornerRadius="{DynamicResource ControlCornerRadius}"
+                BorderThickness="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Margin="0,0,0,16"
+                Padding="14, 16"
+                Focusable="False"
+                KeyboardNavigation.IsTabStop="False">
+            <Border.RenderTransform>
+                <TranslateTransform />
+            </Border.RenderTransform>
             <StackPanel Orientation="Vertical"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center">
-                <ui:SymbolIcon Symbol="MailInboxArrowDown20"
-                               FontSize="32"
-                               Foreground="{ui:ThemeResource AccentTextFillColorPrimaryBrush}"
-                               Margin="0,0,0,5" />
-                <ui:TextBlock Appearance="Primary" FontTypography="BodyStrong" Text="Drag your MIDI or MuseScore file here to start converting."
+                <ui:SymbolIcon FontSize="32"
+                               Foreground="White"
+                               Margin="0,0,0,5">
+                    <ui:SymbolIcon.Style>
+                        <Style TargetType="{x:Type ui:SymbolIcon}">
+                            <Setter Property="Symbol" Value="MailInboxArrowDown20" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                             Value="{x:Static viewModels:FileDraggingInfoState.Valid}">
+                                    <Setter Property="Symbol" Value="MailInboxCheckmark20" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                             Value="{x:Static viewModels:FileDraggingInfoState.Invalid}">
+                                    <Setter Property="Symbol" Value="MailInboxDismiss20" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                             Value="{x:Static viewModels:FileDraggingInfoState.None}">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(ui:SymbolIcon.Foreground).(SolidColorBrush.Color)"
+                                                                To="#FF559CE4"
+                                                                Duration="{StaticResource ColourFadeOutAnimationDuration}" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                    <DataTrigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetProperty="(ui:SymbolIcon.Foreground).(SolidColorBrush.Color)"
+                                                                Duration="{StaticResource ColourFadeInAnimationDuration}" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.ExitActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:SymbolIcon.Style>
+                </ui:SymbolIcon>
+                <ui:TextBlock Appearance="Primary" FontTypography="BodyStrong" Text="Drag your MIDI file here to start converting."
                               TextAlignment="Center"
                               Margin="0,0,0,10" />
                 <Grid>
@@ -75,7 +122,71 @@
                            Content="Select file..."
                            Command="{Binding BrowseFilesCommand}" />
             </StackPanel>
-        </ui:Card>
+            <Border.Style>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="#FF2B2B2B" />
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                     Value="{x:Static viewModels:FileDraggingInfoState.Valid}">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                        To="#FF4CAF50"
+                                                        Duration="{StaticResource ColourFadeInAnimationDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                        Duration="{StaticResource ColourFadeOutAnimationDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+
+                        <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                     Value="{x:Static viewModels:FileDraggingInfoState.Invalid}">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                        To="#FFF44336"
+                                                        Duration="{StaticResource ColourFadeInAnimationDuration}" />
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.05" Value="10" />
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="-10" />
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.15" Value="8" />
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="-8" />
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.25" Value="5" />
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.3" Value="-5" />
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.35" Value="2" />
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                        Duration="{StaticResource ColourFadeOutAnimationDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
         <controls:SubSettingItemsControl Grid.Row="1"
                                          x:Name="TrackConfigurationItemsControl"
                                          ItemsSource="{Binding TrackConfigItems}"
