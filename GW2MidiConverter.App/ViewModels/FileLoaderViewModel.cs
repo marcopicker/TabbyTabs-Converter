@@ -28,6 +28,7 @@ internal class FileLoaderViewModel : ObservableObject
     private MidiDocument? _loadedMidiDocument;
     private TabDocument? _loadedTabDocument;
     private FileDraggingInfoState _currentDragState;
+    private bool _fileLoadingErrorProxy;
 
     public ICommand OnDragEnterCommand { get; }
     public ICommand OnDragLeaveCommand { get; }
@@ -35,6 +36,15 @@ internal class FileLoaderViewModel : ObservableObject
     public ICommand OnDropFilesCommand { get; }
 
     public ICommand BrowseFilesCommand { get; }
+
+    /// <summary>
+    /// This is a dummy object used to trigger the shake effect when an invalid file is loaded.
+    /// </summary>
+    public bool FileLoadingErrorProxy
+    {
+        get => _fileLoadingErrorProxy;
+        private set => SetProperty(ref _fileLoadingErrorProxy, value);
+    }
 
     public FileDraggingInfoState CurrentDragState
     {
@@ -73,6 +83,7 @@ internal class FileLoaderViewModel : ObservableObject
         OnDropFilesCommand = new RelayCommand<DragEventArgs>(HandleDropFiles);
         BrowseFilesCommand = new RelayCommand(BrowseFiles);
         ConvertTabCommand = new RelayCommand(ConvertTab, CanConvertTab);
+        FileLoadingErrorProxy = false;
 
         PossibleInstruments = instrumentProvider.GetInstruments().ToList();
     }
@@ -134,9 +145,11 @@ internal class FileLoaderViewModel : ObservableObject
         {
             case 0:
                 _snackbar.Show("No Files", "Please select a MIDI file first.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
+                TriggerShakeAnimation();
                 return;
             case > 1:
                 _snackbar.Show("Multiple Files", "Please select only one MIDI file.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
+                TriggerShakeAnimation();
                 return;
         }
 
@@ -150,12 +163,14 @@ internal class FileLoaderViewModel : ObservableObject
         catch (Exception e)
         {
             _snackbar.Show("File Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
+            TriggerShakeAnimation();
             return;
         }
 
         if (midiDocument.InstrumentTrackIndexes.Count == 0)
         {
             _snackbar.Show("No Tracks", "The selected MIDI file does not contain any tracks.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(3));
+            TriggerShakeAnimation();
             return;
         }
 
@@ -256,5 +271,14 @@ internal class FileLoaderViewModel : ObservableObject
             item.Validity = ValidityType.Warning;
             item.InvalidMessage = "At least one note of this track is outside of the selected instrument's range!";
         }
+    }
+
+    private void TriggerShakeAnimation()
+    {
+        FileLoadingErrorProxy = false;
+        FileLoadingErrorProxy = true;
+
+        // Set it back to false at the end to prevent the shake animation from replaying when the view is reloaded.
+        FileLoadingErrorProxy = false;
     }
 }

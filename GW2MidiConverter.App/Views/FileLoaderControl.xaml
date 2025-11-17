@@ -15,6 +15,18 @@
     <UserControl.Resources>
         <Duration x:Key="ColourFadeInAnimationDuration">0:0:0.125</Duration>
         <Duration x:Key="ColourFadeOutAnimationDuration">0:0:0.2</Duration>
+        <Storyboard x:Key="HorizontalErrorShakeAnimation">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.05" Value="10" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="-10" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.15" Value="8" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="-8" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.25" Value="5" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.3" Value="-5" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.35" Value="2" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
     </UserControl.Resources>
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="DragEnter">
@@ -69,6 +81,7 @@
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                              Value="{x:Static viewModels:FileDraggingInfoState.None}">
+                                    <!-- The animation values are backwards on purpose, since the default state of this element is valid/invalid. -->
                                     <DataTrigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
@@ -159,20 +172,9 @@
                                         <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                                         To="#FFF44336"
                                                         Duration="{StaticResource ColourFadeInAnimationDuration}" />
-                                        <Storyboard>
-                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.05" Value="10" />
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="-10" />
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.15" Value="8" />
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="-8" />
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.25" Value="5" />
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.3" Value="-5" />
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.35" Value="2" />
-                                                <LinearDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
-                                            </DoubleAnimationUsingKeyFrames>
-                                        </Storyboard>
                                     </Storyboard>
                                 </BeginStoryboard>
+                                <BeginStoryboard Storyboard="{StaticResource HorizontalErrorShakeAnimation}" />
                             </DataTrigger.EnterActions>
                             <DataTrigger.ExitActions>
                                 <BeginStoryboard>
@@ -182,6 +184,12 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.ExitActions>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding FileLoadingErrorProxy, UpdateSourceTrigger=Explicit, Mode=OneWay}"
+                                     Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource HorizontalErrorShakeAnimation}" />
+                            </DataTrigger.EnterActions>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
