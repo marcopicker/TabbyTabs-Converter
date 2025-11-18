@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
              xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
              xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
+             xmlns:resources="clr-namespace:GW2MidiConverter.App.Resources"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance viewModels:PreferencesViewModel}"
@@ -34,8 +35,13 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <StackPanel>
-        <DockPanel x:Name="HeaderPanel"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" 
+                   x:Name="HeaderPanel"
                    LastChildFill="True"
                    Margin="0,0,0,16">
             <ui:Button DockPanel.Dock="Right"
@@ -49,11 +55,12 @@
                           Text="Preferences"
                           FontTypography="Title" />
         </DockPanel>
-        <ScrollViewer x:Name="ContentScroller"
+        <ScrollViewer Grid.Row="1" 
+                      x:Name="ContentScroller"
                       HorizontalScrollBarVisibility="Hidden"
-                      VerticalScrollBarVisibility="Visible">
+                      VerticalScrollBarVisibility="Auto">
             <StackPanel Grid.IsSharedSizeScope="False">
-                <controls:SubSettingContentControl HeaderText="Update"
+                <controls:SubSettingContentControl HeaderText="New version available"
                                                    DescriptionText="{Binding NewVersion, StringFormat={}Version {0} is available!}"
                                                    Margin="0,0,0,8"
                                                    Visibility="{Binding IsNewVersionAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -90,8 +97,8 @@
                               FontTypography="Subtitle"
                               Margin="0,0,0,8" />
                 <ui:TextBlock>
-                    <Run Text="TabbyTabs" />
-                    <Run Text="1.0.0" />
+                    <Run Text="{x:Static resources:ApplicationResources.ApplicationName}" />
+                    <Run Text="{Binding CurrentVersion, Mode=OneWay}" />
                 </ui:TextBlock>
                 <ui:TextBlock Margin="0,0,0,8">
                     <Run Text="Copyright © 2025" />
@@ -125,5 +132,5 @@
                 </ItemsControl>
             </StackPanel>
         </ScrollViewer>
-    </StackPanel>
+    </Grid>
 </UserControl>

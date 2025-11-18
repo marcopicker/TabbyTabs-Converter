@@ -46,40 +46,13 @@
 
     <Grid HorizontalAlignment="Stretch"
           VerticalAlignment="Stretch">
-        <Border x:Name="UpdateInfoBorder"
-                HorizontalAlignment="Right"
+        <Border x:Name="BetaInfoBorder"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Margin="16"
-                Visibility="Collapsed">
-            <!-- <Border.Style> -->
-            <!--     <Style TargetType="Border"> -->
-            <!--         <Setter Property="Visibility" Value="Visible" /> -->
-            <!--         <Style.Triggers> -->
-            <!--             <DataTrigger Binding="{Binding UpdateInfo.IsNewVersionAvailable, FallbackValue=False}" Value="False"> -->
-            <!--                 <Setter Property="Visibility" Value="Collapsed" /> -->
-            <!--             </DataTrigger> -->
-            <!--         </Style.Triggers> -->
-            <!--     </Style> -->
-            <!-- </Border.Style> -->
-            <!-- <ui:HyperlinkButton NavigateUri="{Binding UpdateInfo.DownloadUrl}" -->
-            <!--                     Icon="{ui:SymbolIcon Link24}"> -->
-            <!--     <ui:TextBlock> -->
-            <!--         <Run Text="A new version is available: v"/> -->
-            <!--         <Run Text="{Binding UpdateInfo.LatestVersion}"/> -->
-            <!--     </ui:TextBlock> -->
-            <!-- </ui:HyperlinkButton> -->
-            <ui:Button HorizontalContentAlignment="Stretch"
-                       Width="32"
-                       Height="32"
-                       ToolTip="Settings"
-                       Padding="0">
-                <Grid HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch">
-                    <ui:SymbolIcon Grid.Column="0"
-                                   HorizontalAlignment="Center"
-                                   Symbol="Settings24" />
-                </Grid>
-            </ui:Button>
+                Margin="8">
+            <ui:TextBlock Text="This is a beta version. Expect bugs and silly things!"
+                          Appearance="Disabled"
+                          FontTypography="Body"/>
         </Border>
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center">

@@ -44,4 +44,17 @@ internal partial class MainWindow
     {
         PreferencesBackdrop.Visibility = Visibility.Collapsed;
     }
+
+    private void MainWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (PreferencesBackdrop.Visibility != Visibility.Visible ||
+            e.Key != Key.Escape)
+        {
+            e.Handled = false;
+            return;
+        }
+        
+        PreferencesBackdrop.Visibility = Visibility.Collapsed;
+        e.Handled = true;
+    }
 }

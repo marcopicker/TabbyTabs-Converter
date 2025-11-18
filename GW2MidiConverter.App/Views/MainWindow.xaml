@@ -11,12 +11,15 @@
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
-                 Width="1300"
                  Height="800"
+                 Width="1300"
+                 MinWidth="800"
+                 MinHeight="450"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Default"
-                 WindowStartupLocation="CenterScreen">
+                 WindowStartupLocation="CenterScreen"
+                 PreviewKeyDown="MainWindow_OnPreviewKeyDown">
     <b:Interaction.Triggers>
         <b:EventTrigger EventName="Loaded">
             <b:InvokeCommandAction Command="{Binding LoadedCommand}" />
@@ -32,11 +35,11 @@
     </ui:FluentWindow.Resources>
     <Grid HorizontalAlignment="Stretch"
           VerticalAlignment="Stretch">
-        <ContentPresenter x:Name="RootContentDialog" />
         <ContentControl Content="{Binding CurrentViewModel}"
                         Focusable="False" />
         <ui:TitleBar Title="{Binding ApplicationTitle}"
                      Icon="{ui:SymbolIcon MusicNote120}" />
+        <ContentPresenter x:Name="RootContentDialog" />
         <Border x:Name="PreferencesBackdrop"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
@@ -53,7 +56,7 @@
                     CornerRadius="{DynamicResource PopupCornerRadius}"
                     BorderBrush="{DynamicResource ContentDialogBorderBrush}"
                     Background="{DynamicResource ContentDialogBackground}"
-                    Margin="100">
+                    Margin="64">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="30"
                                       Direction="0"

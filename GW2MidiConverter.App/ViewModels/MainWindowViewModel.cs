@@ -5,6 +5,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GW2MidiConverter.App.Models;
+using GW2MidiConverter.App.Resources;
 using GW2MidiConverter.App.Services;
 using GW2MidiConverter.App.Views;
 using GW2MidiConverter.Tab;
@@ -22,7 +23,7 @@ internal class MainWindowViewModel : ObservableObject
     private readonly FileLoaderViewModel _fileLoaderViewModel;
     private readonly TabRendererViewModel _tabRendererViewModel;
 
-    public string ApplicationTitle => $"GW2 Tab Converter ({Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)})";
+    public string ApplicationTitle => $"{ApplicationResources.ApplicationName} ({Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)})";
 
     public object? CurrentViewModel
     {
@@ -64,6 +65,7 @@ internal class MainWindowViewModel : ObservableObject
 
     private async Task CheckForUpdates()
     {
+        return;
         VersionCheckInfo versionInfo = await _applicationVersionChecker.IsNewVersionAvailableAsync();
         if (!versionInfo.IsNewVersionAvailable) return;
         _fileLoaderViewModel.UpdateInfo = versionInfo;
