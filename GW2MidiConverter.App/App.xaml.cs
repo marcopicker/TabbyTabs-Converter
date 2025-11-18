@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.Reflection;
+using System.Windows;
 using GW2MidiConverter.App.Models;
+using GW2MidiConverter.App.Resources;
 using GW2MidiConverter.App.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,19 +53,24 @@ public partial class App : Application
 
     private static void RegisterLogger(IServiceCollection services)
     {
-        Logger logger = new LoggerConfiguration().MinimumLevel.Debug()
-                                                 .Enrich.FromLogContext()
-                                                 .WriteTo.Console()
-                                                 .WriteTo.File(
-                                                     formatter: new CompactJsonFormatter(),
-                                                     path: "logs/log.json",
-                                                     rollingInterval: RollingInterval.Day
-                                                 )
-                                                 .CreateLogger();
+        Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
+                                              .Enrich.FromLogContext()
+                                              .Enrich.WithProperty("Application", ApplicationResources.ApplicationName)
+                                              .Enrich.WithProperty("Version", Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? string.Empty)
+                                              .WriteTo.Console()
+                                              .WriteTo.File(
+                                                  formatter: new CompactJsonFormatter(),
+                                                  path: "logs/log.json",
+                                                  rollingInterval: RollingInterval.Day,
+                                                  fileSizeLimitBytes: 10485760,
+                                                  retainedFileCountLimit: 30,
+                                                  rollOnFileSizeLimit: true
+                                              )
+                                              .CreateLogger();
         services.AddLogging(builder =>
         {
             builder.ClearProviders();
-            builder.AddSerilog(logger, true);
+            builder.AddSerilog(Log.Logger, true);
         });
     }
 
@@ -71,14 +78,18 @@ public partial class App : Application
     {
         _host.Start();
 
+        Log.Information("Application starting. Version: {Version}", Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Unknown");
+        
         MainWindow? mainWindow = _host.Services.GetService<MainWindow>();
         mainWindow?.Show();
-
+        
         base.OnStartup(args);
     }
 
     protected override void OnExit(ExitEventArgs args)
     {
+        Log.Information("Application shutting down.");
+        
         _host.StopAsync().Wait();
         _host.Dispose();
         base.OnExit(args);
