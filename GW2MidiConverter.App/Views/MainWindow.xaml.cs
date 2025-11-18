@@ -36,6 +36,7 @@ internal partial class MainWindow
 
     private void PreferencesBackdrop_OnMouseDown(object sender, MouseButtonEventArgs e)
     {
+        return;
         PreferencesBackdrop.Visibility = Visibility.Collapsed;
     }
 
