@@ -9,6 +9,7 @@ using GW2MidiConverter.App.ViewModels.Settings;
 using GW2MidiConverter.Rendering;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
@@ -20,6 +21,7 @@ internal class TabRendererViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbarService;
     private readonly IContentDialogService _contentDialogService;
+    private readonly ILogger<TabRendererViewModel> _logger;
     private TabDocument? _tabDocument;
     private string _tabText = "";
     private ISettingsViewModel? _selectedSettingsViewModel;
@@ -64,10 +66,12 @@ internal class TabRendererViewModel : ObservableObject
 
 
     public TabRendererViewModel(ISnackbarService snackbarService,
-                                IContentDialogService contentDialogService)
+                                IContentDialogService contentDialogService,
+                                ILogger<TabRendererViewModel> logger)
     {
         _snackbarService = snackbarService;
         _contentDialogService = contentDialogService;
+        _logger = logger;
 
         ExportCommand = new RelayCommand(ExportTab);
         ReturnCommand = new RelayCommand(RequestReturn);
@@ -90,6 +94,7 @@ internal class TabRendererViewModel : ObservableObject
 
     private void ApplySettings(TabRenderingSettings settings)
     {
+        _logger.LogInformation("Applying settings: {@Settings}", settings);
         _noteRenderingSettingsViewModel.ApplySettings(settings.NoteRenderingSettings);
         _measureRenderingSettingsViewModel.ApplySettings(settings.MeasureRenderingSettings);
         _trackRenderingSettingsViewModel.ApplySettings(settings.TrackRenderingSettings);
@@ -100,18 +105,22 @@ internal class TabRendererViewModel : ObservableObject
     {
         if (TabDocument == null!) return;
 
+        using IDisposable? _ = _logger.BeginScope(new { Operation = "Rendering Tab" });
+        
         try
         {
             TabRenderingSettings settings = BuildRenderingSettings();
+            _logger.LogInformation("Rendering tab with settings: {@Settings}", settings);
             TabRenderer renderer = new TabRenderer(TabDocument, settings);
             TabText = renderer.Render();
+            _logger.LogInformation("Tab rendered successfully.");
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Failed to render tab.");
             bool hasSnackbarPresenter = _snackbarService.GetSnackbarPresenter() != null;
             if (hasSnackbarPresenter) _snackbarService.Show("Rendering Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(30));
             TabText = string.Empty;
-            Console.WriteLine(e);
         }
     }
 
@@ -139,14 +148,18 @@ internal class TabRendererViewModel : ObservableObject
 
     private void ExportTab()
     {
+        using IDisposable? _ = _logger.BeginScope(new { Operation = "Exporting Tab" });
+        
         if (TabDocument == null)
         {
+            _logger.LogError("Failed to export tab: No tab loaded.");
             _snackbarService.Show("No Tab", "Please load a MIDI file first.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(4));
             return;
         }
 
         if (!CheckSettingValidity())
         {
+            _logger.LogError("Failed to export tab: Invalid settings.");
             _snackbarService.Show("Invalid Settings", "Please check your settings and try again.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(4));
             return;
         }
@@ -160,14 +173,15 @@ internal class TabRendererViewModel : ObservableObject
         string fileName = PrepareFileName();
         saveFileDialog.FileName = fileName;
 
-
         try
         {
             if (saveFileDialog.ShowDialog() != true) return;
             File.WriteAllText(saveFileDialog.FileName, TabText);
+            _logger.LogInformation("Tab exported successfully.");
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Failed to export tab.");
             _snackbarService.Show("Export Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
             throw;
         }
@@ -175,6 +189,7 @@ internal class TabRendererViewModel : ObservableObject
 
     private void ExecuteLoadStyleCommand()
     {
+        using IDisposable? _ = _logger.BeginScope(new { Operation = "Loading Style" });
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
             Filter = "GW2TabStyle File (*.gw2tabstyle)|*.gw2tabstyle",
@@ -187,19 +202,24 @@ internal class TabRendererViewModel : ObservableObject
             bool? dialogResult = openFileDialog.ShowDialog();
             if (dialogResult != true) return;
 
+            _logger.LogInformation("Loading style '{FileName}'...", openFileDialog.FileName);
+            
             TabRenderingSettings renderingSettings = TabRenderingSettings.FromFile(openFileDialog.FileName);
             ApplySettings(renderingSettings);
 
+            _logger.LogInformation("Style loaded successfully.");
             _snackbarService.Show("Style Loaded", $"The style '{Path.GetFileName(openFileDialog.FileName)}' was successfully loaded.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), TimeSpan.FromSeconds(3));
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Failed to load style.");
             _snackbarService.Show("Load Error", e.Message, ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle16), TimeSpan.FromSeconds(10));
         }
     }
 
     private void ExecuteSaveStyleCommand()
     {
+        using IDisposable? _ = _logger.BeginScope(new { Operation = "Saving Style" });
         SaveFileDialog saveFileDialog = new SaveFileDialog
         {
             Filter = "GW2TabStyle File (*.gw2tabstyle)|*.gw2tabstyle",
@@ -212,13 +232,17 @@ internal class TabRendererViewModel : ObservableObject
             bool? dialogResult = saveFileDialog.ShowDialog();
             if (dialogResult != true) return;
 
+            _logger.LogInformation("Saving style '{FileName}'...", saveFileDialog.FileName);
+            
             TabRenderingSettings renderingSettings = BuildRenderingSettings();
             renderingSettings.SaveToFile(saveFileDialog.FileName);
 
+            _logger.LogInformation("Style saved successfully.");
             _snackbarService.Show("Style Saved", "The style was saved successfully.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), TimeSpan.FromSeconds(3));
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Failed to save style.");
             _snackbarService.Show("Load Error", e.Message, ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle16), TimeSpan.FromSeconds(10));
         }
     }

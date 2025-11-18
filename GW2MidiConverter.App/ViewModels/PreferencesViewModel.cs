@@ -8,12 +8,14 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GW2MidiConverter.App.Services;
+using Microsoft.Extensions.Logging;
 
 namespace GW2MidiConverter.App.ViewModels;
 
 internal class PreferencesViewModel : ObservableObject
 {
     private readonly IApplicationVersionChecker _versionChecker;
+    private readonly ILogger<PreferencesViewModel> _logger;
     private bool _autoCheckForUpdates;
     private bool _isNewVersionAvailable;
 
@@ -47,10 +49,12 @@ internal class PreferencesViewModel : ObservableObject
 
     public string CurrentVersion { get; }
 
-    public PreferencesViewModel(IApplicationVersionChecker versionChecker)
+    public PreferencesViewModel(IApplicationVersionChecker versionChecker,
+                                ILogger<PreferencesViewModel> logger)
     {
         _updateInfo = new VersionCheckInfo(false, new Version(), string.Empty, string.Empty);
         _versionChecker = versionChecker;
+        _logger = logger;
         CheckForUpdateCommand = new AsyncRelayCommand(CheckForUpdates);
         GetUpdateCommand = new RelayCommand(GetUpdate);
 
@@ -62,11 +66,23 @@ internal class PreferencesViewModel : ObservableObject
 
     private async Task CheckForUpdates()
     {
-        VersionCheckInfo result = await _versionChecker.IsNewVersionAvailableAsync();
-        if (result.IsNewVersionAvailable) IsNewVersionAvailable = true;
+        using IDisposable? _ = _logger.BeginScope(new { Operation = "CheckForUpdates" });
+        _logger.LogInformation("Manual update check...");
 
-        _updateInfo = result;
-        NewVersion = result.LatestVersion.ToString();
+        try
+        {
+            VersionCheckInfo result = await _versionChecker.IsNewVersionAvailableAsync();
+            if (result.IsNewVersionAvailable) IsNewVersionAvailable = true;
+
+            _updateInfo = result;
+            NewVersion = result.LatestVersion.ToString();
+            _logger.LogInformation("Update check complete. New version available: {IsNewVersionAvailable}", result.IsNewVersionAvailable);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to check for updates.");
+            IsNewVersionAvailable = false;
+        }
     }
 
     private void GetUpdate()

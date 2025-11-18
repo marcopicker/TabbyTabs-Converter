@@ -8,6 +8,9 @@ using GW2MidiConverter.App.Views;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
+using Serilog.Core.Enrichers;
+using Serilog.Formatting.Compact;
+using Serilog.Formatting.Json;
 using Wpf.Ui;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -48,9 +51,14 @@ public partial class App : Application
 
     private static void RegisterLogger(IServiceCollection services)
     {
-        Logger logger = new LoggerConfiguration().WriteTo.Console()
-                                                 //.WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
-                                                 .MinimumLevel.Debug()
+        Logger logger = new LoggerConfiguration().MinimumLevel.Debug()
+                                                 .Enrich.FromLogContext()
+                                                 .WriteTo.Console()
+                                                 .WriteTo.File(
+                                                     formatter: new CompactJsonFormatter(),
+                                                     path: "logs/log.json",
+                                                     rollingInterval: RollingInterval.Day
+                                                 )
                                                  .CreateLogger();
         services.AddLogging(builder =>
         {

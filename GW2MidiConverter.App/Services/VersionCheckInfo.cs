@@ -7,4 +7,7 @@ internal record VersionCheckInfo(
     Version LatestVersion,
     string ReleaseNotes,
     string DownloadUrl
-);
+)
+{
+    public static readonly VersionCheckInfo NoNewVersionInfo = new VersionCheckInfo(false, new Version(), string.Empty, string.Empty);
+};
