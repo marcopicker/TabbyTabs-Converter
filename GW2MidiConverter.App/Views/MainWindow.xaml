@@ -30,12 +30,58 @@
             <controls:TabRenderingControl />
         </DataTemplate>
     </ui:FluentWindow.Resources>
-    <Grid>
+    <Grid HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
+        <ContentPresenter x:Name="RootContentDialog" />
         <ContentControl Content="{Binding CurrentViewModel}"
                         Focusable="False" />
-        <ContentPresenter x:Name="RootContentDialog" />
-        <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
         <ui:TitleBar Title="{Binding ApplicationTitle}"
                      Icon="{ui:SymbolIcon MusicNote120}" />
+        <Border x:Name="PreferencesBackdrop"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Background="#3F000000"
+                IsHitTestVisible="True"
+                Focusable="False"
+                Visibility="Collapsed"
+                MouseDown="PreferencesBackdrop_OnMouseDown">
+            <Border Focusable="True"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Padding="24"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource PopupCornerRadius}"
+                    BorderBrush="{DynamicResource ContentDialogBorderBrush}"
+                    Background="{DynamicResource ContentDialogBackground}"
+                    Margin="100">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30"
+                                      Direction="0"
+                                      Opacity="0.4"
+                                      ShadowDepth="0"
+                                      Color="#202020" />
+                </Border.Effect>
+                <controls:PreferencesView x:Name="PreferencesView"
+                                          CloseRequested="PreferencesView_OnCloseRequested"/>
+            </Border>
+        </Border>
+        <ui:Button x:Name="PreferencesButton"
+                   HorizontalContentAlignment="Stretch"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Bottom"
+                   Margin="8"
+                   Width="32"
+                   Height="32"
+                   ToolTip="Settings"
+                   Padding="0"
+                   Click="PreferencesButton_OnClick">
+            <Grid HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+                <ui:SymbolIcon Grid.Column="0"
+                               HorizontalAlignment="Center"
+                               Symbol="Settings24" />
+            </Grid>
+        </ui:Button>
+        <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
     </Grid>
 </ui:FluentWindow>

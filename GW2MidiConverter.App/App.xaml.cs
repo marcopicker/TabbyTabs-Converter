@@ -30,11 +30,10 @@ public partial class App : Application
 
     private static void RegisterApplicationContent(IServiceCollection services)
     {
-        // Windows
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<PreferencesViewModel>();
         
-        // Services
         services.AddSingleton<IInstrumentProvider, InstrumentFilesLoader>();
         services.AddSingleton<IEditDistanceCalculator, LevenshteinDistanceCalculator>();
         services.AddSingleton<IApplicationVersionChecker, GitHubHostedApplicationVersionChecker>();

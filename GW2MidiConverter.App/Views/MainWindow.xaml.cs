@@ -2,6 +2,7 @@
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
@@ -13,10 +14,9 @@ namespace GW2MidiConverter.App.Views;
 internal partial class MainWindow
 {
     public MainWindow(MainWindowViewModel viewModel,
-                      INavigationService navigationService,
                       ISnackbarService snackbarService,
-                      IServiceProvider serviceProvider,
-                      IContentDialogService contentDialogService)
+                      IContentDialogService contentDialogService,
+                      PreferencesViewModel preferencesViewModel)
     {
         DataContext = viewModel;
 
@@ -24,6 +24,23 @@ internal partial class MainWindow
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         contentDialogService.SetDialogHost(RootContentDialog);
 
+        PreferencesView.DataContext = preferencesViewModel;
         // Loaded += (_, _) => snackbarService.Show("MEOW!", "Cat cat cat purr", ControlAppearance.Primary, null, TimeSpan.FromSeconds(5));
+    }
+
+    private void PreferencesButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        Visibility newVisibility = PreferencesBackdrop.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        PreferencesBackdrop.Visibility = newVisibility;
+    }
+
+    private void PreferencesBackdrop_OnMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        PreferencesBackdrop.Visibility = Visibility.Collapsed;
+    }
+
+    private void PreferencesView_OnCloseRequested(object? sender, EventArgs e)
+    {
+        PreferencesBackdrop.Visibility = Visibility.Collapsed;
     }
 }

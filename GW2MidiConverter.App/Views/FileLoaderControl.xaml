@@ -7,12 +7,16 @@
              xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
+             xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal"
              d:DataContext="{d:DesignInstance viewModels:FileLoaderViewModel}"
              Background="Transparent"
              AllowDrop="True">
     <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
+                                                 True="Visible"
+                                                 False="Collapsed" />
         <Duration x:Key="ColourFadeInAnimationDuration">0:0:0.125</Duration>
         <Duration x:Key="ColourFadeOutAnimationDuration">0:0:0.2</Duration>
         <Storyboard x:Key="HorizontalErrorShakeAnimation">
@@ -45,24 +49,37 @@
         <Border x:Name="UpdateInfoBorder"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
-                Margin="16">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="Visibility" Value="Visible" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding UpdateInfo.IsNewVersionAvailable, FallbackValue=False}" Value="False">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <ui:HyperlinkButton NavigateUri="{Binding UpdateInfo.DownloadUrl}"
-                                Icon="{ui:SymbolIcon Link24}">
-                <ui:TextBlock>
-                    <Run Text="A new version is available: v"/>
-                    <Run Text="{Binding UpdateInfo.LatestVersion}"/>
-                </ui:TextBlock>
-            </ui:HyperlinkButton>
+                Margin="16"
+                Visibility="Collapsed">
+            <!-- <Border.Style> -->
+            <!--     <Style TargetType="Border"> -->
+            <!--         <Setter Property="Visibility" Value="Visible" /> -->
+            <!--         <Style.Triggers> -->
+            <!--             <DataTrigger Binding="{Binding UpdateInfo.IsNewVersionAvailable, FallbackValue=False}" Value="False"> -->
+            <!--                 <Setter Property="Visibility" Value="Collapsed" /> -->
+            <!--             </DataTrigger> -->
+            <!--         </Style.Triggers> -->
+            <!--     </Style> -->
+            <!-- </Border.Style> -->
+            <!-- <ui:HyperlinkButton NavigateUri="{Binding UpdateInfo.DownloadUrl}" -->
+            <!--                     Icon="{ui:SymbolIcon Link24}"> -->
+            <!--     <ui:TextBlock> -->
+            <!--         <Run Text="A new version is available: v"/> -->
+            <!--         <Run Text="{Binding UpdateInfo.LatestVersion}"/> -->
+            <!--     </ui:TextBlock> -->
+            <!-- </ui:HyperlinkButton> -->
+            <ui:Button HorizontalContentAlignment="Stretch"
+                       Width="32"
+                       Height="32"
+                       ToolTip="Settings"
+                       Padding="0">
+                <Grid HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
+                    <ui:SymbolIcon Grid.Column="0"
+                                   HorizontalAlignment="Center"
+                                   Symbol="Settings24" />
+                </Grid>
+            </ui:Button>
         </Border>
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center">
