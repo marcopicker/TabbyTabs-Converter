@@ -9,12 +9,8 @@ using GW2MidiConverter.App.ViewModels;
 using GW2MidiConverter.App.Views;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Core;
-using Serilog.Core.Enrichers;
 using Serilog.Formatting.Compact;
-using Serilog.Formatting.Json;
 using Wpf.Ui;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace GW2MidiConverter.App;
 
