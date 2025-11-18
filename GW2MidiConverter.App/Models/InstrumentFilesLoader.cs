@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using GW2MidiConverter.GuildWars.Instruments;
+using Microsoft.Extensions.Logging;
 
 namespace GW2MidiConverter.App.Models;
 
-internal class InstrumentFilesLoader : IInstrumentProvider
+internal class InstrumentFilesLoader(ILogger<InstrumentFilesLoader> logger) : IInstrumentProvider
 {
     private static string InstrumentFolder => Path.Combine("Resources", "Instruments");
 
@@ -19,11 +20,25 @@ internal class InstrumentFilesLoader : IInstrumentProvider
 
     private void LoadInstruments()
     {
+        using IDisposable? _ = logger.BeginScope(new
+        {
+            Operation = "Loading instrument files",
+            Folder = InstrumentFolder
+        });
+        
         DirectoryInfo directory = new DirectoryInfo(InstrumentFolder);
-        if (!directory.Exists) _instruments = [];
+        if (!directory.Exists)
+        {
+            logger.LogWarning("Instrument folder does not exist.");
+            _instruments = [];
+        }
 
         FileInfo[] files = directory.GetFiles($"*.{Instrument.INSTRUMENT_FILE_EXTENSION}");
-        if (files.Length == 0) _instruments = [];
+        if (files.Length == 0)
+        {
+            logger.LogWarning("No instrument files found in provided folder.");
+            _instruments = [];
+        }
 
         List<Instrument> instruments = [];
         foreach (FileInfo file in files)
@@ -32,11 +47,12 @@ internal class InstrumentFilesLoader : IInstrumentProvider
             {
                 Instrument instrument = Instrument.FromFile(file.FullName);
                 instruments.Add(instrument);
+                logger.LogInformation("Loaded instrument file {FileName}", file.FullName);
             }
             catch (Exception e)
             {
-                // TODO MP: Log this.
-                continue;
+                // Don't re-throw this; a broken file should not crash the program.
+                logger.LogError(e, "Failed to load instrument file {FileName}", file.FullName);
             }
         }
 

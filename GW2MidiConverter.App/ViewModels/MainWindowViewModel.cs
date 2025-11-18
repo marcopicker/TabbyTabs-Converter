@@ -34,17 +34,17 @@ internal class MainWindowViewModel : ObservableObject
     public ICommand LoadedCommand { get; }
 
     public MainWindowViewModel(ISnackbarService snackbar,
-                               IInstrumentProvider instrumentProvider,
-                               IEditDistanceCalculator editDistanceCalculator,
                                IContentDialogService contentDialogService,
-                               IApplicationVersionChecker applicationVersionChecker)
+                               IApplicationVersionChecker applicationVersionChecker,
+                               FileLoaderViewModel fileLoaderViewModel,
+                               TabRendererViewModel tabRendererViewModel)
     {
         _contentDialogService = contentDialogService;
         _applicationVersionChecker = applicationVersionChecker;
-        _fileLoaderViewModel = new FileLoaderViewModel(snackbar, instrumentProvider, editDistanceCalculator);
+        _fileLoaderViewModel = fileLoaderViewModel;
         _fileLoaderViewModel.TabDocumentLoaded += HandleTabDocumentLoaded;
 
-        _tabRendererViewModel = new TabRendererViewModel(snackbar, contentDialogService);
+        _tabRendererViewModel = tabRendererViewModel;
         _tabRendererViewModel.ReturnRequested += HandleReturnRequested;
 
         CurrentViewModel = _fileLoaderViewModel;

@@ -5,7 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using GW2MidiConverter.App.ViewModels;
 using GW2MidiConverter.App.Views;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 using Wpf.Ui;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace GW2MidiConverter.App;
 
@@ -16,6 +20,7 @@ public partial class App : Application
     static App()
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        RegisterLogger(builder.Services);
         RegisterWpfUiComponents(builder.Services);
         RegisterApplicationContent(builder.Services);
         _host = builder.Build();
@@ -33,15 +38,25 @@ public partial class App : Application
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<PreferencesViewModel>();
-        
+        services.AddSingleton<FileLoaderViewModel>();
+        services.AddSingleton<TabRendererViewModel>();
+
         services.AddSingleton<IInstrumentProvider, InstrumentFilesLoader>();
         services.AddSingleton<IEditDistanceCalculator, LevenshteinDistanceCalculator>();
         services.AddSingleton<IApplicationVersionChecker, GitHubHostedApplicationVersionChecker>();
     }
 
-    public static T GetRequiredService<T>() where T : class
+    private static void RegisterLogger(IServiceCollection services)
     {
-        return _host.Services.GetRequiredService<T>();
+        Logger logger = new LoggerConfiguration().WriteTo.Console()
+                                                 //.WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
+                                                 .MinimumLevel.Debug()
+                                                 .CreateLogger();
+        services.AddLogging(builder =>
+        {
+            builder.ClearProviders();
+            builder.AddSerilog(logger, true);
+        });
     }
 
     protected override void OnStartup(StartupEventArgs args)

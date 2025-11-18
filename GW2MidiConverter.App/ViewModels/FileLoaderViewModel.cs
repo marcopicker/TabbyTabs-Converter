@@ -14,6 +14,7 @@ using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Octaves;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
@@ -24,6 +25,7 @@ internal class FileLoaderViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbar;
     private readonly IEditDistanceCalculator _editDistanceCalculator;
+    private readonly ILogger<FileLoaderViewModel> _logger;
     private FullyObservableCollection<TrackConfigItemViewModel> _trackConfigItems = [];
 
     private MidiDocument? _loadedMidiDocument;
@@ -81,10 +83,12 @@ internal class FileLoaderViewModel : ObservableObject
 
     public FileLoaderViewModel(ISnackbarService snackbar,
                                IInstrumentProvider instrumentProvider,
-                               IEditDistanceCalculator editDistanceCalculator)
+                               IEditDistanceCalculator editDistanceCalculator,
+                               ILogger<FileLoaderViewModel> logger)
     {
         _snackbar = snackbar;
         _editDistanceCalculator = editDistanceCalculator;
+        _logger = logger;
 
         OnDragEnterCommand = new RelayCommand<DragEventArgs>(HandleDragEnter);
         OnDragLeaveCommand = new RelayCommand<DragEventArgs>(HandleDragLeave);
@@ -149,63 +153,96 @@ internal class FileLoaderViewModel : ObservableObject
 
     private void TryLoadFiles(string[] files)
     {
+        using IDisposable? _ = _logger.BeginScope(new
+        {
+            Operation = "Loading MIDI files",
+            Files = files
+        });
+
         switch (files.Length)
         {
             case 0:
+                _logger.LogWarning("No files selected.");
                 _snackbar.Show("No Files", "Please select a MIDI file first.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
                 TriggerShakeAnimation();
                 return;
             case > 1:
+                _logger.LogWarning("Multiple files selected.");
                 _snackbar.Show("Multiple Files", "Please select only one MIDI file.", ControlAppearance.Danger, null, _snackbar.DefaultTimeOut);
                 TriggerShakeAnimation();
                 return;
         }
 
         string fileName = files[0];
+        _logger.LogInformation("Loading MIDI file '{FileName}'...", fileName);
 
         MidiDocument midiDocument;
         try
         {
             midiDocument = MidiDocument.LoadFromMidiFile(fileName);
         }
+        catch (InvalidMidiDocumentException e)
+        {
+            _logger.LogError(e, "Failed to load MIDI file '{FileName}'.", fileName);
+            _snackbar.Show("Invalid File", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
+            TriggerShakeAnimation();
+            return;
+        }
+        catch (MidiDocumentException e)
+        {
+            _logger.LogError(e, "Failed to load MIDI file '{FileName}'.", fileName);
+            _snackbar.Show("Invalid MIDI File", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
+            TriggerShakeAnimation();
+            return;
+        }
         catch (Exception e)
         {
-            _snackbar.Show("File Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
+            _logger.LogError(e, "Failed to load MIDI file '{FileName}'.", fileName);
+            _snackbar.Show("File Loading Error", "An unexpected error occurred while trying to load the provided file.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
             TriggerShakeAnimation();
             return;
         }
 
         if (midiDocument.InstrumentTrackIndexes.Count == 0)
         {
-            _snackbar.Show("No Tracks", "The selected MIDI file does not contain any tracks.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(3));
+            _logger.LogWarning("MIDI file '{FileName}' does not contain any tracks.", fileName);
+            _snackbar.Show("Invalid MIDI File", "The selected MIDI file does not contain any instrument tracks.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(3));
             TriggerShakeAnimation();
             return;
         }
 
         _loadedMidiDocument = midiDocument;
+        _logger.LogInformation("Successfully loaded MIDI file '{FileName}'.", fileName);
         PrepareMidiDocument();
     }
 
     private void PrepareMidiDocument()
     {
         if (_loadedMidiDocument == null) return;
+        using IDisposable? _ = _logger.BeginScope(new { Operation = "Preparing MIDI document" });
 
+        _logger.LogInformation("Preparing tab document...");
         _loadedTabDocument = TabDocument.FromMidiDocument(_loadedMidiDocument, new LookAheadOctaveCalculator());
 
         List<TrackConfigItemViewModel> items = [];
         foreach (int index in _loadedMidiDocument.InstrumentTrackIndexes)
         {
             TrackInfo trackInfo = _loadedMidiDocument.GetTrackInfo(index);
+            _logger.LogDebug("Preparing track {TrackIndex}...", index);
 
             TrackConfigItemViewModel item = new TrackConfigItemViewModel(trackInfo);
             item.SelectedInstrument = FindFittingInstrumentForTrack(trackInfo);
+            _logger.LogDebug("Assigned the track the instrument '{Instrument}'.", item.SelectedInstrument?.Name);
+            
             item.IsChecked = item.SelectedInstrument != null;
 
             items.Add(item);
+            _logger.LogDebug("Prepared track {TrackIndex}.", index);
         }
 
         TrackConfigItems = new FullyObservableCollection<TrackConfigItemViewModel>(items);
         ConvertTabCommand.NotifyCanExecuteChanged();
+        _logger.LogInformation("Successfully prepared tab document.");
     }
 
     private void ConvertTab()
@@ -222,7 +259,8 @@ internal class FileLoaderViewModel : ObservableObject
         }
         catch (Exception e)
         {
-            _snackbar.Show("Conversion Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
+            _logger.LogError(e, "Failed to convert MIDI file to tab document.");
+            _snackbar.Show("Unexpected Conversion Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
         }
     }
 
@@ -246,6 +284,7 @@ internal class FileLoaderViewModel : ObservableObject
 
     private void OnTabDocumentLoaded(TabDocument e)
     {
+        _logger.LogInformation("Tab document loaded.");
         TabDocumentLoaded?.Invoke(this, e);
     }
 
