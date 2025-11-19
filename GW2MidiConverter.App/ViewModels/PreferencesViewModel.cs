@@ -115,18 +115,19 @@ internal class PreferencesViewModel : ObservableObject
 
     private void OpenLogDirectory()
     {
-        string logDirectory = Path.Combine(Environment.CurrentDirectory, "Logs");
-        
         try
         {
-            Process.Start(new ProcessStartInfo(logDirectory)
+            DirectoryInfo logFolder = new DirectoryInfo(Logging.LogFolder);
+            if (!logFolder.Exists) logFolder.Create();
+            
+            Process.Start(new ProcessStartInfo(Logging.LogFolder)
             {
                 UseShellExecute = true
             });
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to open log directory: {Directory}", logDirectory);
+            _logger.LogError(e, "Failed to open log directory: {Directory}", Logging.LogFolder);
             _snackbarService.Show("Unexpected Error", $"{ApplicationResources.ApplicationName} was unable to open the log directory.", ControlAppearance.Danger, null, _snackbarService.DefaultTimeOut);
         }
     }

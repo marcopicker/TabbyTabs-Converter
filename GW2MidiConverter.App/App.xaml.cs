@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using System.Windows;
 using GW2MidiConverter.App.Models;
 using GW2MidiConverter.App.Resources;
@@ -49,6 +50,7 @@ public partial class App : Application
 
     private static void RegisterLogger(IServiceCollection services)
     {
+        string logFilePath = Path.Combine(Logging.LogFolder, "log.json");
         Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
                                               .Enrich.FromLogContext()
                                               .Enrich.WithProperty("Application", ApplicationResources.ApplicationName)
@@ -56,10 +58,10 @@ public partial class App : Application
                                               .WriteTo.Console()
                                               .WriteTo.File(
                                                   formatter: new CompactJsonFormatter(),
-                                                  path: "logs/log.json",
+                                                  path: logFilePath,
                                                   rollingInterval: RollingInterval.Day,
                                                   fileSizeLimitBytes: 10485760,
-                                                  retainedFileCountLimit: 30,
+                                                  retainedFileCountLimit: 7,
                                                   rollOnFileSizeLimit: true
                                               )
                                               .CreateLogger();

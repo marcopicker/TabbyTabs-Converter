@@ -106,18 +106,18 @@ internal class TabRendererViewModel : ObservableObject
         if (TabDocument == null!) return;
 
         using IDisposable? _ = _logger.BeginScope(new { Operation = "Rendering Tab" });
-        
+        TabRenderingSettings settings = BuildRenderingSettings();
+
         try
         {
-            TabRenderingSettings settings = BuildRenderingSettings();
-            _logger.LogInformation("Rendering tab with settings: {@Settings}", settings);
+            _logger.LogInformation("Rendering tab.");
             TabRenderer renderer = new TabRenderer(TabDocument, settings);
             TabText = renderer.Render();
             _logger.LogInformation("Tab rendered successfully.");
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to render tab.");
+            _logger.LogError(e, "Failed to render tab with settings: {Settings}", settings);
             bool hasSnackbarPresenter = _snackbarService.GetSnackbarPresenter() != null;
             if (hasSnackbarPresenter) _snackbarService.Show("Rendering Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(30));
             TabText = string.Empty;
@@ -149,7 +149,7 @@ internal class TabRendererViewModel : ObservableObject
     private void ExportTab()
     {
         using IDisposable? _ = _logger.BeginScope(new { Operation = "Exporting Tab" });
-        
+
         if (TabDocument == null)
         {
             _logger.LogError("Failed to export tab: No tab loaded.");
@@ -203,7 +203,7 @@ internal class TabRendererViewModel : ObservableObject
             if (dialogResult != true) return;
 
             _logger.LogInformation("Loading style '{FileName}'...", openFileDialog.FileName);
-            
+
             TabRenderingSettings renderingSettings = TabRenderingSettings.FromFile(openFileDialog.FileName);
             ApplySettings(renderingSettings);
 
@@ -233,7 +233,7 @@ internal class TabRendererViewModel : ObservableObject
             if (dialogResult != true) return;
 
             _logger.LogInformation("Saving style '{FileName}'...", saveFileDialog.FileName);
-            
+
             TabRenderingSettings renderingSettings = BuildRenderingSettings();
             renderingSettings.SaveToFile(saveFileDialog.FileName);
 
@@ -268,11 +268,13 @@ internal class TabRendererViewModel : ObservableObject
 
     private bool CheckSettingValidity()
     {
+        // TODO MP: Implement.
         return true;
     }
 
     private string PrepareFileName()
     {
+        // TODO MP: Implement.
         return "Tab.txt";
     }
 }
