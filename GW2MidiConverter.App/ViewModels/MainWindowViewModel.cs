@@ -49,7 +49,7 @@ internal class MainWindowViewModel : ObservableObject
 
         CurrentViewModel = _fileLoaderViewModel;
 
-        LoadedCommand = new AsyncRelayCommand(CheckForUpdates);
+        LoadedCommand = new RelayCommand(OnLoaded);
     }
 
     private void HandleTabDocumentLoaded(object? sender, TabDocument document)
@@ -63,11 +63,8 @@ internal class MainWindowViewModel : ObservableObject
         CurrentViewModel = _fileLoaderViewModel;
     }
 
-    private async Task CheckForUpdates()
+    private void OnLoaded()
     {
-        return;
-        VersionCheckInfo versionInfo = await _applicationVersionChecker.IsNewVersionAvailableAsync();
-        if (!versionInfo.IsNewVersionAvailable) return;
-        _fileLoaderViewModel.UpdateInfo = versionInfo;
+        _fileLoaderViewModel.PrepareInstruments();
     }
 }

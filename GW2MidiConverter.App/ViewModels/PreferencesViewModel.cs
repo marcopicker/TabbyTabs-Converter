@@ -1,20 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GW2MidiConverter.App.Resources;
 using GW2MidiConverter.App.Services;
 using Microsoft.Extensions.Logging;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
 
 namespace GW2MidiConverter.App.ViewModels;
 
 internal class PreferencesViewModel : ObservableObject
 {
     private readonly IApplicationVersionChecker _versionChecker;
+    private readonly ISnackbarService _snackbarService;
     private readonly ILogger<PreferencesViewModel> _logger;
     private bool _autoCheckForUpdates;
     private bool _isNewVersionAvailable;
@@ -26,12 +31,13 @@ internal class PreferencesViewModel : ObservableObject
 
     public ICommand GetUpdateCommand { get; }
 
+    public ICommand OpenLogsCommand { get; }
+
     public bool IsNewVersionAvailable
     {
         get => _isNewVersionAvailable;
         set => SetProperty(ref _isNewVersionAvailable, value);
     }
-
 
     public bool AutoCheckForUpdates
     {
@@ -50,13 +56,16 @@ internal class PreferencesViewModel : ObservableObject
     public string CurrentVersion { get; }
 
     public PreferencesViewModel(IApplicationVersionChecker versionChecker,
+                                ISnackbarService snackbarService,
                                 ILogger<PreferencesViewModel> logger)
     {
         _updateInfo = new VersionCheckInfo(false, new Version(), string.Empty, string.Empty);
         _versionChecker = versionChecker;
+        _snackbarService = snackbarService;
         _logger = logger;
         CheckForUpdateCommand = new AsyncRelayCommand(CheckForUpdates);
         GetUpdateCommand = new RelayCommand(GetUpdate);
+        OpenLogsCommand = new RelayCommand(OpenLogDirectory);
 
         CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? string.Empty;
         _newVersion = string.Empty;
@@ -89,11 +98,37 @@ internal class PreferencesViewModel : ObservableObject
     {
         if (!_updateInfo.IsNewVersionAvailable) return;
 
-        string url = _updateInfo.DownloadUrl;
-        Process.Start(new ProcessStartInfo(url)
+        try
         {
-            UseShellExecute = true
-        });
+            string url = _updateInfo.DownloadUrl;
+            Process.Start(new ProcessStartInfo(url)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to open update URL.");
+            _snackbarService.Show("Unexpected Error", $"{ApplicationResources.ApplicationName} was unable to retrieve the update.", ControlAppearance.Danger, null, _snackbarService.DefaultTimeOut);
+        }
+    }
+
+    private void OpenLogDirectory()
+    {
+        string logDirectory = Path.Combine(Environment.CurrentDirectory, "Logs");
+        
+        try
+        {
+            Process.Start(new ProcessStartInfo(logDirectory)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to open log directory: {Directory}", logDirectory);
+            _snackbarService.Show("Unexpected Error", $"{ApplicationResources.ApplicationName} was unable to open the log directory.", ControlAppearance.Danger, null, _snackbarService.DefaultTimeOut);
+        }
     }
 
     private static List<LicenseAttribution> GetLicenseAttributions()

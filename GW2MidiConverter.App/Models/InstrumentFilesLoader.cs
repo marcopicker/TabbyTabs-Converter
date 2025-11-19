@@ -10,9 +10,9 @@ internal class InstrumentFilesLoader(ILogger<InstrumentFilesLoader> logger) : II
 {
     private static string InstrumentFolder => Path.Combine("Resources", "Instruments");
 
-    private IReadOnlyCollection<Instrument>? _instruments;
+    private IReadOnlyCollection<InstrumentProviderResult>? _instruments;
 
-    public IReadOnlyCollection<Instrument> GetInstruments()
+    public IReadOnlyCollection<InstrumentProviderResult> GetInstruments()
     {
         if (_instruments == null) LoadInstruments();
         return _instruments ?? [];
@@ -25,7 +25,7 @@ internal class InstrumentFilesLoader(ILogger<InstrumentFilesLoader> logger) : II
             Operation = "Loading instrument files",
             Folder = InstrumentFolder
         });
-        
+
         DirectoryInfo directory = new DirectoryInfo(InstrumentFolder);
         if (!directory.Exists)
         {
@@ -40,19 +40,20 @@ internal class InstrumentFilesLoader(ILogger<InstrumentFilesLoader> logger) : II
             _instruments = [];
         }
 
-        List<Instrument> instruments = [];
+        List<InstrumentProviderResult> instruments = [];
         foreach (FileInfo file in files)
         {
             try
             {
                 Instrument instrument = Instrument.FromFile(file.FullName);
-                instruments.Add(instrument);
+                instruments.Add(new InstrumentProviderResult(instrument, file.FullName));
                 logger.LogInformation("Loaded instrument file {FileName}", file.FullName);
             }
             catch (Exception e)
             {
-                // Don't re-throw this; a broken file should not crash the program.
+                // Don't re-throw this; an invalid instrument file should not crash the program.
                 logger.LogError(e, "Failed to load instrument file {FileName}", file.FullName);
+                instruments.Add(new InstrumentProviderResult(null, file.FullName, false, e.Message));
             }
         }
 

@@ -18,13 +18,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace GW2MidiConverter.App.ViewModels;
 
 internal class FileLoaderViewModel : ObservableObject
 {
     private readonly ISnackbarService _snackbar;
+    private readonly IInstrumentProvider _instrumentProvider;
     private readonly IEditDistanceCalculator _editDistanceCalculator;
+    private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<FileLoaderViewModel> _logger;
     private FullyObservableCollection<TrackConfigItemViewModel> _trackConfigItems = [];
 
@@ -33,6 +36,7 @@ internal class FileLoaderViewModel : ObservableObject
     private FileDraggingInfoState _currentDragState;
     private bool _fileLoadingErrorProxy;
     private VersionCheckInfo? _updateInfo;
+    private IReadOnlyList<Instrument> _possibleInstruments = [];
 
     public ICommand OnDragEnterCommand { get; }
     public ICommand OnDragLeaveCommand { get; }
@@ -69,7 +73,11 @@ internal class FileLoaderViewModel : ObservableObject
         }
     }
 
-    public IReadOnlyList<Instrument> PossibleInstruments { get; }
+    public IReadOnlyList<Instrument> PossibleInstruments
+    {
+        get => _possibleInstruments;
+        private set => SetProperty(ref _possibleInstruments, value);
+    }
 
     public RelayCommand ConvertTabCommand { get; }
 
@@ -84,10 +92,13 @@ internal class FileLoaderViewModel : ObservableObject
     public FileLoaderViewModel(ISnackbarService snackbar,
                                IInstrumentProvider instrumentProvider,
                                IEditDistanceCalculator editDistanceCalculator,
+                               IContentDialogService contentDialogService,
                                ILogger<FileLoaderViewModel> logger)
     {
         _snackbar = snackbar;
+        _instrumentProvider = instrumentProvider;
         _editDistanceCalculator = editDistanceCalculator;
+        _contentDialogService = contentDialogService;
         _logger = logger;
 
         OnDragEnterCommand = new RelayCommand<DragEventArgs>(HandleDragEnter);
@@ -96,8 +107,23 @@ internal class FileLoaderViewModel : ObservableObject
         BrowseFilesCommand = new RelayCommand(BrowseFiles);
         ConvertTabCommand = new RelayCommand(ConvertTab, CanConvertTab);
         FileLoadingErrorProxy = false;
+    }
 
-        PossibleInstruments = instrumentProvider.GetInstruments().ToList();
+    public void PrepareInstruments()
+    {
+        IReadOnlyCollection<InstrumentProviderResult> results = _instrumentProvider.GetInstruments();
+        PossibleInstruments = results.Where(i => i is { Successful: true, Instrument: not null })
+                                     .Select(i => i.Instrument!)
+                                     .ToList();
+
+        List<InstrumentProviderResult> invalidInstruments = results.Where(i => !i.Successful).ToList();
+        if (invalidInstruments.Count == 0) return;
+
+        _snackbar.Show("Instrument Warning",
+                       $"{invalidInstruments.Capacity} instrument(s) could not be loaded, as their files are corrupted or in the wrong format. See the log for details.",
+                       ControlAppearance.Caution,
+                       null,
+                       TimeSpan.FromSeconds(10));
     }
 
     private void HandleDragEnter(DragEventArgs? e)
@@ -233,7 +259,7 @@ internal class FileLoaderViewModel : ObservableObject
             TrackConfigItemViewModel item = new TrackConfigItemViewModel(trackInfo);
             item.SelectedInstrument = FindFittingInstrumentForTrack(trackInfo);
             _logger.LogDebug("Assigned the track the instrument '{Instrument}'.", item.SelectedInstrument?.Name);
-            
+
             item.IsChecked = item.SelectedInstrument != null;
 
             items.Add(item);

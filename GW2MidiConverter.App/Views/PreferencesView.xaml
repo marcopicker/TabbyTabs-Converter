@@ -37,10 +37,10 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" 
+        <DockPanel Grid.Row="0"
                    x:Name="HeaderPanel"
                    LastChildFill="True"
                    Margin="0,0,0,16">
@@ -55,7 +55,7 @@
                           Text="Preferences"
                           FontTypography="Title" />
         </DockPanel>
-        <ScrollViewer Grid.Row="1" 
+        <ScrollViewer Grid.Row="1"
                       x:Name="ContentScroller"
                       HorizontalScrollBarVisibility="Hidden"
                       VerticalScrollBarVisibility="Auto">
@@ -80,11 +80,19 @@
 
                 <controls:SubSettingContentControl HeaderText="Automatic update checks"
                                                    DescriptionText="Check for an update every time you start this program."
-                                                   IsEnabled="False">
+                                                   IsEnabled="False"
+                                                   Margin="0,0,0,8">
                     <ui:ToggleSwitch OnContent="Yes"
                                      OffContent="No"
                                      VerticalAlignment="Center"
                                      IsChecked="{Binding AutoCheckForUpdates}" />
+                </controls:SubSettingContentControl>
+
+                <controls:SubSettingContentControl HeaderText="Logs"
+                                                   DescriptionText="Open the folder that contains the log files.">
+                    <ui:Button Appearance="Secondary"
+                               Content="Open log folder"
+                               Command="{Binding OpenLogsCommand}" />
                 </controls:SubSettingContentControl>
 
                 <Rectangle HorizontalAlignment="Stretch"

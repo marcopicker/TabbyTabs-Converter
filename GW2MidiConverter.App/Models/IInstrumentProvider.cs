@@ -5,5 +5,5 @@ namespace GW2MidiConverter.App.Models;
 
 internal interface IInstrumentProvider
 {
-    IReadOnlyCollection<Instrument> GetInstruments();
+    IReadOnlyCollection<InstrumentProviderResult> GetInstruments();
 }
