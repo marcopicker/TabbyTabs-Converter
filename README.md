@@ -38,7 +38,7 @@ You can download the latest on the [Releases page](https://github.com/Pocram93/G
 
 1. [Download](#download) the latest version from the Releases page.
 
-> [!NOTE]
+> [!TIP]
 > If you cannot see the **GW2.Tab.Converter.zip** file click on **Assets** to expand the list of files.
 
 2. Extract the **.zip** file in a location of your choosing.
