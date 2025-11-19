@@ -5,15 +5,13 @@ using GW2MidiConverter.Tab;
 
 namespace GW2MidiConverter.Rendering;
 
-public class RestRenderer(TabRendererSettings settings)
+public class RestRenderer(NoteRenderingSettings settings)
 {
-    private readonly TabRendererSettings _settings = settings;
-
     public string RenderBeats(decimal beats)
     {
         if (beats <= 0) return string.Empty;
 
-        decimal[] registeredLengths = _settings.RestSymbolsPerBeat.Keys.OrderByDescending(d => d).ToArray();
+        TabElementLength[] registeredLengths = settings.RestSymbolsPerBeat.Keys.OrderByDescending(d => d).ToArray();
         StringBuilder builder = new StringBuilder();
 
         decimal remainingBeats = beats;
@@ -26,9 +24,9 @@ public class RestRenderer(TabRendererSettings settings)
                 break;
             }
 
-            char restSymbol = _settings.RestSymbolsPerBeat[maxFittingRest];
+            char restSymbol = settings.RestSymbolsPerBeat[maxFittingRest];
             builder.Append(restSymbol);
-            builder.Append(_settings.GetTrailingSpacesForBeatLength(new TabElementLength(maxFittingRest)));
+            builder.Append(settings.GetTrailingSpacesForBeatLength(new TabElementLength(maxFittingRest)));
             remainingBeats -= maxFittingRest;
         }
 

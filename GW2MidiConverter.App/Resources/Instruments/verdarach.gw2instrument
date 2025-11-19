@@ -1,0 +1,32 @@
+{
+    "Name" : "Verdarach",
+    "Notes" : 
+    [ 
+        { "MidiNote" : 24, "Key" : "Note1", "Octave" : -1 },
+        { "MidiNote" : 26, "Key" : "Note2", "Octave" : -1 },
+        { "MidiNote" : 28, "Key" : "Note3", "Octave" : -1 },
+        { "MidiNote" : 29, "Key" : "Note4", "Octave" : -1 },
+        { "MidiNote" : 31, "Key" : "Note5", "Octave" : -1 },
+        { "MidiNote" : 33, "Key" : "Note6", "Octave" : -1 },
+        { "MidiNote" : 35, "Key" : "Note7", "Octave" : -1 },
+        { "MidiNote" : 36, "Key" : "Note8", "Octave" : -1 },
+        
+        { "MidiNote" : 36, "Key" : "Note1", "Octave" : 0 },
+        { "MidiNote" : 38, "Key" : "Note2", "Octave" : 0 },
+        { "MidiNote" : 40, "Key" : "Note3", "Octave" : 0 },
+        { "MidiNote" : 41, "Key" : "Note4", "Octave" : 0 },
+        { "MidiNote" : 43, "Key" : "Note5", "Octave" : 0 },
+        { "MidiNote" : 45, "Key" : "Note6", "Octave" : 0 },
+        { "MidiNote" : 47, "Key" : "Note7", "Octave" : 0 },
+        { "MidiNote" : 48, "Key" : "Note8", "Octave" : 0 },
+        
+        { "MidiNote" : 48, "Key" : "Note1", "Octave" : 1 },
+        { "MidiNote" : 50, "Key" : "Note2", "Octave" : 1 },
+        { "MidiNote" : 52, "Key" : "Note3", "Octave" : 1 },
+        { "MidiNote" : 53, "Key" : "Note4", "Octave" : 1 },
+        { "MidiNote" : 55, "Key" : "Note5", "Octave" : 1 },
+        { "MidiNote" : 57, "Key" : "Note6", "Octave" : 1 },
+        { "MidiNote" : 59, "Key" : "Note7", "Octave" : 1 },
+        { "MidiNote" : 60, "Key" : "Note8", "Octave" : 1 }
+    ]
+}

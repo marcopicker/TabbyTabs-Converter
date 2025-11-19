@@ -100,7 +100,15 @@ public static class MidiFiles
     /// </summary>
     public static string ChordTestFile => Path.Combine(RESOURCE_FOLDER, "chord_tests.mid");
     
-    public static string CriticalRole => Path.Combine(RESOURCE_FOLDER, "Critical_Role_-_Your_Turn_To_Roll_(GW2).mid");
-
-    public static string Nightmare => Path.Combine(RESOURCE_FOLDER, "The Nightmare Before Christmas - This is Halloween (GW2) Notedrop Ver.mid");
+    /// <summary>
+    /// The path to a MIDI file that contains various odd time signatures.<br/>
+    /// Bars:
+    /// <list type="number">
+    /// <item><description>9/8, 6 notes.</description></item>
+    /// <item><description>4/8, 2 notes.</description></item>
+    /// <item><description>6/8, 4 notes.</description></item>
+    /// <item><description>5/8, 3 notes.</description></item>
+    /// </list>
+    /// </summary>
+    public static string OddTimeSignatures => Path.Combine(RESOURCE_FOLDER, "odd_time_signatures.mid");
 }

@@ -1,0 +1,32 @@
+{
+    "Name" : "Marriner's Horn",
+    "Notes" : 
+    [ 
+        { "MidiNote" : 52, "Key" : "Note1", "Octave" : -1 },
+        { "MidiNote" : 54, "Key" : "Note2", "Octave" : -1 },
+        { "MidiNote" : 56, "Key" : "Note3", "Octave" : -1 },
+        { "MidiNote" : 57, "Key" : "Note4", "Octave" : -1 },
+        { "MidiNote" : 59, "Key" : "Note5", "Octave" : -1 },
+        { "MidiNote" : 61, "Key" : "Note6", "Octave" : -1 },
+        { "MidiNote" : 63, "Key" : "Note7", "Octave" : -1 },
+        { "MidiNote" : 64, "Key" : "Note8", "Octave" : -1 },
+        
+        { "MidiNote" : 64, "Key" : "Note1", "Octave" : 0 },
+        { "MidiNote" : 66, "Key" : "Note2", "Octave" : 0 },
+        { "MidiNote" : 68, "Key" : "Note3", "Octave" : 0 },
+        { "MidiNote" : 69, "Key" : "Note4", "Octave" : 0 },
+        { "MidiNote" : 71, "Key" : "Note5", "Octave" : 0 },
+        { "MidiNote" : 73, "Key" : "Note6", "Octave" : 0 },
+        { "MidiNote" : 75, "Key" : "Note7", "Octave" : 0 },
+        { "MidiNote" : 76, "Key" : "Note8", "Octave" : 0 },
+        
+        { "MidiNote" : 76, "Key" : "Note1", "Octave" : 1 },
+        { "MidiNote" : 78, "Key" : "Note2", "Octave" : 1 },
+        { "MidiNote" : 80, "Key" : "Note3", "Octave" : 1 },
+        { "MidiNote" : 81, "Key" : "Note4", "Octave" : 1 },
+        { "MidiNote" : 83, "Key" : "Note5", "Octave" : 1 },
+        { "MidiNote" : 85, "Key" : "Note6", "Octave" : 1 },
+        { "MidiNote" : 87, "Key" : "Note7", "Octave" : 1 },
+        { "MidiNote" : 88, "Key" : "Note8", "Octave" : 1 }
+    ]
+}

@@ -29,7 +29,7 @@ public class MidiDocument
 
     // TODO MP: Make this public.
     internal MidiTimingMap TimingMap { get; }
-    
+
     /// <summary>
     /// Returns the count of instrument-tracks in this MIDI document.
     /// </summary>
@@ -93,8 +93,19 @@ public class MidiDocument
 
     public static MidiDocument LoadFromMidiFile(string path)
     {
-        MidiFile midiFile = new MidiFile(path, true);
-        return new MidiDocument(midiFile);
+        try
+        {
+            MidiFile midiFile = new MidiFile(path, true);
+            return new MidiDocument(midiFile);
+        }
+        catch (FormatException e)
+        {
+            throw new InvalidMidiDocumentException("The MIDI file is either not a MIDI file or corrupted.", e);
+        }
+        catch (Exception e)
+        {
+            throw new MidiDocumentException("An unexpected error occurred while loading the MIDI file.", e);
+        }
     }
 
     #endregion

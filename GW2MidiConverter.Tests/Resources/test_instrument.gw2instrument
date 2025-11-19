@@ -1,0 +1,16 @@
+{
+  "Name" : "Test Instrument",
+  "Notes" : [ {
+    "MidiNote" : 60,
+    "Key" : "Note1",
+    "Octave" : 0
+  }, {
+    "MidiNote" : 60,
+    "Key" : "Note8",
+    "Octave" : -1
+  }, {
+       "MidiNote" : 62,
+       "Key" : "Note2",
+       "Octave" : 0
+  } ]
+}

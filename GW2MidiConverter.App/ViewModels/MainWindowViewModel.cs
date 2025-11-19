@@ -1,35 +1,70 @@
-using System.Collections.ObjectModel;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using GW2MidiConverter.App.Views.Pages;
-using Wpf.Ui.Controls;
+using CommunityToolkit.Mvvm.Input;
+using GW2MidiConverter.App.Models;
+using GW2MidiConverter.App.Resources;
+using GW2MidiConverter.App.Services;
+using GW2MidiConverter.App.Views;
+using GW2MidiConverter.Tab;
+using Wpf.Ui;
+using Wpf.Ui.Extensions;
 
 namespace GW2MidiConverter.App.ViewModels;
 
-public class MainWindowViewModel : ObservableObject
+internal class MainWindowViewModel : ObservableObject
 {
-    public ObservableCollection<object> MenuItems
+    private readonly IContentDialogService _contentDialogService;
+    private readonly IApplicationVersionChecker _applicationVersionChecker;
+    private object? _currentViewModel;
+
+    private readonly FileLoaderViewModel _fileLoaderViewModel;
+    private readonly TabRendererViewModel _tabRendererViewModel;
+
+    public string ApplicationTitle => $"{ApplicationResources.ApplicationName} ({Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)})";
+
+    public object? CurrentViewModel
     {
-        get => _menuItems;
-        set => SetProperty(ref _menuItems, value);
+        get => _currentViewModel;
+        private set => SetProperty(ref _currentViewModel, value);
     }
 
-    public ObservableCollection<object> FooterMenuItems
+    public ICommand LoadedCommand { get; }
+
+    public MainWindowViewModel(ISnackbarService snackbar,
+                               IContentDialogService contentDialogService,
+                               IApplicationVersionChecker applicationVersionChecker,
+                               FileLoaderViewModel fileLoaderViewModel,
+                               TabRendererViewModel tabRendererViewModel)
     {
-        get => _footerMenuItems;
-        set => SetProperty(ref _footerMenuItems, value);
+        _contentDialogService = contentDialogService;
+        _applicationVersionChecker = applicationVersionChecker;
+        _fileLoaderViewModel = fileLoaderViewModel;
+        _fileLoaderViewModel.TabDocumentLoaded += HandleTabDocumentLoaded;
+
+        _tabRendererViewModel = tabRendererViewModel;
+        _tabRendererViewModel.ReturnRequested += HandleReturnRequested;
+
+        CurrentViewModel = _fileLoaderViewModel;
+
+        LoadedCommand = new RelayCommand(OnLoaded);
     }
 
-    public object ApplicationTitle => "GW2MidiConverter.App";
+    private void HandleTabDocumentLoaded(object? sender, TabDocument document)
+    {
+        CurrentViewModel = _tabRendererViewModel;
+        _tabRendererViewModel.TabDocument = document;
+    }
 
-    private ObservableCollection<object> _menuItems =
-    [
-        new NavigationViewItem("MyPage", SymbolRegular.Home24, typeof(MyPage)),
-    ];
+    private void HandleReturnRequested(object? sender, EventArgs e)
+    {
+        CurrentViewModel = _fileLoaderViewModel;
+    }
 
-    private ObservableCollection<object> _footerMenuItems =
-    [
-        new NavigationViewItem("About", SymbolRegular.Info24, typeof(AboutPage)),
-        new NavigationViewItemSeparator(),
-        new NavigationViewItem("Settings", SymbolRegular.Settings24, typeof(PreferencesPage))
-    ];
+    private void OnLoaded()
+    {
+        _fileLoaderViewModel.PrepareInstruments();
+    }
 }

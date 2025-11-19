@@ -14,9 +14,9 @@ public class BracketSimplifierTests
     }
 
     [Test]
-    public void Constructor_NoBracketPairsSpecified_Throws()
+    public void Constructor_NoBracketPairsSpecified_DoesNotThrow()
     {
-        Assert.That(() => _ = new BracketSimplifier([]), Throws.ArgumentException);
+        Assert.That(() => _ = new BracketSimplifier([]), Throws.Nothing);
     }
 
     [TestCase("", "")]
@@ -32,6 +32,7 @@ public class BracketSimplifierTests
     [TestCase("[1]/[2]/[3]", "[1/2/3]")]
     [TestCase("(1) (2 3)", "(1 2 3)")]
     [TestCase("[1] (2) [3] [4] 5 [6]", "[1] (2) [3 4] 5 [6]")]
+    [TestCase("[1]/[2]/2/(3)", "[1/2]/2/(3)")]
     public void Simplify_StandardGuildWars2Brackets(string input, string expected)
     {
         List<BracketPair> bracketPairs =

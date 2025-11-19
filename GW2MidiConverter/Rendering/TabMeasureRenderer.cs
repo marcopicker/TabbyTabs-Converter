@@ -8,22 +8,24 @@ using GW2MidiConverter.Tab.Tokens;
 
 namespace GW2MidiConverter.Rendering;
 
-public class TabMeasureRenderer
+internal class TabMeasureRenderer
 {
-    private readonly TabRendererSettings _settings;
+    private readonly MeasureRenderingSettings _measureRenderingSettings;
+    private readonly NoteRenderingSettings _noteRenderingSettings;
     private readonly NoteRenderer _noteRenderer;
     private readonly RestRenderer _restRenderer;
     private readonly BracketSimplifier _bracketSimplifier;
 
     private readonly StringBuilder _measureStringBuilder = new StringBuilder();
 
-    public TabMeasureRenderer(TabRendererSettings settings)
+    public TabMeasureRenderer(MeasureRenderingSettings measureRenderingSettings, NoteRenderingSettings noteRenderingSettings)
     {
-        _settings = settings;
-        ArgumentNullException.ThrowIfNull(settings);
-        _noteRenderer = new NoteRenderer(settings);
-        _restRenderer = new RestRenderer(settings);
-        _bracketSimplifier = new BracketSimplifier(settings.BracketPairsPerOctave.Values.ToList());
+        _measureRenderingSettings = measureRenderingSettings;
+        _noteRenderingSettings = noteRenderingSettings;
+        ArgumentNullException.ThrowIfNull(noteRenderingSettings);
+        _noteRenderer = new NoteRenderer(noteRenderingSettings);
+        _restRenderer = new RestRenderer(noteRenderingSettings);
+        _bracketSimplifier = new BracketSimplifier(noteRenderingSettings.BracketPairsPerOctave.Values.ToList());
     }
 
     public string RenderMeasure(TabMeasure measure)
@@ -36,7 +38,7 @@ public class TabMeasureRenderer
         for (int i = 0; i < beats; i++)
         {
             _measureStringBuilder.Append(RenderBeat(measure, i + 1));
-            _measureStringBuilder.Append(new string(' ', _settings.SpacesBetweenBeats));
+            _measureStringBuilder.Append(new string(' ', _measureRenderingSettings.SpacesBetweenBeats));
         }
 
         return _measureStringBuilder.ToString().Trim();
@@ -46,13 +48,14 @@ public class TabMeasureRenderer
     {
         ArgumentNullException.ThrowIfNull(measure);
         if (measure.Tokens.Count == 0) return [];
-        
+
         int beats = measure.TimeSignature.Numerator;
         List<string> renderedBeats = new List<string>(beats);
         for (int i = 0; i < beats; i++)
         {
             renderedBeats.Add(RenderBeat(measure, i + 1));
         }
+
         return renderedBeats;
     }
 
@@ -65,18 +68,26 @@ public class TabMeasureRenderer
         if (measure.Tokens.Count == 0) return string.Empty;
 
         StringBuilder stringBuilder = new StringBuilder();
-        
+
         IReadOnlyList<TabToken> preparedTokens = PrepareTokensForBeat(measure, beat);
         foreach (TabToken token in preparedTokens)
         {
             stringBuilder.Append(RenderToken(token));
-            stringBuilder.Append(_settings.GetTrailingSpacesForBeatLength(token.Length));
+            stringBuilder.Append(_noteRenderingSettings.GetTrailingSpacesForBeatLength(token.Length));
         }
 
         string renderedBeat = stringBuilder.ToString().Trim();
-        return _bracketSimplifier.Simplify(renderedBeat);
+
+        try
+        {
+            return _bracketSimplifier.Simplify(renderedBeat);
+        }
+        catch (BracketSimplifierException e)
+        {
+            throw new TabMeasureRendererException($"Encountered an exception while simplifying brackets in measure {measure.MeasureNumber} - beat {beat}.", e);
+        }
     }
-    
+
     private string RenderToken(TabToken token)
     {
         return token switch
@@ -93,7 +104,7 @@ public class TabMeasureRenderer
         string notes = _noteRenderer.RenderNotes(token.Notes);
         stringBuilder.Append(notes);
 
-        stringBuilder.Append(_settings.GetTrailingSpacesForBeatLength(token.Length));
+        stringBuilder.Append(_noteRenderingSettings.GetTrailingSpacesForBeatLength(token.Length));
 
         if (token.Length.Beats > 1m)
         {
@@ -110,7 +121,7 @@ public class TabMeasureRenderer
         foreach (TabToken token in measure.Tokens)
         {
             TabToken tokenToAdd = token;
-            
+
             // NoteGroupTokens that started before this beat have already had their numbers rendered.
             // We want to display rests instead.
             if (token is NoteGroupToken noteToken)
@@ -120,9 +131,10 @@ public class TabMeasureRenderer
                     tokenToAdd = new RestToken(noteToken.Position, noteToken.Length);
                 }
             }
-            
+
             if (TabTokenUtility.TryCutTokenToFitBeat(tokenToAdd, beat, out TabToken? cutToken)) output.Add(cutToken!);
         }
+
         return output.Distinct().OrderBy(t => t.Position).ToList();
     }
 }

@@ -1,0 +1,297 @@
+<UserControl x:Class="GW2MidiConverter.App.Views.FileLoaderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
+             xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal"
+             d:DataContext="{d:DesignInstance viewModels:FileLoaderViewModel}"
+             Background="Transparent"
+             AllowDrop="True">
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
+                                                 True="Visible"
+                                                 False="Collapsed" />
+        <Duration x:Key="ColourFadeInAnimationDuration">0:0:0.125</Duration>
+        <Duration x:Key="ColourFadeOutAnimationDuration">0:0:0.2</Duration>
+        <Storyboard x:Key="HorizontalErrorShakeAnimation">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.05" Value="10" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.1" Value="-10" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.15" Value="8" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.2" Value="-8" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.25" Value="5" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.3" Value="-5" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.35" Value="2" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.4" Value="0" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="DragEnter">
+            <b:InvokeCommandAction Command="{Binding OnDragEnterCommand}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="DragLeave">
+            <b:InvokeCommandAction Command="{Binding OnDragLeaveCommand}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="Drop">
+            <b:InvokeCommandAction Command="{Binding OnDropFilesCommand}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
+    <Grid HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
+        <Border x:Name="BetaInfoBorder"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"
+                Margin="8">
+            <ui:TextBlock Text="This is a beta version. Expect bugs and silly things!"
+                          Appearance="Disabled"
+                          FontTypography="Body"/>
+        </Border>
+        <Grid HorizontalAlignment="Center"
+              VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0"
+                    x:Name="MainBorder"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    CornerRadius="{DynamicResource ControlCornerRadius}"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="0,0,0,16"
+                    Padding="14, 16"
+                    Focusable="False"
+                    KeyboardNavigation.IsTabStop="False">
+                <Border.RenderTransform>
+                    <TranslateTransform />
+                </Border.RenderTransform>
+                <StackPanel Orientation="Vertical"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                    <ui:SymbolIcon FontSize="32"
+                                   Foreground="White"
+                                   Margin="0,0,0,5">
+                        <ui:SymbolIcon.Style>
+                            <Style TargetType="{x:Type ui:SymbolIcon}">
+                                <Setter Property="Symbol" Value="MailInboxArrowDown20" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                 Value="{x:Static viewModels:FileDraggingInfoState.Valid}">
+                                        <Setter Property="Symbol" Value="MailInboxCheckmark20" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                 Value="{x:Static viewModels:FileDraggingInfoState.Invalid}">
+                                        <Setter Property="Symbol" Value="MailInboxDismiss20" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                 Value="{x:Static viewModels:FileDraggingInfoState.None}">
+                                        <!-- The animation values are backwards on purpose, since the default state of this element is valid/invalid. -->
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetProperty="(ui:SymbolIcon.Foreground).(SolidColorBrush.Color)"
+                                                                    To="#FF559CE4"
+                                                                    Duration="{StaticResource ColourFadeOutAnimationDuration}" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetProperty="(ui:SymbolIcon.Foreground).(SolidColorBrush.Color)"
+                                                                    Duration="{StaticResource ColourFadeInAnimationDuration}" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:SymbolIcon.Style>
+                    </ui:SymbolIcon>
+                    <ui:TextBlock Appearance="Primary" FontTypography="BodyStrong" Text="Drag your MIDI file here to start converting."
+                                  TextAlignment="Center"
+                                  Margin="0,0,0,10" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Grid.Column="0"
+                                   HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}"
+                                   Margin="0, 5"
+                                   Height="1" />
+                        <ui:TextBlock Grid.Column="1"
+                                      Margin="8,0"
+                                      Appearance="Primary"
+                                      FontTypography="Caption"
+                                      Text="OR"
+                                      HorizontalAlignment="Center"
+                                      TextAlignment="Center" />
+                        <Rectangle Grid.Column="2"
+                                   HorizontalAlignment="Stretch" Fill="{ui:ThemeResource TextFillColorDisabledBrush}"
+                                   Margin="0, 5"
+                                   Height="1" />
+                    </Grid>
+                    <ui:Button HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="0,10,0,0"
+                               Content="Select file..."
+                               Command="{Binding BrowseFilesCommand}" />
+                </StackPanel>
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <SolidColorBrush Color="#FF2B2B2B" />
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                         Value="{x:Static viewModels:FileDraggingInfoState.Valid}">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                            To="#FF4CAF50"
+                                                            Duration="{StaticResource ColourFadeInAnimationDuration}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                            Duration="{StaticResource ColourFadeOutAnimationDuration}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding CurrentDragState, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                         Value="{x:Static viewModels:FileDraggingInfoState.Invalid}">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                            To="#FFF44336"
+                                                            Duration="{StaticResource ColourFadeInAnimationDuration}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                    <BeginStoryboard Storyboard="{StaticResource HorizontalErrorShakeAnimation}" />
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                            Duration="{StaticResource ColourFadeOutAnimationDuration}" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding FileLoadingErrorProxy, UpdateSourceTrigger=Explicit, Mode=OneWay}"
+                                         Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard Storyboard="{StaticResource HorizontalErrorShakeAnimation}" />
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+            <controls:SubSettingItemsControl Grid.Row="1"
+                                             x:Name="TrackConfigurationItemsControl"
+                                             ItemsSource="{Binding TrackConfigItems}"
+                                             Grid.IsSharedSizeScope="True"
+                                             AddButtonVisibility="Collapsed"
+                                             Margin="0,0,0,16">
+                <controls:SubSettingItemsControl.Style>
+                    <Style TargetType="controls:SubSettingItemsControl">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TrackConfigItems.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </controls:SubSettingItemsControl.Style>
+                <controls:SubSettingItemsControl.InternalHeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel HorizontalAlignment="Stretch"
+                                    Orientation="Vertical">
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="A" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="B" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="C" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBlock Grid.Column="0"
+                                              Text="Enabled"
+                                              HorizontalAlignment="Left"
+                                              TextAlignment="Left"
+                                              Margin="0,0,16,0" />
+                                <ui:TextBlock Grid.Column="1"
+                                              Text="Track Name"
+                                              HorizontalAlignment="Stretch"
+                                              TextAlignment="Left" />
+                                <ui:TextBlock Grid.Column="2"
+                                              Text="Instrument"
+                                              HorizontalAlignment="Stretch"
+                                              TextAlignment="Right"
+                                              Margin="8,0,0,0" />
+                            </Grid>
+                            <Rectangle x:Name="Separator"
+                                       HorizontalAlignment="Stretch"
+                                       Margin="-16, 0,-16,8"
+                                       Height="1"
+                                       Fill="{DynamicResource WindowBackground}"
+                                       Focusable="False" />
+                        </StackPanel>
+                    </DataTemplate>
+                </controls:SubSettingItemsControl.InternalHeaderTemplate>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:TrackConfigItemViewModel}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="A" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="B" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="C" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0"
+                                      IsChecked="{Binding IsChecked}"
+                                      Margin="0,0,16,0" />
+                            <ui:TextBlock Grid.Column="1"
+                                          Text="{Binding TrackName}"
+                                          VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding Path=DataContext.PossibleInstruments, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                      SelectedItem="{Binding SelectedInstrument}"
+                                      Margin="8,0,0,0"
+                                      HorizontalAlignment="Right" />
+                            <controls:ValidityIcon Grid.Column="3"
+                                                   ValidityMessage="{Binding InvalidMessage}"
+                                                   ValidityType="{Binding Validity}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </controls:SubSettingItemsControl>
+            <ui:Button Grid.Row="2"
+                       HorizontalAlignment="Right"
+                       Command="{Binding ConvertTabCommand}"
+                       Content="Convert Tab"
+                       Icon="{ui:SymbolIcon ArrowRight16}"
+                       Visibility="{Binding ElementName=TrackConfigurationItemsControl, Path=Visibility }" />
+        </Grid>
+    </Grid>
+</UserControl>

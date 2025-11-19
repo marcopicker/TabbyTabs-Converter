@@ -1,7 +1,7 @@
-using GW2MidiConverter.GuildWars.Instruments;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Tab;
 using GW2MidiConverter.Tab.Octaves;
+using GW2MidiConverter.Tests.GuildWars.Instruments;
 using GW2MidiConverter.Tests.Resources;
 using NUnit.Framework;
 
@@ -23,7 +23,7 @@ public class TabDocumentTests
         MidiDocument midiDocument = MidiDocument.LoadFromMidiFile(MidiFiles.ChordTestFile);
         TabDocument tabDocument = TabDocument.FromMidiDocument(midiDocument, new LookAheadOctaveCalculator());
 
-        tabDocument.EnableTrack(1, Instrument.Piano);
+        tabDocument.EnableTrack(1, TestInstruments.Piano);
         
         Assert.That(tabDocument.Tracks, Has.Count.EqualTo(1));
     }

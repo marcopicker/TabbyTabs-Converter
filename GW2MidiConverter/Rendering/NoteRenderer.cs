@@ -8,10 +8,10 @@ namespace GW2MidiConverter.Rendering;
 
 public class NoteRenderer
 {
-    private readonly TabRendererSettings _settings;
+    private readonly NoteRenderingSettings _settings;
     private readonly BracketSimplifier _bracketSimplifier;
 
-    public NoteRenderer(TabRendererSettings settings)
+    public NoteRenderer(NoteRenderingSettings settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
 
@@ -36,7 +36,11 @@ public class NoteRenderer
 
     private string ApplyOctave(string noteString, Octave octave)
     {
-        if (!_settings.BracketPairsPerOctave.TryGetValue(octave, out BracketPair? bracketPair)) return noteString;
+        if (!_settings.BracketPairsPerOctave.TryGetValue(octave, out BracketPair? bracketPair))
+        {
+            return noteString;
+        }
+        
         return $"{bracketPair.OpeningBracket}{noteString}{bracketPair.ClosingBracket}";
     }
 }

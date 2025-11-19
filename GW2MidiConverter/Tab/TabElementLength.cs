@@ -1,9 +1,11 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using GW2MidiConverter.Midi;
 
 namespace GW2MidiConverter.Tab;
 
+[TypeConverter(typeof(TabElementLengthConverter))]
 public readonly struct TabElementLength(decimal beats) : IComparable<TabElementLength>, IEquatable<TabElementLength>
 {
     public decimal Beats { get; } = beats;

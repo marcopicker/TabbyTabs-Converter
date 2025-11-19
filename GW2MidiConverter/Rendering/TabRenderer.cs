@@ -9,25 +9,28 @@ namespace GW2MidiConverter.Rendering;
 public class TabRenderer
 {
     private readonly TabDocument _tabDocument;
-    private readonly TabRendererSettings _settings;
+    private readonly TabRenderingSettings _settings;
     private readonly TabTrackRenderer _trackRenderer;
-    
+
     private readonly StringBuilder _stringBuilder = new StringBuilder();
 
-    public TabRenderer(TabDocument tabDocument, TabRendererSettings? settings = null)
+    public TabRenderer(TabDocument tabDocument, TabRenderingSettings? settings = null)
     {
         ArgumentNullException.ThrowIfNull(tabDocument);
 
         _tabDocument = tabDocument;
-        _settings = settings ?? new TabRendererSettings();
-        _trackRenderer = new TabTrackRenderer(_settings);
+        _settings = settings ?? new TabRenderingSettings();
+        _trackRenderer = new TabTrackRenderer(_settings.TrackRenderingSettings,
+                                              _settings.MeasureRenderingSettings,
+                                              _settings.NoteRenderingSettings,
+                                              _settings.TimeSignatureRenderingSettings);
     }
 
     public string Render()
     {
         if (_tabDocument.Tracks.Count == 0) return string.Empty;
         _stringBuilder.Clear();
-        
+
         _stringBuilder.Append(RenderHeader());
         for (int i = 0; i < _tabDocument.Tracks.Count; i++)
         {
@@ -49,18 +52,14 @@ public class TabRenderer
     {
         return "Hello, I am a header!\n\n";
     }
-
-    [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The instrument name is invariant.")]
+    
     private void RenderTrack(TabTrack track)
     {
-        _stringBuilder.AppendLine($"{track.TrackInfo.InstrumentName}:");
-        _stringBuilder.Append(new string('\n', _settings.LineBreaksAfterTrackName));
-        
         _stringBuilder.AppendLine(_trackRenderer.Render(track));
     }
 
     private string RenderPostTrackMargin()
     {
-        return new string('\n', _settings.LineBreaksBetweenTracks);
+        return new string('\n', _settings.TrackRenderingSettings.LineBreaksBetweenTracks);
     }
 }

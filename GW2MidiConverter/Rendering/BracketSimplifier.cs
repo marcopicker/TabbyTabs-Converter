@@ -5,21 +5,20 @@ using System.Text;
 
 namespace GW2MidiConverter.Rendering;
 
-public class BracketSimplifier
+internal class BracketSimplifier
 {
     private readonly IReadOnlyCollection<BracketPair> _bracketPairs;
 
     public BracketSimplifier(IReadOnlyCollection<BracketPair> bracketPairs)
     {
         ArgumentNullException.ThrowIfNull(bracketPairs);
-        if (bracketPairs.Count == 0) throw new ArgumentException("Bracket pairs must not be empty.", nameof(bracketPairs));
-
         _bracketPairs = bracketPairs;
     }
 
     public string Simplify(string input)
     {
         if (string.IsNullOrWhiteSpace(input)) return input;
+        if (_bracketPairs.Count == 0) return input;
 
         StringBuilder builder = new StringBuilder();
         BracketPair? currentBracketScope = null;
@@ -41,7 +40,7 @@ public class BracketSimplifier
                 if (!isOpeningBracket)
                 {
                     // Example: "1 2 3]" is illegal.
-                    throw new InvalidOperationException("Closing brackets cannot exist without a matching opening bracket.");
+                    throw new BracketSimplifierException(input, index, "Closing brackets cannot exist without a matching opening bracket.");
                 }
 
                 currentBracketScope = currentPair;
@@ -53,14 +52,14 @@ public class BracketSimplifier
             if (isOpeningBracket)
             {
                 // Brackets cannot be nested.
-                throw new InvalidOperationException("Brackets cannot be nested.");
+                throw new BracketSimplifierException(input, index, "Brackets cannot be nested.");
             }
 
             bool bracketsMatch = currentBracketScope.IsClosingBracket(currentCharacter);
             if (!bracketsMatch)
             {
                 // Example: "1 [2) 3" is illegal.
-                throw new InvalidOperationException("Closing brackets must match the opening bracket.");
+                throw new BracketSimplifierException(input, index, "Closing brackets must match the opening bracket.");
             }
 
             // We're now dealing with a matching closing bracket!
@@ -70,6 +69,7 @@ public class BracketSimplifier
             if (indexOfNextMatchingOpeningBracket < 0)
             {
                 builder.Append(currentCharacter);
+                canBracketBeSkipped = false;
                 continue;
             }
 
@@ -81,6 +81,7 @@ public class BracketSimplifier
             }
 
             builder.Append(currentCharacter);
+            canBracketBeSkipped = false;
         }
 
         return builder.ToString();
