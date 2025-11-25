@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:settingsControls="clr-namespace:GW2MidiConverter.App.Views.Settings"
              xmlns:settingsViewModels="clr-namespace:GW2MidiConverter.App.ViewModels.Settings"
+             xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
              mc:Ignorable="d"
@@ -23,6 +24,9 @@
         <DataTemplate DataType="{x:Type settingsViewModels:TimeSignatureRenderingSettingsViewModel}">
             <settingsControls:TimeSignatureRenderingSettingsControl />
         </DataTemplate>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
+                                                 True="Visible"
+                                                 False="Collapsed" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -171,6 +175,57 @@
                 <TextBlock FontFamily="Lucida Console" xml:space="preserve" Text="{Binding TabText}"
                            Padding="0,20,0,0" />
             </ScrollViewer>
+        </Border>
+        <Border Grid.Column="2"
+                Focusable="False"
+                IsHitTestVisible="False"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Padding="24"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource PopupCornerRadius}"
+                BorderBrush="{DynamicResource ContentDialogBorderBrush}"
+                Background="{DynamicResource ContentDialogBackground}"
+                Margin="64"
+                Opacity="0">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="30"
+                                  Direction="0"
+                                  Opacity="0.4"
+                                  ShadowDepth="0"
+                                  Color="#202020" />
+            </Border.Effect>
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsRenderingTakingLongerThanExpected}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         From="0"
+                                                         To="1"
+                                                         Duration="0:0:0.125" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         Duration="0:0:0.125"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Orientation="Vertical">
+                <ui:ProgressRing IsIndeterminate="True"
+                                 Margin="0,0,0,16" />
+                <ui:TextBlock Text="Rendering..." />
+            </StackPanel>
         </Border>
     </Grid>
 </UserControl>

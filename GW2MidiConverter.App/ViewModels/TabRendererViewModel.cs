@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,7 +23,6 @@ internal class TabRendererViewModel : ObservableObject
     private readonly ISnackbarService _snackbarService;
     private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<TabRendererViewModel> _logger;
-    private TabDocument? _tabDocument;
     private string _tabText = "";
     private ISettingsViewModel? _selectedSettingsViewModel;
 
@@ -30,6 +30,8 @@ internal class TabRendererViewModel : ObservableObject
     private readonly MeasureRenderingSettingsViewModel _measureRenderingSettingsViewModel;
     private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
     private readonly TimeSignatureRenderingSettingsViewModel _timeSignatureRenderingSettingsViewModel;
+    private bool _isRenderingTakingLongerThanExpected;
+    private CancellationTokenSource? _renderCancellationTokenSource;
 
     public event EventHandler? ReturnRequested;
 
@@ -41,15 +43,7 @@ internal class TabRendererViewModel : ObservableObject
         set => SetProperty(ref _selectedSettingsViewModel, value);
     }
 
-    public TabDocument? TabDocument
-    {
-        get => _tabDocument;
-        set
-        {
-            _tabDocument = value;
-            RebuildTab();
-        }
-    }
+    public TabDocument? TabDocument { get; set; }
 
     public string TabText
     {
@@ -57,8 +51,13 @@ internal class TabRendererViewModel : ObservableObject
         private set => SetProperty(ref _tabText, value);
     }
 
-    public ICommand ExportCommand { get; }
+    public bool IsRenderingTakingLongerThanExpected
+    {
+        get => _isRenderingTakingLongerThanExpected;
+        private set => SetProperty(ref _isRenderingTakingLongerThanExpected, value);
+    }
 
+    public ICommand ExportCommand { get; }
     public ICommand ReturnCommand { get; }
     public ICommand LoadStyleCommand { get; }
     public ICommand SaveStyleCommand { get; }
@@ -75,8 +74,8 @@ internal class TabRendererViewModel : ObservableObject
 
         ExportCommand = new RelayCommand(ExportTab);
         ReturnCommand = new RelayCommand(RequestReturn);
-        LoadStyleCommand = new RelayCommand(ExecuteLoadStyleCommand);
-        SaveStyleCommand = new RelayCommand(ExecuteSaveStyleCommand);
+        LoadStyleCommand = new AsyncRelayCommand(ExecuteLoadStyleCommandAsync);
+        SaveStyleCommand = new AsyncRelayCommand(ExecuteSaveStyleCommandAsync);
         ResetStyleCommand = new AsyncRelayCommand(ExecuteResetSettingsCommand);
 
         _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings(), "Notes");
@@ -101,44 +100,101 @@ internal class TabRendererViewModel : ObservableObject
         _timeSignatureRenderingSettingsViewModel.ApplySettings(settings.TimeSignatureRenderingSettings);
     }
 
-    private void RebuildTab()
+    public async Task RenderTabAsync(CancellationToken cancellationToken = default)
     {
         if (TabDocument == null!) return;
 
         using IDisposable? _ = _logger.BeginScope(new { Operation = "Rendering Tab" });
-        TabRenderingSettings settings = BuildRenderingSettings();
+        _logger.LogInformation("Rendering tab.");
 
         try
         {
-            _logger.LogInformation("Rendering tab.");
-            TabRenderer renderer = new TabRenderer(TabDocument, settings);
-            TabText = renderer.Render();
+            Task<string> renderingTask = GetRenderedTabAsync(cancellationToken);
+            Task maxExpectedRuntimeTask = Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+
+            Task completedTask = await Task.WhenAny(renderingTask, maxExpectedRuntimeTask);
+            if (completedTask == maxExpectedRuntimeTask)
+            {
+                IsRenderingTakingLongerThanExpected = true;
+                await renderingTask;
+            }
+
+            TabText = await renderingTask;
             _logger.LogInformation("Tab rendered successfully.");
+        }
+        catch (TaskCanceledException)
+        {
+            _logger.LogInformation("Rendering tab cancelled.");
+        }
+        catch (TabRenderingException e)
+        {
+            _logger.LogError(e, "Failed to render tab with settings: {Settings}", e.Settings);
+            bool hasSnackbarPresenter = _snackbarService.GetSnackbarPresenter() != null;
+            if (hasSnackbarPresenter) _snackbarService.Show("Tab Rendering Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to render tab with settings: {Settings}", settings);
+            _logger.LogError(e, "Failed to render tab.");
             bool hasSnackbarPresenter = _snackbarService.GetSnackbarPresenter() != null;
-            if (hasSnackbarPresenter) _snackbarService.Show("Rendering Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(30));
+            if (hasSnackbarPresenter) _snackbarService.Show("Tab Rendering Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
             TabText = string.Empty;
+        }
+        finally
+        {
+            IsRenderingTakingLongerThanExpected = false;
         }
     }
 
-    private TabRenderingSettings BuildRenderingSettings()
+    private async Task<string> GetRenderedTabAsync(CancellationToken cancellationToken = default)
     {
-        return new TabRenderingSettings
+        if (TabDocument == null!) return string.Empty;
+       
+        TabRenderingSettings settings = await BuildRenderingSettingsAsync();
+
+        return await Task.Run(() =>
+        {
+            TabRenderer renderer = new TabRenderer(TabDocument, settings);
+            return renderer.Render(cancellationToken);
+        }, cancellationToken);
+    }
+
+    private async Task<TabRenderingSettings> BuildRenderingSettingsAsync()
+    {
+        return await Task.Run(() => new TabRenderingSettings
         {
             NoteRenderingSettings = _noteRenderingSettingsViewModel.GetSettings(),
             MeasureRenderingSettings = _measureRenderingSettingsViewModel.GetSettings(),
             TrackRenderingSettings = _trackRenderingSettingsViewModel.GetSettings(),
             TimeSignatureRenderingSettings = _timeSignatureRenderingSettingsViewModel.GetSettings()
-        };
+        });
     }
 
     private void RegisterSettingsViewModel(ISettingsViewModel settingsViewModel)
     {
         Settings.Add(settingsViewModel);
-        settingsViewModel.SubSettingChanged += (_, _) => RebuildTab();
+        settingsViewModel.SubSettingChanged += HandleSubSettingsChanged;
+    }
+
+    private async void HandleSubSettingsChanged(object? sender, EventArgs eventArgs)
+    {
+        try
+        {
+            _renderCancellationTokenSource?.Cancel();
+            _renderCancellationTokenSource?.Dispose();
+
+            _renderCancellationTokenSource = new CancellationTokenSource();
+            CancellationToken token = _renderCancellationTokenSource.Token;
+
+            await RenderTabAsync(token);
+        }
+        catch (TaskCanceledException)
+        {
+            // Nothing; this is expected.
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to rebuild tab after sub-setting change.");
+        }
     }
 
     private void RequestReturn()
@@ -187,7 +243,7 @@ internal class TabRendererViewModel : ObservableObject
         }
     }
 
-    private void ExecuteLoadStyleCommand()
+    private async Task ExecuteLoadStyleCommandAsync()
     {
         using IDisposable? _ = _logger.BeginScope(new { Operation = "Loading Style" });
         OpenFileDialog openFileDialog = new OpenFileDialog
@@ -204,8 +260,11 @@ internal class TabRendererViewModel : ObservableObject
 
             _logger.LogInformation("Loading style '{FileName}'...", openFileDialog.FileName);
 
-            TabRenderingSettings renderingSettings = TabRenderingSettings.FromFile(openFileDialog.FileName);
-            ApplySettings(renderingSettings);
+            await Task.Run(() =>
+            {
+                TabRenderingSettings renderingSettings = TabRenderingSettings.FromFile(openFileDialog.FileName);
+                ApplySettings(renderingSettings);
+            });
 
             _logger.LogInformation("Style loaded successfully.");
             _snackbarService.Show("Style Loaded", $"The style '{Path.GetFileName(openFileDialog.FileName)}' was successfully loaded.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), TimeSpan.FromSeconds(3));
@@ -217,7 +276,7 @@ internal class TabRendererViewModel : ObservableObject
         }
     }
 
-    private void ExecuteSaveStyleCommand()
+    private async Task ExecuteSaveStyleCommandAsync()
     {
         using IDisposable? _ = _logger.BeginScope(new { Operation = "Saving Style" });
         SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -234,8 +293,8 @@ internal class TabRendererViewModel : ObservableObject
 
             _logger.LogInformation("Saving style '{FileName}'...", saveFileDialog.FileName);
 
-            TabRenderingSettings renderingSettings = BuildRenderingSettings();
-            renderingSettings.SaveToFile(saveFileDialog.FileName);
+            TabRenderingSettings renderingSettings = await BuildRenderingSettingsAsync();
+            await Task.Run(() => renderingSettings.SaveToFile(saveFileDialog.FileName));
 
             _logger.LogInformation("Style saved successfully.");
             _snackbarService.Show("Style Saved", "The style was saved successfully.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), TimeSpan.FromSeconds(3));

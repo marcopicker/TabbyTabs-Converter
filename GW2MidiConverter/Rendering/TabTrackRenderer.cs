@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using System.Threading;
 using GW2MidiConverter.Midi;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
@@ -21,9 +22,10 @@ internal class TabTrackRenderer(
     /// Renders the given track. This method only renders the actual content, and no headers like the instrument name.
     /// </summary>
     /// <param name="track">The track to render.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The rendered track.</returns>
     [SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "The instrument name is invariant.")]
-    public string Render(TabTrack track)
+    public string Render(TabTrack track, CancellationToken cancellationToken = default)
     {
         if (track.Measures.Count == 0) return string.Empty;
         _trackStringBuilder.Clear();
@@ -35,6 +37,8 @@ internal class TabTrackRenderer(
         int consecutiveMeasures = 0;
         for (int i = 0; i < track.Measures.Count; i++)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            
             TabMeasure currentMeasure = track.Measures[i];
             TabMeasure? nextMeasure = i + 1 < track.Measures.Count ? track.Measures[i + 1] : null;
 

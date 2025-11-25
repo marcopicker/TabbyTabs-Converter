@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
 
@@ -26,22 +28,38 @@ public class TabRenderer
                                               _settings.TimeSignatureRenderingSettings);
     }
 
-    public string Render()
+    public string Render(CancellationToken cancellationToken = default)
     {
         if (_tabDocument.Tracks.Count == 0) return string.Empty;
         _stringBuilder.Clear();
 
-        _stringBuilder.Append(RenderHeader());
-        for (int i = 0; i < _tabDocument.Tracks.Count; i++)
+        try
         {
-            TabTrack track = _tabDocument.Tracks[i];
-            RenderTrack(track);
-
-            bool isLastTrack = i == _tabDocument.Tracks.Count - 1;
-            if (!isLastTrack)
+            _stringBuilder.Append(RenderHeader());
+            for (int i = 0; i < _tabDocument.Tracks.Count; i++)
             {
-                _stringBuilder.Append(RenderPostTrackMargin());
+                cancellationToken.ThrowIfCancellationRequested();
+
+                TabTrack track = _tabDocument.Tracks[i];
+                RenderTrack(track, cancellationToken);
+
+                bool isLastTrack = i == _tabDocument.Tracks.Count - 1;
+                if (!isLastTrack)
+                {
+                    _stringBuilder.Append(RenderPostTrackMargin());
+                }
             }
+        }
+        catch (TaskCanceledException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            throw new TabRenderingException("An unexpected error occurred while rendering the tab.", e)
+            {
+                Settings = _settings
+            };
         }
 
         return _stringBuilder.ToString();
@@ -52,10 +70,11 @@ public class TabRenderer
     {
         return "Hello, I am a header!\n\n";
     }
-    
-    private void RenderTrack(TabTrack track)
+
+    private void RenderTrack(TabTrack track, CancellationToken cancellationToken)
     {
-        _stringBuilder.AppendLine(_trackRenderer.Render(track));
+        string renderedTrack = _trackRenderer.Render(track, cancellationToken);
+        _stringBuilder.AppendLine(renderedTrack);
     }
 
     private string RenderPostTrackMargin()
