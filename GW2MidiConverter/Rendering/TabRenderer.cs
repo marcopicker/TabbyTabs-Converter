@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using GW2MidiConverter.Rendering.Settings;
 using GW2MidiConverter.Tab;
 
@@ -50,7 +49,7 @@ public class TabRenderer
                 }
             }
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
             throw;
         }

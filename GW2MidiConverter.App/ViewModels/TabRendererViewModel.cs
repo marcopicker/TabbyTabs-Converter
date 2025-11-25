@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ namespace GW2MidiConverter.App.ViewModels;
 
 internal class TabRendererViewModel : ObservableObject
 {
+    private static readonly TimeSpan MaximumExpectedRenderTimeBeforeShowingProgressIndicator = TimeSpan.FromMilliseconds(200); 
+    
     private readonly ISnackbarService _snackbarService;
     private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<TabRendererViewModel> _logger;
@@ -31,6 +34,8 @@ internal class TabRendererViewModel : ObservableObject
     private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
     private readonly TimeSignatureRenderingSettingsViewModel _timeSignatureRenderingSettingsViewModel;
     private bool _isRenderingTakingLongerThanExpected;
+
+    private int _activeRendererCount;
     private CancellationTokenSource? _renderCancellationTokenSource;
 
     public event EventHandler? ReturnRequested;
@@ -104,13 +109,17 @@ internal class TabRendererViewModel : ObservableObject
     {
         if (TabDocument == null!) return;
 
-        using IDisposable? _ = _logger.BeginScope(new { Operation = "Rendering Tab" });
-        _logger.LogInformation("Rendering tab.");
+        _activeRendererCount++;
 
+        using IDisposable? _ = _logger.BeginScope(new { Operation = "Rendering Tab", ActiveRenderers = _activeRendererCount });
+        _logger.LogInformation("Rendering tab (Currently active: {Count})", _activeRendererCount);
+
+        Stopwatch renderStopwatch = Stopwatch.StartNew();
+        
         try
         {
             Task<string> renderingTask = GetRenderedTabAsync(cancellationToken);
-            Task maxExpectedRuntimeTask = Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+            Task maxExpectedRuntimeTask = Task.Delay(MaximumExpectedRenderTimeBeforeShowingProgressIndicator, cancellationToken);
 
             Task completedTask = await Task.WhenAny(renderingTask, maxExpectedRuntimeTask);
             if (completedTask == maxExpectedRuntimeTask)
@@ -120,7 +129,7 @@ internal class TabRendererViewModel : ObservableObject
             }
 
             TabText = await renderingTask;
-            _logger.LogInformation("Tab rendered successfully.");
+            _logger.LogInformation("Tab rendered successfully after {ElapsedTime}ms.", renderStopwatch.ElapsedMilliseconds);
         }
         catch (TaskCanceledException)
         {
@@ -141,14 +150,18 @@ internal class TabRendererViewModel : ObservableObject
         }
         finally
         {
-            IsRenderingTakingLongerThanExpected = false;
+            _activeRendererCount--;
+            if (_activeRendererCount == 0)
+            {
+                IsRenderingTakingLongerThanExpected = false;
+            }
         }
     }
 
     private async Task<string> GetRenderedTabAsync(CancellationToken cancellationToken = default)
     {
         if (TabDocument == null!) return string.Empty;
-       
+        
         TabRenderingSettings settings = await BuildRenderingSettingsAsync();
 
         return await Task.Run(() =>
