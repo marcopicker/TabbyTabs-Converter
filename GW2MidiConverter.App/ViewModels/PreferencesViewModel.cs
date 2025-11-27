@@ -119,7 +119,7 @@ internal class PreferencesViewModel : ObservableObject
         {
             DirectoryInfo logFolder = new DirectoryInfo(Logging.LogFolder);
             if (!logFolder.Exists) logFolder.Create();
-            
+
             Process.Start(new ProcessStartInfo(Logging.LogFolder)
             {
                 UseShellExecute = true
@@ -146,7 +146,11 @@ internal class PreferencesViewModel : ObservableObject
             new LicenseAttribution(".NET Community Toolkit", "8.4.0", "https://github.com/CommunityToolkit/dotnet", "MIT License", "https://github.com/CommunityToolkit/dotnet/blob/main/License.md"),
             new LicenseAttribution("XamlBehaviors for WPF", "1.1.135", "https://github.com/Microsoft/XamlBehaviorsWpf", "MIT License", "https://github.com/microsoft/XamlBehaviorsWpf/blob/main/LICENSE"),
             new LicenseAttribution("NAudio", "2.2.1", "https://github.com/naudio/NAudio", "MIT License", "https://github.com/naudio/NAudio/blob/master/license.txt"),
-            new LicenseAttribution("Newtonsoft Json.NET", "13.0.4", "https://www.newtonsoft.com/json", "MIT License", "https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md")
+            new LicenseAttribution("Newtonsoft Json.NET", "13.0.4", "https://www.newtonsoft.com/json", "MIT License", "https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md"),
+            new LicenseAttribution("Serilog", "4.3.0", "https://serilog.net/", "Apache 2.0 License", "https://github.com/serilog/serilog/blob/dev/LICENSE"),
+            new LicenseAttribution("Serilog.Formatting.Compact", "3.0.0", "https://github.com/serilog/serilog-formatting-compact", "Apache 2.0 License", "https://github.com/serilog/serilog-formatting-compact/blob/dev/LICENSE"),
+            new LicenseAttribution("Serilog.Sinks.Console", "6.1.1", "https://github.com/serilog/serilog-sinks-console", "Apache 2.0 License", "https://github.com/serilog/serilog-sinks-console/blob/dev/LICENSE"),
+            new LicenseAttribution("Serilog.Sinks.File", "7.0.0", "https://github.com/serilog/serilog-sinks-file", "Apache 2.0 License", "https://github.com/serilog/serilog-sinks-file/blob/dev/LICENSE")
         ];
     }
 }

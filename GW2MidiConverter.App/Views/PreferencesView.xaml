@@ -110,7 +110,7 @@
                 </ui:TextBlock>
                 <ui:TextBlock Margin="0,0,0,8">
                     <Run Text="Copyright © 2025" />
-                    <Hyperlink NavigateUri="https://www.google.com"
+                    <Hyperlink NavigateUri="https://github.com/Pocram93"
                                RequestNavigate="Hyperlink_OnRequestNavigate"
                                Style="{StaticResource HyperLinkStyle}">
                         <Run Text="Marco Picker" />
