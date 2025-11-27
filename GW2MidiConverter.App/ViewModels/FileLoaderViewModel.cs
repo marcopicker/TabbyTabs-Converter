@@ -261,8 +261,9 @@ internal class FileLoaderViewModel : ObservableObject
             _logger.LogDebug("Assigned the track the instrument '{Instrument}'.", item.SelectedInstrument?.Name);
 
             item.IsChecked = item.SelectedInstrument != null;
-
             items.Add(item);
+            
+            VerifyTrackConfigItem(item);
             _logger.LogDebug("Prepared track {TrackIndex}.", index);
         }
 
