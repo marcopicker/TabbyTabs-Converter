@@ -8,6 +8,7 @@
                  xmlns:controls="clr-namespace:GW2MidiConverter.App.Views"
                  xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
                  xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+                 xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
                  Title="{Binding ApplicationTitle}"
@@ -32,6 +33,9 @@
         <DataTemplate DataType="{x:Type viewModels:TabRendererViewModel}">
             <controls:TabRenderingControl />
         </DataTemplate>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
+                                                 True="Visible"
+                                                 False="Collapsed" />
     </ui:FluentWindow.Resources>
     <Grid HorizontalAlignment="Stretch"
           VerticalAlignment="Stretch">
@@ -65,26 +69,32 @@
                                       Color="#202020" />
                 </Border.Effect>
                 <controls:PreferencesView x:Name="PreferencesView"
-                                          CloseRequested="PreferencesView_OnCloseRequested"/>
+                                          CloseRequested="PreferencesView_OnCloseRequested" />
             </Border>
         </Border>
-        <ui:Button x:Name="PreferencesButton"
-                   HorizontalContentAlignment="Stretch"
-                   HorizontalAlignment="Right"
-                   VerticalAlignment="Bottom"
-                   Margin="8"
-                   Width="32"
-                   Height="32"
-                   ToolTip="Settings"
-                   Padding="0"
-                   Click="PreferencesButton_OnClick">
-            <Grid HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch">
-                <ui:SymbolIcon Grid.Column="0"
-                               HorizontalAlignment="Center"
-                               Symbol="Settings24" />
-            </Grid>
-        </ui:Button>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="8">
+            <ui:Button Appearance="Success"
+                       Icon="{ui:SymbolIcon ArrowCounterclockwise24}"
+                       Content="A new version is available"
+                       Margin="0,0,8,0"
+                       Visibility="{Binding IsUpdateAvailable}"
+                       Command="{Binding GetUpdateCommand}" />
+            <ui:Button HorizontalContentAlignment="Stretch"
+                       Width="32"
+                       Height="32"
+                       ToolTip="Settings"
+                       Padding="0"
+                       Click="PreferencesButton_OnClick">
+                <Grid HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
+                    <ui:SymbolIcon HorizontalAlignment="Center"
+                                   Symbol="Settings24" />
+                </Grid>
+            </ui:Button>
+        </StackPanel>
         <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
     </Grid>
 </ui:FluentWindow>

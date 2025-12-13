@@ -1,6 +1,9 @@
 ﻿using System.IO;
 using System.Reflection;
 using System.Windows;
+using EasyPrefs;
+using EasyPrefs.Abstractions;
+using EasyPrefs.JSON;
 using GW2MidiConverter.App.Models;
 using GW2MidiConverter.App.Resources;
 using GW2MidiConverter.App.Services;
@@ -23,9 +26,26 @@ public partial class App : Application
     {
         HostApplicationBuilder builder = Host.CreateApplicationBuilder();
         RegisterLogger(builder.Services);
+        RegisterPreferences(builder.Services);
         RegisterWpfUiComponents(builder.Services);
         RegisterApplicationContent(builder.Services);
         _host = builder.Build();
+    }
+
+    private static void RegisterPreferences(IServiceCollection services)
+    {
+        JsonPreferenceDataProvider dataProvider = new JsonPreferenceDataProvider("preferences.json");
+
+        BuildablePreferenceSchemaProvider schemaProvider = new BuildablePreferenceSchemaProvider();
+        schemaProvider.AddSchema(new PreferenceSchema(PreferenceKeys.AUTO_UPDATE, typeof(bool), false));
+
+        Preferences preferences = new Preferences(dataProvider, schemaProvider)
+        {
+            AutoApplyChanges = true
+        };
+
+        services.AddSingleton<IPreferences, Preferences>(_ => preferences);
+        services.AddSingleton<IPreferencesReader, Preferences>(_ => preferences);
     }
 
     private static void RegisterWpfUiComponents(IServiceCollection services)
@@ -54,7 +74,7 @@ public partial class App : Application
         Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
                                               .Enrich.FromLogContext()
                                               .Enrich.WithProperty("Application", ApplicationResources.ApplicationName)
-                                              .Enrich.WithProperty("Version", Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? string.Empty)
+                                              .Enrich.WithProperty("Version", VersioningHelper.CurrentVersionText ?? string.Empty)
                                               .WriteTo.Console()
                                               .WriteTo.File(
                                                   formatter: new CompactJsonFormatter(),
@@ -76,18 +96,18 @@ public partial class App : Application
     {
         _host.Start();
 
-        Log.Information("Application starting. Version: {Version}", Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Unknown");
-        
+        Log.Information("Application starting. Version: {Version}", VersioningHelper.CurrentVersionText ?? "Unknown");
+
         MainWindow? mainWindow = _host.Services.GetService<MainWindow>();
         mainWindow?.Show();
-        
+
         base.OnStartup(args);
     }
 
     protected override void OnExit(ExitEventArgs args)
     {
         Log.Information("Application shutting down.");
-        
+
         _host.StopAsync().Wait();
         _host.Dispose();
         base.OnExit(args);

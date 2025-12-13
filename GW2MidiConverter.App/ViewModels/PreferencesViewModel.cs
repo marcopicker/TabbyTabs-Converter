@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using EasyPrefs.Abstractions;
 using GW2MidiConverter.App.Resources;
 using GW2MidiConverter.App.Services;
 using Microsoft.Extensions.Logging;
@@ -21,6 +21,7 @@ internal class PreferencesViewModel : ObservableObject
     private readonly IApplicationVersionChecker _versionChecker;
     private readonly ISnackbarService _snackbarService;
     private readonly ILogger<PreferencesViewModel> _logger;
+    private readonly IPreferences _preferences;
     private bool _autoCheckForUpdates;
     private bool _isNewVersionAvailable;
 
@@ -42,7 +43,11 @@ internal class PreferencesViewModel : ObservableObject
     public bool AutoCheckForUpdates
     {
         get => _autoCheckForUpdates;
-        set => SetProperty(ref _autoCheckForUpdates, value);
+        set
+        {
+            if (!SetProperty(ref _autoCheckForUpdates, value)) return;
+            _preferences.SetPreference("AutoUpdate", value);
+        }
     }
 
     public IReadOnlyList<LicenseAttribution> LicenseAttributions { get; }
@@ -57,20 +62,29 @@ internal class PreferencesViewModel : ObservableObject
 
     public PreferencesViewModel(IApplicationVersionChecker versionChecker,
                                 ISnackbarService snackbarService,
-                                ILogger<PreferencesViewModel> logger)
+                                ILogger<PreferencesViewModel> logger,
+                                IPreferences preferences)
     {
         _updateInfo = new VersionCheckInfo(false, new Version(), string.Empty, string.Empty);
         _versionChecker = versionChecker;
         _snackbarService = snackbarService;
         _logger = logger;
+        _preferences = preferences;
         CheckForUpdateCommand = new AsyncRelayCommand(CheckForUpdates);
         GetUpdateCommand = new RelayCommand(GetUpdate);
         OpenLogsCommand = new RelayCommand(OpenLogDirectory);
 
-        CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? string.Empty;
+        CurrentVersion = VersioningHelper.CurrentVersionText ?? string.Empty;
         _newVersion = string.Empty;
 
-        LicenseAttributions = GetLicenseAttributions().OrderBy(l => l.LicenseName).ToList();
+        LicenseAttributions = GetLicenseAttributions().OrderBy(l => l.SoftwareName).ToList();
+
+        LoadPreferences();
+    }
+
+    private void LoadPreferences()
+    {
+        AutoCheckForUpdates = _preferences.GetPreference<bool>(PreferenceKeys.AUTO_UPDATE);
     }
 
     private async Task CheckForUpdates()
@@ -150,7 +164,9 @@ internal class PreferencesViewModel : ObservableObject
             new LicenseAttribution("Serilog", "4.3.0", "https://serilog.net/", "Apache 2.0 License", "https://github.com/serilog/serilog/blob/dev/LICENSE"),
             new LicenseAttribution("Serilog.Formatting.Compact", "3.0.0", "https://github.com/serilog/serilog-formatting-compact", "Apache 2.0 License", "https://github.com/serilog/serilog-formatting-compact/blob/dev/LICENSE"),
             new LicenseAttribution("Serilog.Sinks.Console", "6.1.1", "https://github.com/serilog/serilog-sinks-console", "Apache 2.0 License", "https://github.com/serilog/serilog-sinks-console/blob/dev/LICENSE"),
-            new LicenseAttribution("Serilog.Sinks.File", "7.0.0", "https://github.com/serilog/serilog-sinks-file", "Apache 2.0 License", "https://github.com/serilog/serilog-sinks-file/blob/dev/LICENSE")
+            new LicenseAttribution("Serilog.Sinks.File", "7.0.0", "https://github.com/serilog/serilog-sinks-file", "Apache 2.0 License", "https://github.com/serilog/serilog-sinks-file/blob/dev/LICENSE"),
+            new LicenseAttribution("EasyPrefs", "1.3.4", "https://github.com/marcopicker/EasyPrefs", "MIT License", "https://github.com/marcopicker/EasyPrefs/blob/main/LICENSE"),
+            new LicenseAttribution("EasyPrefs.JSON", "1.3.4", "https://github.com/marcopicker/EasyPrefs", "MIT License", "https://github.com/marcopicker/EasyPrefs/blob/main/LICENSE"),
         ];
     }
 }

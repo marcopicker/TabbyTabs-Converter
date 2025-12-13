@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,7 @@ namespace GW2MidiConverter.App.Services;
 
 internal class GitHubHostedApplicationVersionChecker : IApplicationVersionChecker
 {
-    private const string LATEST_RELEASE_URI = "https://api.github.com/repos/Pocram93/GW2-Midi-Converter/releases/latest";
+    private const string LATEST_RELEASE_URI = "https://api.github.com/repos/marcopicker/GW2-Midi-Converter/releases/latest";
 
     private readonly ILogger<GitHubHostedApplicationVersionChecker> _logger;
     private readonly HttpClient _client = new HttpClient();
@@ -28,7 +27,7 @@ internal class GitHubHostedApplicationVersionChecker : IApplicationVersionChecke
             _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
         }
 
-        _currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+        _currentVersion = VersioningHelper.CurrentVersion;
     }
 
     public async Task<VersionCheckInfo> IsNewVersionAvailableAsync()
