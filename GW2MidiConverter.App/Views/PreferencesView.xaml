@@ -6,7 +6,6 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:controls="clr-namespace:GW2MidiConverter.App.Controls"
              xmlns:viewModels="clr-namespace:GW2MidiConverter.App.ViewModels"
-             xmlns:converters="clr-namespace:GW2MidiConverter.App.Converters"
              xmlns:resources="clr-namespace:GW2MidiConverter.App.Resources"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
@@ -16,12 +15,6 @@
              MaxHeight="850"
              Focusable="False">
     <UserControl.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
-                                                 True="Visible"
-                                                 False="Collapsed" />
-        <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"
-                                                 True="Collapsed"
-                                                 False="Visible" />
         <Style x:Key="HyperLinkStyle"
                TargetType="{x:Type Hyperlink}">
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -34,6 +27,31 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Version check ContentControls -->
+        <controls:SubSettingContentControl x:Key="UncheckedVersionContentControl"
+                                           HeaderText="Version"
+                                           DescriptionText="{Binding CurrentVersion, StringFormat={}Current version: {0}}">
+            <ui:Button Appearance="Secondary"
+                       Content="Check for updates"
+                       Command="{Binding CheckForUpdateCommand}" />
+        </controls:SubSettingContentControl>
+
+        <controls:SubSettingContentControl x:Key="NewVersionAvailableContent"
+                                           HeaderText="New version available"
+                                           DescriptionText="{Binding NewVersion, StringFormat={}Version {0} is available!}">
+            <ui:Button Appearance="Primary"
+                       Content="Download new version"
+                       Command="{Binding GetUpdateCommand}" />
+        </controls:SubSettingContentControl>
+
+        <controls:SubSettingContentControl x:Key="NoVersionAvailableContent"
+                                           HeaderText="You are up to date"
+                                           DescriptionText="{Binding CurrentVersion, StringFormat={}Current version: {0}}">
+            <ui:Button Appearance="Primary"
+                       Content="You are up to date"
+                       IsEnabled="False" />
+        </controls:SubSettingContentControl>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -60,23 +78,24 @@
                       HorizontalScrollBarVisibility="Hidden"
                       VerticalScrollBarVisibility="Auto">
             <StackPanel Grid.IsSharedSizeScope="False">
-                <controls:SubSettingContentControl HeaderText="New version available"
-                                                   DescriptionText="{Binding NewVersion, StringFormat={}Version {0} is available!}"
-                                                   Margin="0,0,0,8"
-                                                   Visibility="{Binding IsNewVersionAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <ui:Button Appearance="Primary"
-                               Content="Download new version"
-                               Command="{Binding GetUpdateCommand}" />
-                </controls:SubSettingContentControl>
-
-                <controls:SubSettingContentControl HeaderText="Version"
-                                                   DescriptionText="{Binding CurrentVersion, StringFormat={}Current version: {0}}"
-                                                   Margin="0,0,0,8"
-                                                   Visibility="{Binding IsNewVersionAvailable, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-                    <ui:Button Appearance="Secondary"
-                               Content="Check for updates"
-                               Command="{Binding CheckForUpdateCommand}" />
-                </controls:SubSettingContentControl>
+                <ContentControl x:Name="UpdateControl"
+                                Margin="0,0,0,8">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="Content" Value="{StaticResource UncheckedVersionContentControl}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding VersionCheckState}"
+                                             Value="{x:Static viewModels:VersionCheckState.NewVersionAvailable}">
+                                    <Setter Property="Content" Value="{StaticResource NewVersionAvailableContent}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding VersionCheckState}"
+                                             Value="{x:Static viewModels:VersionCheckState.NoVersionAvailable}">
+                                    <Setter Property="Content" Value="{StaticResource NoVersionAvailableContent}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
 
                 <controls:SubSettingContentControl HeaderText="Automatic update checks"
                                                    DescriptionText="Check for an update every time you start this program."

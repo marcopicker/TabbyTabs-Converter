@@ -23,8 +23,7 @@ internal class PreferencesViewModel : ObservableObject
     private readonly ILogger<PreferencesViewModel> _logger;
     private readonly IPreferences _preferences;
     private bool _autoCheckForUpdates;
-    private bool _isNewVersionAvailable;
-
+    private VersionCheckState _versionCheckState = VersionCheckState.Unchecked;
     private VersionCheckInfo _updateInfo;
     private string _newVersion;
 
@@ -34,10 +33,10 @@ internal class PreferencesViewModel : ObservableObject
 
     public ICommand OpenLogsCommand { get; }
 
-    public bool IsNewVersionAvailable
+    public VersionCheckState VersionCheckState
     {
-        get => _isNewVersionAvailable;
-        set => SetProperty(ref _isNewVersionAvailable, value);
+        get => _versionCheckState;
+        set => SetProperty(ref _versionCheckState, value);
     }
 
     public bool AutoCheckForUpdates
@@ -95,7 +94,7 @@ internal class PreferencesViewModel : ObservableObject
         try
         {
             VersionCheckInfo result = await _versionChecker.IsNewVersionAvailableAsync();
-            if (result.IsNewVersionAvailable) IsNewVersionAvailable = true;
+            VersionCheckState = result.IsNewVersionAvailable ? VersionCheckState.NewVersionAvailable : VersionCheckState.NoVersionAvailable;
 
             _updateInfo = result;
             NewVersion = result.LatestVersion.ToString();
@@ -104,7 +103,7 @@ internal class PreferencesViewModel : ObservableObject
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to check for updates.");
-            IsNewVersionAvailable = false;
+            VersionCheckState = VersionCheckState.NoVersionAvailable;
         }
     }
 

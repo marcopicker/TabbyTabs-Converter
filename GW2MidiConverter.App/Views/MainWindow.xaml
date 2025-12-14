@@ -80,7 +80,7 @@
                        Icon="{ui:SymbolIcon ArrowCounterclockwise24}"
                        Content="A new version is available"
                        Margin="0,0,8,0"
-                       Visibility="{Binding IsUpdateAvailable}"
+                       Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}"
                        Command="{Binding GetUpdateCommand}" />
             <ui:Button HorizontalContentAlignment="Stretch"
                        Width="32"
