@@ -11,6 +11,10 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300" x:ClassModifier="internal"
              d:DataContext="{d:DesignInstance viewModels:TabRendererViewModel}">
+    <UserControl.InputBindings>
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExportCommand}" />
+        <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyCommand}" />
+    </UserControl.InputBindings>
     <UserControl.Resources>
         <DataTemplate DataType="{x:Type settingsViewModels:NoteRendererSettingsViewModel}">
             <settingsControls:NoteRenderingSettingsControl />
@@ -92,12 +96,24 @@
                 <Border Grid.Row="4"
                         Margin="8,8,8,16">
                     <DockPanel LastChildFill="False">
-                        <ui:Button DockPanel.Dock="Right"
-                                   Content="Export Tab"
-                                   Command="{Binding ExportCommand}"
-                                   VerticalAlignment="Center"
-                                   Icon="{ui:SymbolIcon Save16}"
-                                   Appearance="Primary" />
+                        <!-- <ui:Button DockPanel.Dock="Right" -->
+                        <!--            Content="Export Tab" -->
+                        <!--            Command="{Binding ExportCommand}" -->
+                        <!--            VerticalAlignment="Center" -->
+                        <!--            Icon="{ui:SymbolIcon Save16}" -->
+                        <!--            Appearance="Primary" /> -->
+                        <ui:DropDownButton DockPanel.Dock="Right"
+                                           Content="Export Tab"
+                                           Icon="{ui:SymbolIcon Save16}"
+                                           Appearance="Primary"
+                                           VerticalAlignment="Center">
+                            <ui:DropDownButton.Flyout>
+                                <ContextMenu>
+                                    <MenuItem Header="Export" Icon="{ui:SymbolIcon Save16}" Command="{Binding ExportCommand}" />
+                                    <MenuItem Header="Copy" Icon="{ui:SymbolIcon Copy16}" Command="{Binding CopyCommand}" />
+                                </ContextMenu>
+                            </ui:DropDownButton.Flyout>
+                        </ui:DropDownButton>
                         <ui:Button DockPanel.Dock="Left"
                                    Content="Back"
                                    Command="{Binding ReturnCommand}"
@@ -213,7 +229,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                         Duration="0:0:0.125"/>
+                                                         Duration="0:0:0.125" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </DataTrigger.ExitActions>

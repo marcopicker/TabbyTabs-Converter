@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -62,6 +63,7 @@ internal class TabRendererViewModel : ObservableObject
         private set => SetProperty(ref _isRenderingTakingLongerThanExpected, value);
     }
 
+    public ICommand CopyCommand { get; }
     public ICommand ExportCommand { get; }
     public ICommand ReturnCommand { get; }
     public ICommand LoadStyleCommand { get; }
@@ -77,6 +79,7 @@ internal class TabRendererViewModel : ObservableObject
         _contentDialogService = contentDialogService;
         _logger = logger;
 
+        CopyCommand = new RelayCommand(CopyTab);
         ExportCommand = new RelayCommand(ExportTab);
         ReturnCommand = new RelayCommand(RequestReturn);
         LoadStyleCommand = new AsyncRelayCommand(ExecuteLoadStyleCommandAsync);
@@ -215,6 +218,12 @@ internal class TabRendererViewModel : ObservableObject
         ReturnRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    private void CopyTab()
+    {
+        Clipboard.SetText(TabText);
+        _snackbarService.Show("Tab Copied", "The tab was copied to the clipboard.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Clipboard3Day24), TimeSpan.FromSeconds(3));
+    }
+    
     private void ExportTab()
     {
         using IDisposable? _ = _logger.BeginScope(new { Operation = "Exporting Tab" });
@@ -236,7 +245,7 @@ internal class TabRendererViewModel : ObservableObject
         SaveFileDialog saveFileDialog = new SaveFileDialog
         {
             Filter = "Text File (*.txt)|*.txt",
-            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            AddToRecent = true
         };
 
         string fileName = PrepareFileName();
