@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -221,7 +222,7 @@ internal class TabRendererViewModel : ObservableObject
     private void CopyTab()
     {
         Clipboard.SetText(TabText);
-        _snackbarService.Show("Tab Copied", "The tab was copied to the clipboard.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Clipboard3Day24), TimeSpan.FromSeconds(3));
+        _snackbarService.Show("Tab Copied", "The tab was copied to the clipboard.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Clipboard3Day24), TimeSpan.FromSeconds(1));
     }
     
     private void ExportTab()
@@ -349,7 +350,6 @@ internal class TabRendererViewModel : ObservableObject
 
     private bool CheckSettingValidity()
     {
-        // TODO MP: Implement.
         return true;
     }
 
