@@ -1,0 +1,131 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using BardicTabConverter.General;
+using BardicTabConverter.Midi;
+using NAudio.Midi;
+
+namespace BardicTabConverter.Converters;
+
+internal class MidiTrackConverter
+{
+    private readonly MidiConverterSettings _settings;
+    private readonly MidiDocument _midiDocument;
+    private readonly MidiTimingMap _timingMap;
+
+    public MidiTrackConverter(MidiDocument midiDocument, MidiConverterSettings? settings = null)
+    {
+        ArgumentNullException.ThrowIfNull(midiDocument);
+        ArgumentNullException.ThrowIfNull(midiDocument.GetRawMidiFile().Events);
+
+        _midiDocument = midiDocument;
+        _timingMap = MidiTimingMap.FromMidiFile(_midiDocument.GetRawMidiFile());
+        _settings = settings ?? new MidiConverterSettings();
+    }
+
+    public Dictionary<int, MidiTrack> ConvertTracks(List<int> trackIndexes)
+    {
+        if (trackIndexes.Count == 0) throw new ArgumentException("At least one track index must be specified.", nameof(trackIndexes));
+        if (trackIndexes.Any(t => t < 0 || t >= _midiDocument.GetRawMidiFile().Tracks)) throw new ArgumentOutOfRangeException(nameof(trackIndexes), "One or more track indexes are out of range.");
+
+        List<int> tracks = trackIndexes.Where(i => _midiDocument.InstrumentTrackIndexes.Contains(i)).ToList();
+        return tracks.ToDictionary(track => track, ConvertTrack);
+    }
+
+    private MidiTrack ConvertTrack(int trackIndex)
+    {
+        // We really only care about note events.
+        List<NoteOnEvent> eventsOfTrack = _midiDocument.GetRawMidiFile()
+                                                       .Events
+                                                       .GetTrackEvents(trackIndex)
+                                                       .OfType<NoteOnEvent>()
+                                                       .Where(e => e.OffEvent != null && e.NoteLength >= _settings.MinimumNoteDuration)
+                                                       .ToList();
+        List<MidiMeasure> measures = [];
+        foreach (MidiMeasureInfo measureInfo in _timingMap.Measures)
+        {
+            MidiMeasure measure = ConvertMeasure(measureInfo, eventsOfTrack);
+            measure = FixEventLengths(measure);
+            measures.Add(measure);
+        }
+
+        TrackInfo info = GetMidiTrackInfoForTrack(trackIndex);
+        return new MidiTrack(info, measures);
+    }
+
+    private TrackInfo GetMidiTrackInfoForTrack(int trackIndex)
+    {
+        TextEvent? trackNameEvent = _midiDocument.GetRawMidiFile()
+                                                 .Events
+                                                 .GetTrackEvents(trackIndex)
+                                                 .OfType<TextEvent>()
+                                                 .FirstOrDefault(t => t.MetaEventType == MetaEventType.SequenceTrackName);
+        string trackName = trackNameEvent == null ? string.Empty : trackNameEvent.Text;
+        return new TrackInfo(trackIndex, trackName);
+    }
+
+    private MidiMeasure ConvertMeasure(MidiMeasureInfo midiMeasureInfo, List<NoteOnEvent> noteEventsInTrack)
+    {
+        List<long> eventTimesInMeasure = noteEventsInTrack.Where(e => e.AbsoluteTime >= midiMeasureInfo.StartTick && e.AbsoluteTime < midiMeasureInfo.EndTick)
+                                                          .Select(e => e.AbsoluteTime)
+                                                          .Distinct().Order().ToList();
+        List<MidiNoteGroup> noteGroups = [];
+        foreach (long time in eventTimesInMeasure)
+        {
+            List<NoteOnEvent> eventsAtTime = noteEventsInTrack.Where(e => e.AbsoluteTime == time).ToList();
+            MidiNoteGroup group = ConvertNoteEvents(eventsAtTime);
+            noteGroups.Add(group);
+        }
+
+        return new MidiMeasure(midiMeasureInfo, noteGroups.ToArray());
+    }
+
+    private MidiNoteGroup ConvertNoteEvents(List<NoteOnEvent> events)
+    {
+        bool areNotesOfSameLength = events.All(e => e.NoteLength == events.First().NoteLength);
+        if (!areNotesOfSameLength)
+        {
+            // TODO MP: Add warning.
+        }
+
+        // For chords, we can use any of the played notes for time information.
+        NoteOnEvent firstEvent = events.First();
+        MidiNoteNumber[] pitches = events.Select(e => (MidiNoteNumber)e.NoteNumber).Distinct().Order().ToArray();
+        SongPosition position = _timingMap.GetPositionAtTick(firstEvent.AbsoluteTime);
+        MidiTimeSpan timeSpan = new MidiTimeSpan(firstEvent.AbsoluteTime, firstEvent.AbsoluteTime + firstEvent.NoteLength);
+
+        return new MidiNoteGroup(pitches, position, timeSpan);
+    }
+
+    private static MidiMeasure FixEventLengths(MidiMeasure measure)
+    {
+        if (measure.NoteGroups.Count == 0) return measure;
+
+        List<MidiNoteGroup> fixedGroups = [];
+
+        for (int i = 0; i < measure.NoteGroups.Count - 1; i++)
+        {
+            MidiNoteGroup group = measure.NoteGroups[i];
+            MidiNoteGroup nextGroup = measure.NoteGroups[i + 1];
+
+            MidiNoteGroup fixedGroup = FixGroupLength(group, nextGroup.TimeSpan.StartTick);
+            fixedGroups.Add(fixedGroup);
+        }
+
+        MidiNoteGroup lastGroup = measure.NoteGroups[^1];
+        fixedGroups.Add(FixGroupLength(lastGroup, measure.MeasureInfo.EndTick));
+
+        return measure with { NoteGroups = fixedGroups };
+    }
+    
+    private static MidiNoteGroup FixGroupLength(MidiNoteGroup group, long nextEventTick)
+    {
+        long tickDelta = nextEventTick - group.TimeSpan.EndTick;
+        if (tickDelta <= 3)
+        {
+            return group with { TimeSpan = group.TimeSpan with { EndTick = nextEventTick } };
+        }
+
+        return group;
+    }
+}
