@@ -277,7 +277,8 @@ internal class FileLoaderViewModel : ObservableObject
         if (_loadedTabDocument == null) return;
         try
         {
-            List<TabDocumentTrackConfig> config = TrackConfigItems.Select(i => new TabDocumentTrackConfig(i.TrackInfo.TrackIndex, i.SelectedInstrument))
+            List<TabDocumentTrackConfig> config = TrackConfigItems.Where(i => i.IsChecked)
+                                                                  .Select(i => new TabDocumentTrackConfig(i.TrackInfo.TrackIndex, i.SelectedInstrument))
                                                                   .ToList();
             _loadedTabDocument.DisableAllTracks();
             _loadedTabDocument.EnableTracks(config);
