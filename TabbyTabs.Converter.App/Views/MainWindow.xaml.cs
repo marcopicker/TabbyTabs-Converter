@@ -20,7 +20,6 @@ internal partial class MainWindow
         contentDialogService.SetDialogHost(RootContentDialog);
 
         PreferencesView.DataContext = preferencesViewModel;
-        // Loaded += (_, _) => snackbarService.Show("MEOW!", "Cat cat cat purr", ControlAppearance.Primary, null, TimeSpan.FromSeconds(5));
     }
 
     private void PreferencesButton_OnClick(object sender, RoutedEventArgs e)
@@ -31,8 +30,7 @@ internal partial class MainWindow
 
     private void PreferencesBackdrop_OnMouseDown(object sender, MouseButtonEventArgs e)
     {
-        return;
-        PreferencesBackdrop.Visibility = Visibility.Collapsed;
+        // PreferencesBackdrop.Visibility = Visibility.Collapsed;
     }
 
     private void PreferencesView_OnCloseRequested(object? sender, EventArgs e)

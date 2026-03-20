@@ -8,7 +8,7 @@ namespace TabbyTabs.Converter.App.Services;
 
 internal class GitHubHostedApplicationVersionChecker : IApplicationVersionChecker
 {
-    private const string LATEST_RELEASE_URI = "https://api.github.com/repos/marcopicker/GW2-Midi-Converter/releases/latest";
+    private const string LATEST_RELEASE_URI = "https://api.github.com/repos/marcopicker/tabbytabs-converter/releases/latest";
 
     private readonly ILogger<GitHubHostedApplicationVersionChecker> _logger;
     private readonly HttpClient _client = new HttpClient();

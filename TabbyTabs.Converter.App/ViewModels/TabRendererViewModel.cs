@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,8 +22,8 @@ namespace TabbyTabs.Converter.App.ViewModels;
 
 internal class TabRendererViewModel : ObservableObject
 {
-    private static readonly TimeSpan MaximumExpectedRenderTimeBeforeShowingProgressIndicator = TimeSpan.FromMilliseconds(200); 
-    
+    private static readonly TimeSpan MaximumExpectedRenderTimeBeforeShowingProgressIndicator = TimeSpan.FromMilliseconds(200);
+
     private readonly ISnackbarService _snackbarService;
     private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<TabRendererViewModel> _logger;
@@ -119,7 +118,7 @@ internal class TabRendererViewModel : ObservableObject
         _logger.LogInformation("Rendering tab (Currently active: {Count})", _activeRendererCount);
 
         Stopwatch renderStopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             Task<string> renderingTask = GetRenderedTabAsync(cancellationToken);
@@ -165,7 +164,7 @@ internal class TabRendererViewModel : ObservableObject
     private async Task<string> GetRenderedTabAsync(CancellationToken cancellationToken = default)
     {
         if (TabDocument == null!) return string.Empty;
-        
+
         TabRenderingSettings settings = await BuildRenderingSettingsAsync();
 
         return await Task.Run(() =>
@@ -222,9 +221,9 @@ internal class TabRendererViewModel : ObservableObject
     private void CopyTab()
     {
         Clipboard.SetText(TabText);
-        _snackbarService.Show("Tab Copied", "The tab was copied to the clipboard.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Clipboard3Day24), TimeSpan.FromSeconds(1));
+        _snackbarService.Show("Tab Copied", "The tab was copied to the clipboard.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Clipboard3Day24), _snackbarService.DefaultTimeOut);
     }
-    
+
     private void ExportTab()
     {
         using IDisposable? _ = _logger.BeginScope(new { Operation = "Exporting Tab" });
@@ -232,14 +231,14 @@ internal class TabRendererViewModel : ObservableObject
         if (TabDocument == null)
         {
             _logger.LogError("Failed to export tab: No tab loaded.");
-            _snackbarService.Show("No Tab", "Please load a MIDI file first.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(4));
+            _snackbarService.Show("No Tab", "Please load a MIDI file first.", ControlAppearance.Danger, null, _snackbarService.DefaultTimeOut);
             return;
         }
 
         if (!CheckSettingValidity())
         {
             _logger.LogError("Failed to export tab: Invalid settings.");
-            _snackbarService.Show("Invalid Settings", "Please check your settings and try again.", ControlAppearance.Danger, null, TimeSpan.FromSeconds(4));
+            _snackbarService.Show("Invalid Settings", "Please check your settings and try again.", ControlAppearance.Danger, null, _snackbarService.DefaultTimeOut);
             return;
         }
 
@@ -261,7 +260,7 @@ internal class TabRendererViewModel : ObservableObject
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to export tab.");
-            _snackbarService.Show("Export Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(10));
+            _snackbarService.Show("Export Error", e.Message, ControlAppearance.Danger, null, TimeSpan.FromSeconds(60));
             throw;
         }
     }
@@ -290,12 +289,12 @@ internal class TabRendererViewModel : ObservableObject
             });
 
             _logger.LogInformation("Style loaded successfully.");
-            _snackbarService.Show("Style Loaded", $"The style '{Path.GetFileName(openFileDialog.FileName)}' was successfully loaded.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), TimeSpan.FromSeconds(3));
+            _snackbarService.Show("Style Loaded", $"The style '{Path.GetFileName(openFileDialog.FileName)}' was successfully loaded.", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Checkmark16), _snackbarService.DefaultTimeOut);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to load style.");
-            _snackbarService.Show("Load Error", e.Message, ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle16), TimeSpan.FromSeconds(10));
+            _snackbarService.Show("Load Error", e.Message, ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle16), TimeSpan.FromSeconds(60));
         }
     }
 

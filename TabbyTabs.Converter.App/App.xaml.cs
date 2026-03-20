@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Reflection;
 using System.Windows;
 using TabbyTabs.Converter.App.Models;
 using TabbyTabs.Converter.App.Resources;
@@ -18,18 +17,18 @@ using Wpf.Ui;
 
 namespace TabbyTabs.Converter.App;
 
-public partial class App : Application
+public partial class App
 {
-    private static readonly IHost _host;
+    private static readonly IHost Host;
 
     static App()
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        HostApplicationBuilder builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
         RegisterLogger(builder.Services);
         RegisterPreferences(builder.Services);
         RegisterWpfUiComponents(builder.Services);
         RegisterApplicationContent(builder.Services);
-        _host = builder.Build();
+        Host = builder.Build();
     }
 
     private static void RegisterPreferences(IServiceCollection services)
@@ -94,11 +93,11 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs args)
     {
-        _host.Start();
+        Host.Start();
 
         Log.Information("Application starting. Version: {Version}", VersioningHelper.CurrentVersionText ?? "Unknown");
 
-        MainWindow? mainWindow = _host.Services.GetService<MainWindow>();
+        MainWindow? mainWindow = Host.Services.GetService<MainWindow>();
         mainWindow?.Show();
 
         base.OnStartup(args);
@@ -108,8 +107,8 @@ public partial class App : Application
     {
         Log.Information("Application shutting down.");
 
-        _host.StopAsync().Wait();
-        _host.Dispose();
+        Host.StopAsync().Wait();
+        Host.Dispose();
         base.OnExit(args);
     }
 }
