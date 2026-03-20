@@ -10,6 +10,7 @@
         <FileVersion>1.0.0</FileVersion>
         <PackageId>TabbyTabs.Converter.App</PackageId>
         <Authors>Marco Picker</Authors>
+        <AssemblyName>TabbyTabs Converter</AssemblyName>
     </PropertyGroup>
 
     <PropertyGroup>

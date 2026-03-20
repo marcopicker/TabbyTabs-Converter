@@ -39,7 +39,7 @@ You can download the latest on the [Releases page](https://github.com/marcopicke
 1. [Download](#download) the latest version from the Releases page.
 
 > [!TIP]
-> If you cannot see the **TabbyTabs.Converter.zip** file click on **Assets** to expand the list of files.
+> If you cannot see the **TabbyTabs Converter.zip** file click on **Assets** to expand the list of files.
 
 2. Extract the **.zip** file in a location of your choosing.
 
