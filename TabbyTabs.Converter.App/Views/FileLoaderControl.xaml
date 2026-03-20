@@ -46,14 +46,14 @@
 
     <Grid HorizontalAlignment="Stretch"
           VerticalAlignment="Stretch">
-        <Border x:Name="BetaInfoBorder"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Bottom"
-                Margin="8">
-            <ui:TextBlock Text="This is a beta version. Expect bugs and silly things!"
-                          Appearance="Disabled"
-                          FontTypography="Body"/>
-        </Border>
+        <!-- <Border x:Name="BetaInfoBorder" -->
+        <!--         HorizontalAlignment="Left" -->
+        <!--         VerticalAlignment="Bottom" -->
+        <!--         Margin="8"> -->
+        <!--     <ui:TextBlock Text="This is a beta version. Expect bugs and silly things!" -->
+        <!--                   Appearance="Disabled" -->
+        <!--                   FontTypography="Body"/> -->
+        <!-- </Border> -->
         <Grid HorizontalAlignment="Center"
               VerticalAlignment="Center">
             <Grid.RowDefinitions>
