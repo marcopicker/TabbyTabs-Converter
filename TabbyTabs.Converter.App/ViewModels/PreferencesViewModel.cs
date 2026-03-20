@@ -58,6 +58,8 @@ internal class PreferencesViewModel : ObservableObject
     }
 
     public string CurrentVersion { get; }
+    
+    public string CopyrightNotice => $"Copyright © {DateTime.Now.Year}";
 
     public PreferencesViewModel(IApplicationVersionChecker versionChecker,
                                 ISnackbarService snackbarService,

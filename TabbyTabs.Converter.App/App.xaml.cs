@@ -70,7 +70,7 @@ public partial class App
     private static void RegisterLogger(IServiceCollection services)
     {
         string logFilePath = Path.Combine(Logging.LogFolder, "log.json");
-        Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
+        Log.Logger = new LoggerConfiguration().MinimumLevel.Warning()
                                               .Enrich.FromLogContext()
                                               .Enrich.WithProperty("Application", ApplicationResources.ApplicationName)
                                               .Enrich.WithProperty("Version", VersioningHelper.CurrentVersionText ?? string.Empty)

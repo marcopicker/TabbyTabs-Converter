@@ -20,13 +20,7 @@ internal class GitHubHostedApplicationVersionChecker : IApplicationVersionChecke
         _client.DefaultRequestHeaders.Add("User-Agent", "TabbyTabs.Converter");
         _client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
         _client.Timeout = TimeSpan.FromSeconds(30);
-
-        string? token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-        if (!string.IsNullOrWhiteSpace(token))
-        {
-            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-        }
-
+        
         _currentVersion = VersioningHelper.CurrentVersion;
     }
 

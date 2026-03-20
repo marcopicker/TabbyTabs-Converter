@@ -1,9 +1,9 @@
-# Bardic Tab Converter
+# TabbyTabs Converter
 > A MIDI to tab converter for games that let you play musical instruments, like _Guild Wars 2_ or _Where Winds Meet_.
 
-**Bardic Tab Converter** is a Windows application that converts MIDI (`.mid` and `.midi`) files into human-readable tablature for musical instruments in video games.
+**TabbyTabs Converter** is a Windows application that converts MIDI (`.mid` and `.midi`) files into human-readable tablature for musical instruments in video games.
 
-**Bardic Tab Converter** is built with styling in mind. You have control over pretty much every aspect of your tablature, from note notation, rest symbols and line breaks to the spacing between beats: **Bardic Tab Converter** lets you quickly create tabs the way _you_ like it. (See [Features](#features) for more!)
+**TabbyTabs Converter** is built with styling in mind. You have control over pretty much every aspect of your tablature, from note notation, rest symbols and line breaks to the spacing between beats: **TabbyTabs Converter** lets you quickly create tabs the way _you_ like it. (See [Features](#features) for more!)
 
 ![A screenshot of the app with an example tab.](app_screenshot.png)
 
@@ -15,7 +15,7 @@
 - [Licensing](#licensing)
 
 ## Download
-You can download the latest on the [Releases page](https://github.com/marcopicker/bardic-tab-converter/releases/latest).
+You can download the latest on the [Releases page](https://github.com/marcopicker/tabbytabs-converter/releases/latest).
 
 ## Features
 - :sparkles: High level of customisation
@@ -39,7 +39,7 @@ You can download the latest on the [Releases page](https://github.com/marcopicke
 1. [Download](#download) the latest version from the Releases page.
 
 > [!TIP]
-> If you cannot see the **Bardic.Tab.Converter.zip** file click on **Assets** to expand the list of files.
+> If you cannot see the **TabbyTabs.Converter.zip** file click on **Assets** to expand the list of files.
 
 2. Extract the **.zip** file in a location of your choosing.
 

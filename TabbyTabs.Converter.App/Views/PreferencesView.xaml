@@ -127,8 +127,8 @@
                     <Run Text="{Binding CurrentVersion, Mode=OneWay}" />
                 </ui:TextBlock>
                 <ui:TextBlock Margin="0,0,0,8">
-                    <Run Text="Copyright © 2025" />
-                    <Hyperlink NavigateUri="https://github.com/Pocram93"
+                    <Run Text="{Binding CopyrightNotice, Mode=OneTime}" />
+                    <Hyperlink NavigateUri="https://github.com/marcopicker"
                                RequestNavigate="Hyperlink_OnRequestNavigate"
                                Style="{StaticResource HyperLinkStyle}">
                         <Run Text="Marco Picker" />
