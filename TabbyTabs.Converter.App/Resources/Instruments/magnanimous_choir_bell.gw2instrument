@@ -2,22 +2,22 @@
     "Name" : "Magnanimous Choir Bell (C Major)",
     "Notes" : 
     [         
-        { "MidiNote" : 72, "Key" : "Note1", "Octave" : 0 },
-        { "MidiNote" : 74, "Key" : "Note2", "Octave" : 0 },
-        { "MidiNote" : 76, "Key" : "Note3", "Octave" : 0 },
-        { "MidiNote" : 77, "Key" : "Note4", "Octave" : 0 },
-        { "MidiNote" : 79, "Key" : "Note5", "Octave" : 0 },
-        { "MidiNote" : 81, "Key" : "Note6", "Octave" : 0 },
-        { "MidiNote" : 83, "Key" : "Note7", "Octave" : 0 },
-        { "MidiNote" : 84, "Key" : "Note8", "Octave" : 0 },
+        { "MidiNote" : 60, "Key" : "Note1", "Octave" : 0 },
+        { "MidiNote" : 62, "Key" : "Note2", "Octave" : 0 },
+        { "MidiNote" : 64, "Key" : "Note3", "Octave" : 0 },
+        { "MidiNote" : 65, "Key" : "Note4", "Octave" : 0 },
+        { "MidiNote" : 67, "Key" : "Note5", "Octave" : 0 },
+        { "MidiNote" : 69, "Key" : "Note6", "Octave" : 0 },
+        { "MidiNote" : 71, "Key" : "Note7", "Octave" : 0 },
+        { "MidiNote" : 72, "Key" : "Note8", "Octave" : 0 },
         
-        { "MidiNote" : 84, "Key" : "Note1", "Octave" : 1 },
-        { "MidiNote" : 86, "Key" : "Note2", "Octave" : 1 },
-        { "MidiNote" : 88, "Key" : "Note3", "Octave" : 1 },
-        { "MidiNote" : 89, "Key" : "Note4", "Octave" : 1 },
-        { "MidiNote" : 91, "Key" : "Note5", "Octave" : 1 },
-        { "MidiNote" : 93, "Key" : "Note6", "Octave" : 1 },
-        { "MidiNote" : 95, "Key" : "Note7", "Octave" : 1 },
-        { "MidiNote" : 96, "Key" : "Note8", "Octave" : 1 }
+        { "MidiNote" : 72, "Key" : "Note1", "Octave" : 1 },
+        { "MidiNote" : 74, "Key" : "Note2", "Octave" : 1 },
+        { "MidiNote" : 76, "Key" : "Note3", "Octave" : 1 },
+        { "MidiNote" : 77, "Key" : "Note4", "Octave" : 1 },
+        { "MidiNote" : 79, "Key" : "Note5", "Octave" : 1 },
+        { "MidiNote" : 81, "Key" : "Note6", "Octave" : 1 },
+        { "MidiNote" : 83, "Key" : "Note7", "Octave" : 1 },
+        { "MidiNote" : 84, "Key" : "Note8", "Octave" : 1 }
     ]
 }
