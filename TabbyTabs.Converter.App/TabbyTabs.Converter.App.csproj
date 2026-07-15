@@ -11,6 +11,8 @@
         <PackageId>TabbyTabs.Converter.App</PackageId>
         <Authors>Marco Picker</Authors>
         <AssemblyName>TabbyTabs Converter</AssemblyName>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>MarcoPickerPrivate.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <PropertyGroup>
