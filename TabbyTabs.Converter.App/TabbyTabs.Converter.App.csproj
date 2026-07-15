@@ -6,11 +6,13 @@
         <Company>Marco Picker</Company>
         <Product>TabbyTabs Converter</Product>
         <Version>1.0.1</Version>
-        <AssemblyVersion>1.0.1</AssemblyVersion>
-        <FileVersion>1.0.1</FileVersion>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <FileVersion>1.0.2</FileVersion>
         <PackageId>TabbyTabs.Converter.App</PackageId>
         <Authors>Marco Picker</Authors>
         <AssemblyName>TabbyTabs Converter</AssemblyName>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>Marco Picker Private Key.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <PropertyGroup>
