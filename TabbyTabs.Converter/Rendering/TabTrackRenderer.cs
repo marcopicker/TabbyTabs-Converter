@@ -147,8 +147,8 @@ internal class TabTrackRenderer(
         StringBuilder stringBuilder = new StringBuilder();
         
         stringBuilder.Append(new string('\n', rehearsalMarkRenderingSettings.LinesBeforeRehearsalMark));
-        stringBuilder.Append(string.Format(CultureInfo.InvariantCulture, rehearsalMarkRenderingSettings.Format, rehearsalMark));
-        stringBuilder.Append(new string('\n', rehearsalMarkRenderingSettings.LinesAfterReheasalMark));
+        stringBuilder.AppendLine(string.Format(CultureInfo.InvariantCulture, rehearsalMarkRenderingSettings.Format, rehearsalMark));
+        stringBuilder.Append(new string('\n', rehearsalMarkRenderingSettings.LinesAfterRehearsalMark));
         
         output = stringBuilder.ToString();
         return true;

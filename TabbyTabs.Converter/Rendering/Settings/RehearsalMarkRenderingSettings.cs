@@ -6,5 +6,5 @@ public class RehearsalMarkRenderingSettings
     public string Format { get; init; } = "{0}";
     
     public int LinesBeforeRehearsalMark { get; init; } = 1;
-    public int LinesAfterReheasalMark { get; init; } = 1;
+    public int LinesAfterRehearsalMark { get; init; } = 1;
 }

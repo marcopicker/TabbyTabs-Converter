@@ -28,6 +28,9 @@
         <DataTemplate DataType="{x:Type settingsViewModels:TimeSignatureRenderingSettingsViewModel}">
             <settingsControls:TimeSignatureRenderingSettingsControl />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type settingsViewModels:RehearsalMarkRenderingSettingsViewModel}">
+            <settingsControls:RehearsalMarkRenderingSettingsControl />
+        </DataTemplate>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"
                                                  True="Visible"
                                                  False="Collapsed" />

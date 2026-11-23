@@ -34,6 +34,7 @@ internal class TabRendererViewModel : ObservableObject
     private readonly MeasureRenderingSettingsViewModel _measureRenderingSettingsViewModel;
     private readonly TrackRenderingSettingsViewModel _trackRenderingSettingsViewModel;
     private readonly TimeSignatureRenderingSettingsViewModel _timeSignatureRenderingSettingsViewModel;
+    private readonly RehearsalMarkRenderingSettingsViewModel _rehearsalMarkRenderingSettingsViewModel;
     private bool _isRenderingTakingLongerThanExpected;
 
     private int _activeRendererCount;
@@ -87,14 +88,19 @@ internal class TabRendererViewModel : ObservableObject
         ResetStyleCommand = new AsyncRelayCommand(ExecuteResetSettingsCommand);
 
         _noteRenderingSettingsViewModel = new NoteRendererSettingsViewModel(new NoteRenderingSettings(), "Notes");
-        _measureRenderingSettingsViewModel = new MeasureRenderingSettingsViewModel(new MeasureRenderingSettings(), "Measures");
-        _trackRenderingSettingsViewModel = new TrackRenderingSettingsViewModel(new TrackRenderingSettings(), "Tracks");
-        _timeSignatureRenderingSettingsViewModel = new TimeSignatureRenderingSettingsViewModel(new TimeSignatureRenderingSettings(), "Time Signatures");
-
         RegisterSettingsViewModel(_noteRenderingSettingsViewModel);
+        
+        _measureRenderingSettingsViewModel = new MeasureRenderingSettingsViewModel(new MeasureRenderingSettings(), "Measures");
         RegisterSettingsViewModel(_measureRenderingSettingsViewModel);
+        
+        _trackRenderingSettingsViewModel = new TrackRenderingSettingsViewModel(new TrackRenderingSettings(), "Tracks");
         RegisterSettingsViewModel(_trackRenderingSettingsViewModel);
+        
+        _timeSignatureRenderingSettingsViewModel = new TimeSignatureRenderingSettingsViewModel(new TimeSignatureRenderingSettings(), "Time Signatures");
         RegisterSettingsViewModel(_timeSignatureRenderingSettingsViewModel);
+        
+        _rehearsalMarkRenderingSettingsViewModel = new RehearsalMarkRenderingSettingsViewModel(new RehearsalMarkRenderingSettings(), "Rehearsal Marks");
+        RegisterSettingsViewModel(_rehearsalMarkRenderingSettingsViewModel);
 
         SelectedSettingsViewModel = Settings[0];
     }
@@ -181,7 +187,8 @@ internal class TabRendererViewModel : ObservableObject
             NoteRenderingSettings = _noteRenderingSettingsViewModel.GetSettings(),
             MeasureRenderingSettings = _measureRenderingSettingsViewModel.GetSettings(),
             TrackRenderingSettings = _trackRenderingSettingsViewModel.GetSettings(),
-            TimeSignatureRenderingSettings = _timeSignatureRenderingSettingsViewModel.GetSettings()
+            TimeSignatureRenderingSettings = _timeSignatureRenderingSettingsViewModel.GetSettings(),
+            RehearsalMarkRenderingSettings = _rehearsalMarkRenderingSettingsViewModel.GetSettings(),
         });
     }
 
