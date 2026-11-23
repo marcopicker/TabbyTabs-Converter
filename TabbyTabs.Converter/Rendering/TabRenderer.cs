@@ -24,7 +24,8 @@ public class TabRenderer
         _trackRenderer = new TabTrackRenderer(_settings.TrackRenderingSettings,
                                               _settings.MeasureRenderingSettings,
                                               _settings.NoteRenderingSettings,
-                                              _settings.TimeSignatureRenderingSettings);
+                                              _settings.TimeSignatureRenderingSettings,
+                                              _settings.RehearsalMarkRenderingSettings);
     }
 
     public string Render(CancellationToken cancellationToken = default)
@@ -34,7 +35,7 @@ public class TabRenderer
 
         try
         {
-            _stringBuilder.Append(RenderHeader());
+            // _stringBuilder.Append(RenderHeader());
             for (int i = 0; i < _tabDocument.Tracks.Count; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();

@@ -120,9 +120,12 @@ internal class TrackConverter
             // Guaranteed to have a value.
             tokens.Add(lastRest!);
         }
-
-        // _currentNoteIndex += lastGroup.Notes.Length;
-        return new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, tokens);
+        
+        TabMeasure measure = new TabMeasure(midiMeasure.MeasureInfo.MeasureNumber, midiMeasure.MeasureInfo.TimeSignature, tokens)
+        {
+            RehearsalMark = midiMeasure.RehearsalMark
+        };
+        return measure;
     }
 
     private NoteGroupToken ConvertNoteGroup(MidiNoteGroup group, Instrument instrument, TimeSignature timeSignature, MidiMeasure measure)

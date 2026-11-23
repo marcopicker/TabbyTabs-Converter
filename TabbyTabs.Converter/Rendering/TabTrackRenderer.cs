@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
@@ -13,7 +14,8 @@ internal class TabTrackRenderer(
     TrackRenderingSettings trackRenderingSettings,
     MeasureRenderingSettings measureRenderingSettings,
     NoteRenderingSettings noteRenderingSettings,
-    TimeSignatureRenderingSettings timeSignatureRenderingSettings)
+    TimeSignatureRenderingSettings timeSignatureRenderingSettings,
+    RehearsalMarkRenderingSettings rehearsalMarkRenderingSettings)
 {
     private readonly StringBuilder _trackStringBuilder = new StringBuilder();
     private readonly TabMeasureRenderer _measureRenderer = new TabMeasureRenderer(measureRenderingSettings, noteRenderingSettings);
@@ -31,24 +33,29 @@ internal class TabTrackRenderer(
         _trackStringBuilder.Clear();
 
         RenderTrackHeader(track);
-
-        TimeSignature previousTimeSignature = new TimeSignature(0, 0);
+        
+        // Start with an invalid time signature to allow for the first measure to render its time signature.
+        TimeSignature previousTimeSignature = new TimeSignature(0, 0); 
+        
         int consecutiveLines = 0;
         int consecutiveMeasures = 0;
-        for (int i = 0; i < track.Measures.Count; i++)
+        for (int measureIndex = 0; measureIndex < track.Measures.Count; measureIndex++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             
-            TabMeasure currentMeasure = track.Measures[i];
-            TabMeasure? nextMeasure = i + 1 < track.Measures.Count ? track.Measures[i + 1] : null;
+            TabMeasure currentMeasure = track.Measures[measureIndex];
+            TabMeasure? nextMeasure = measureIndex + 1 < track.Measures.Count ? track.Measures[measureIndex + 1] : null;
 
+            bool isRehearsalMarkRendered = TryRenderRehearsalMark(currentMeasure.RehearsalMark, out string rehearsalMarkString);
+            if (isRehearsalMarkRendered) _trackStringBuilder.Append(rehearsalMarkString);
+            
             TimeSignature currentTimeSignature = currentMeasure.TimeSignature;
             bool isTimeSignatureRendered = TryRenderMeasureTimeSignature(currentTimeSignature, previousTimeSignature, out string timeSignatureString);
             previousTimeSignature = currentTimeSignature;
 
             if (isTimeSignatureRendered)
             {
-                bool isFirstMeasure = i == 0;
+                bool isFirstMeasure = measureIndex == 0;
                 if (isFirstMeasure) timeSignatureString = timeSignatureString.TrimStart();
                 _trackStringBuilder.Append(timeSignatureString);
                 consecutiveLines = 0;
@@ -128,6 +135,25 @@ internal class TabTrackRenderer(
         return measureRenderingSettings.MeasureDelimiter.ToString();
     }
 
+    private bool TryRenderRehearsalMark(string? rehearsalMark, out string output)
+    {
+        if (!rehearsalMarkRenderingSettings.DrawRehearsalMarks ||
+            string.IsNullOrWhiteSpace(rehearsalMark))
+        {
+            output = string.Empty;
+            return false;
+        }
+        
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        stringBuilder.Append(new string('\n', rehearsalMarkRenderingSettings.LinesBeforeRehearsalMark));
+        stringBuilder.Append(string.Format(CultureInfo.InvariantCulture, rehearsalMarkRenderingSettings.Format, rehearsalMark));
+        stringBuilder.Append(new string('\n', rehearsalMarkRenderingSettings.LinesAfterReheasalMark));
+        
+        output = stringBuilder.ToString();
+        return true;
+    }
+    
     private bool TryRenderMeasureTimeSignature(TimeSignature timeSignature, TimeSignature previousTimeSignature, out string output)
     {
         bool showTimeSignature = timeSignatureRenderingSettings.TimeSignatureVisibility == TimeSignatureVisibility.AlwaysShow ||

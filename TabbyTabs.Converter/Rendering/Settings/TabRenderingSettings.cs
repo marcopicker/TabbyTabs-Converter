@@ -10,6 +10,7 @@ public class TabRenderingSettings
     public MeasureRenderingSettings MeasureRenderingSettings { get; init; } = new MeasureRenderingSettings();
     public NoteRenderingSettings NoteRenderingSettings { get; init; } = new NoteRenderingSettings();
     public TimeSignatureRenderingSettings TimeSignatureRenderingSettings { get; init; } = new TimeSignatureRenderingSettings();
+    public RehearsalMarkRenderingSettings RehearsalMarkRenderingSettings { get; init; } = new RehearsalMarkRenderingSettings();
 
 
     public static TabRenderingSettings FromFile(string path)

@@ -12,6 +12,7 @@ internal class MidiTrackConverter
     private readonly MidiConverterSettings _settings;
     private readonly MidiDocument _midiDocument;
     private readonly MidiTimingMap _timingMap;
+    private readonly MidiTextEventMap _textEventMap;
 
     public MidiTrackConverter(MidiDocument midiDocument, MidiConverterSettings? settings = null)
     {
@@ -20,6 +21,7 @@ internal class MidiTrackConverter
 
         _midiDocument = midiDocument;
         _timingMap = MidiTimingMap.FromMidiFile(_midiDocument.GetRawMidiFile());
+        _textEventMap = new MidiTextEventMap(_midiDocument.GetRawMidiFile(), _timingMap);
         _settings = settings ?? new MidiConverterSettings();
     }
 
@@ -66,18 +68,21 @@ internal class MidiTrackConverter
 
     private MidiMeasure ConvertMeasure(MidiMeasureInfo midiMeasureInfo, List<NoteOnEvent> noteEventsInTrack)
     {
-        List<long> eventTimesInMeasure = noteEventsInTrack.Where(e => e.AbsoluteTime >= midiMeasureInfo.StartTick && e.AbsoluteTime < midiMeasureInfo.EndTick)
-                                                          .Select(e => e.AbsoluteTime)
-                                                          .Distinct().Order().ToList();
+        List<long> noteEventTimesInMeasure = noteEventsInTrack.Where(e => e.AbsoluteTime >= midiMeasureInfo.StartTick && e.AbsoluteTime < midiMeasureInfo.EndTick)
+                                                              .Select(e => e.AbsoluteTime)
+                                                              .Distinct().Order().ToList();
         List<MidiNoteGroup> noteGroups = [];
-        foreach (long time in eventTimesInMeasure)
+        foreach (long time in noteEventTimesInMeasure)
         {
             List<NoteOnEvent> eventsAtTime = noteEventsInTrack.Where(e => e.AbsoluteTime == time).ToList();
             MidiNoteGroup group = ConvertNoteEvents(eventsAtTime);
             noteGroups.Add(group);
         }
-
-        return new MidiMeasure(midiMeasureInfo, noteGroups.ToArray());
+        
+        MidiMeasure measure = new MidiMeasure(midiMeasureInfo, noteGroups.ToArray());
+        string? rehearsalMark = _textEventMap.GetRehearsalMarkForTick(midiMeasureInfo.StartTick);
+        measure.RehearsalMark = rehearsalMark;
+        return measure;
     }
 
     private MidiNoteGroup ConvertNoteEvents(List<NoteOnEvent> events)
@@ -117,7 +122,7 @@ internal class MidiTrackConverter
 
         return measure with { NoteGroups = fixedGroups };
     }
-    
+
     private static MidiNoteGroup FixGroupLength(MidiNoteGroup group, long nextEventTick)
     {
         long tickDelta = nextEventTick - group.TimeSpan.EndTick;

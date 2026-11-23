@@ -62,10 +62,10 @@ public class TabTrackRendererTests
                 new NoteGroupToken([new GuildWarsNote(GuildWarsNoteKey.Note3, new Octave(0))], new SongPosition(8, 2), new TabElementLength(1)),
                 new NoteGroupToken([new GuildWarsNote(GuildWarsNoteKey.Note5, new Octave(0))], new SongPosition(8, 3), new TabElementLength(1)),
                 new NoteGroupToken([new GuildWarsNote(GuildWarsNoteKey.Note8, new Octave(0))], new SongPosition(8, 4), new TabElementLength(1)),
-            ]),            
+            ]),
         ]);
 
-        TabTrackRenderer renderer = new TabTrackRenderer(new TrackRenderingSettings(), new MeasureRenderingSettings(), new NoteRenderingSettings(), new TimeSignatureRenderingSettings());
+        TabTrackRenderer renderer = new TabTrackRenderer(new TrackRenderingSettings(), new MeasureRenderingSettings(), new NoteRenderingSettings(), new TimeSignatureRenderingSettings(), new RehearsalMarkRenderingSettings());
         string output = renderer.Render(track);
     }
 }

@@ -12,6 +12,7 @@ public class TabMeasure(int measureNumber, TimeSignature timeSignature, IReadOnl
     public int MeasureNumber { get; } = measureNumber;
     public TimeSignature TimeSignature { get; } = timeSignature;
     public IReadOnlyList<TabToken> Tokens { get; } = tokens;
+    public string? RehearsalMark { get; set; }
 
     public override string ToString()
     {
